@@ -43,6 +43,129 @@ const P = {
 };
 
 // ─── ICONOS ─────────────────────────────────────
+const ANIMATIONS = {
+  circular: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="68" rx="38" ry="46" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
+    <circle cx="86" cy="58" r="3.5" fill="#d9c4aa"/><circle cx="114" cy="58" r="3.5" fill="#d9c4aa"/>
+    <path d="M89 80 Q100 87 111 80" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
+    <ellipse cx="100" cy="68" rx="57" ry="64" fill="none" stroke="#c89849" stroke-width="2.5" stroke-dasharray="16 10" opacity="0.7">
+      <animateTransform attributeName="transform" type="rotate" from="0 100 68" to="360 100 68" dur="2.5s" repeatCount="3"/>
+    </ellipse>
+    <polygon points="153,32 162,22 164,35" fill="#c89849" opacity="0.7">
+      <animateTransform attributeName="transform" type="rotate" from="0 100 68" to="360 100 68" dur="2.5s" repeatCount="3"/>
+    </polygon>
+    <text x="100" y="126" text-anchor="middle" font-size="9" fill="#aaa" font-family="Inter,sans-serif">Masajea en círculos · 60 seg</text>
+  </svg>`,
+  circular_oil: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="68" rx="38" ry="46" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
+    <circle cx="86" cy="58" r="3.5" fill="#d9c4aa"/><circle cx="114" cy="58" r="3.5" fill="#d9c4aa"/>
+    <path d="M89 80 Q100 87 111 80" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
+    <ellipse cx="100" cy="68" rx="57" ry="64" fill="none" stroke="#9b59b6" stroke-width="2.5" stroke-dasharray="16 10" opacity="0.7">
+      <animateTransform attributeName="transform" type="rotate" from="0 100 68" to="360 100 68" dur="2.5s" repeatCount="3"/>
+    </ellipse>
+    <polygon points="153,32 162,22 164,35" fill="#9b59b6" opacity="0.7">
+      <animateTransform attributeName="transform" type="rotate" from="0 100 68" to="360 100 68" dur="2.5s" repeatCount="3"/>
+    </polygon>
+    <circle cx="170" cy="20" r="6" fill="#a8d8ea" opacity="0"><animate attributeName="opacity" values="0;0;1;0" dur="2.5s" repeatCount="3"/><animate attributeName="cy" values="5;25" dur="2.5s" repeatCount="3"/></circle>
+    <text x="100" y="118" text-anchor="middle" font-size="9" fill="#aaa" font-family="Inter,sans-serif">Cara seca · masajea · agrega agua</text>
+    <text x="100" y="128" text-anchor="middle" font-size="9" fill="#a8d8ea" font-family="Inter,sans-serif">emulsifica y enjuaga</text>
+  </svg>`,
+  patting: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="82" rx="36" ry="42" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
+    <circle cx="87" cy="72" r="3" fill="#d9c4aa"/><circle cx="113" cy="72" r="3" fill="#d9c4aa"/>
+    <path d="M90 92 Q100 99 110 92" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
+    <g><animateTransform attributeName="transform" type="translate" values="0,0;0,10;0,0" dur="1.6s" repeatCount="3" additive="sum"/>
+      <ellipse cx="72" cy="28" rx="14" ry="8" fill="#f5e6d3" stroke="#c8a882" stroke-width="1.2"/>
+      <rect x="62" y="28" width="4" height="14" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
+      <rect x="67.5" y="26" width="4" height="16" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
+      <rect x="73" y="26" width="4" height="16" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
+      <rect x="78.5" y="28" width="3.5" height="13" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
+    </g>
+    <g><animateTransform attributeName="transform" type="translate" values="0,0;0,10;0,0" dur="1.6s" repeatCount="3" additive="sum"/>
+      <ellipse cx="128" cy="28" rx="14" ry="8" fill="#f5e6d3" stroke="#c8a882" stroke-width="1.2"/>
+      <rect x="118" y="28" width="4" height="14" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
+      <rect x="123.5" y="26" width="4" height="16" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
+      <rect x="129" y="26" width="4" height="16" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
+      <rect x="134.5" y="28" width="3.5" height="13" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
+    </g>
+    <circle cx="100" cy="82" r="0" fill="none" stroke="#c89849" stroke-width="1.5" opacity="0">
+      <animate attributeName="r" values="0;30" begin="0.8s" dur="1.6s" repeatCount="3"/>
+      <animate attributeName="opacity" values="0.7;0" begin="0.8s" dur="1.6s" repeatCount="3"/>
+    </circle>
+    <text x="100" y="126" text-anchor="middle" font-size="9" fill="#aaa" font-family="Inter,sans-serif">Palmotea suavemente · no frotes</text>
+  </svg>`,
+  dropper: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="95" rx="36" ry="30" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
+    <circle cx="88" cy="88" r="2.5" fill="#d9c4aa"/><circle cx="112" cy="88" r="2.5" fill="#d9c4aa"/>
+    <path d="M91 102 Q100 107 109 102" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="90" y="5" width="20" height="30" rx="4" fill="#e8e0d8" stroke="#b8a898" stroke-width="1.2"/>
+    <ellipse cx="100" cy="5" rx="10" ry="6" fill="#d8d0c8" stroke="#b8a898" stroke-width="1"/>
+    <rect x="97" y="35" width="6" height="12" rx="3" fill="#b8a898"/>
+    <ellipse cx="100" cy="50" rx="5" ry="7" fill="#a8d4f8" opacity="0">
+      <animate attributeName="cy" values="47;80" dur="1.2s" repeatCount="3"/>
+      <animate attributeName="opacity" values="0;1;1;0" dur="1.2s" repeatCount="3"/>
+    </ellipse>
+    <ellipse cx="100" cy="50" rx="4" ry="6" fill="#a8d4f8" opacity="0">
+      <animate attributeName="cy" values="47;80" begin="0.4s" dur="1.2s" repeatCount="3"/>
+      <animate attributeName="opacity" values="0;1;1;0" begin="0.4s" dur="1.2s" repeatCount="3"/>
+    </ellipse>
+    <ellipse cx="100" cy="50" rx="3.5" ry="5.5" fill="#a8d4f8" opacity="0">
+      <animate attributeName="cy" values="47;80" begin="0.8s" dur="1.2s" repeatCount="3"/>
+      <animate attributeName="opacity" values="0;1;1;0" begin="0.8s" dur="1.2s" repeatCount="3"/>
+    </ellipse>
+    <text x="100" y="126" text-anchor="middle" font-size="9" fill="#aaa" font-family="Inter,sans-serif">3-4 gotas · presiona suavemente</text>
+  </svg>`,
+  spreading: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="70" rx="38" ry="46" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
+    <circle cx="86" cy="60" r="3.5" fill="#d9c4aa"/><circle cx="114" cy="60" r="3.5" fill="#d9c4aa"/>
+    <path d="M89 82 Q100 89 111 82" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="100" y1="70" x2="65" y2="48" stroke="#c89849" stroke-width="2.5" stroke-linecap="round" opacity="0"><animate attributeName="opacity" values="0;0.8;0" dur="2s" repeatCount="3"/><animate attributeName="x2" values="100;65" dur="2s" repeatCount="3"/><animate attributeName="y2" values="70;48" dur="2s" repeatCount="3"/></line>
+    <line x1="100" y1="70" x2="135" y2="48" stroke="#c89849" stroke-width="2.5" stroke-linecap="round" opacity="0"><animate attributeName="opacity" values="0;0.8;0" dur="2s" repeatCount="3"/><animate attributeName="x2" values="100;135" dur="2s" repeatCount="3"/><animate attributeName="y2" values="70;48" dur="2s" repeatCount="3"/></line>
+    <line x1="100" y1="70" x2="72" y2="75" stroke="#c89849" stroke-width="2" stroke-linecap="round" opacity="0"><animate attributeName="opacity" values="0;0;0.8;0" dur="2s" repeatCount="3"/></line>
+    <line x1="100" y1="70" x2="128" y2="75" stroke="#c89849" stroke-width="2" stroke-linecap="round" opacity="0"><animate attributeName="opacity" values="0;0;0.8;0" dur="2s" repeatCount="3"/></line>
+    <text x="100" y="126" text-anchor="middle" font-size="9" fill="#aaa" font-family="Inter,sans-serif">Distribuye hacia arriba y afuera</text>
+  </svg>`,
+  spf: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="72" rx="38" ry="46" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
+    <circle cx="86" cy="62" r="3.5" fill="#d9c4aa"/><circle cx="114" cy="62" r="3.5" fill="#d9c4aa"/>
+    <path d="M89 84 Q100 91 111 84" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="22" cy="28" r="14" fill="#f7c948" opacity="0.8"/>
+    <line x1="22" y1="8" x2="22" y2="2" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="36" y1="14" x2="40" y2="10" stroke="#f7c948" stroke-width="2" stroke-linecap="round"/>
+    <line x1="42" y1="28" x2="48" y2="28" stroke="#f7c948" stroke-width="2" stroke-linecap="round"/>
+    <rect x="62" y="26" width="0" height="92" rx="2" fill="#f7c948" opacity="0.35"><animate attributeName="width" values="0;76;76;0" dur="2.5s" repeatCount="3"/></rect>
+    <text x="100" y="126" text-anchor="middle" font-size="9" fill="#aaa" font-family="Inter,sans-serif">Capa uniforme · cara, cuello y orejas</text>
+  </svg>`,
+  retinal: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="70" rx="38" ry="46" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
+    <ellipse cx="85" cy="60" rx="14" ry="9" fill="#ffdddd" stroke="#e07060" stroke-width="1.2" opacity="0"><animate attributeName="opacity" values="0;0.85;0.85;0" dur="2.5s" repeatCount="3"/></ellipse>
+    <ellipse cx="115" cy="60" rx="14" ry="9" fill="#ffdddd" stroke="#e07060" stroke-width="1.2" opacity="0"><animate attributeName="opacity" values="0;0.85;0.85;0" dur="2.5s" repeatCount="3"/></ellipse>
+    <ellipse cx="100" cy="84" rx="14" ry="6" fill="#ffdddd" stroke="#e07060" stroke-width="1.2" opacity="0"><animate attributeName="opacity" values="0;0.85;0.85;0" dur="2.5s" repeatCount="3"/></ellipse>
+    <text x="85" y="55" text-anchor="middle" font-size="7" fill="#e07060" font-weight="bold" font-family="Inter,sans-serif" opacity="0"><animate attributeName="opacity" values="0;0;1;1;0" dur="2.5s" repeatCount="3"/>evitar</text>
+    <text x="115" y="55" text-anchor="middle" font-size="7" fill="#e07060" font-weight="bold" font-family="Inter,sans-serif" opacity="0"><animate attributeName="opacity" values="0;0;1;1;0" dur="2.5s" repeatCount="3"/>evitar</text>
+    <ellipse cx="100" cy="70" rx="22" ry="26" fill="#d4edda" stroke="#4a7c59" stroke-width="1.2" opacity="0"><animate attributeName="opacity" values="0;0;0;0.6;0" dur="2.5s" repeatCount="3"/></ellipse>
+    <text x="100" y="72" text-anchor="middle" font-size="8" fill="#2d6040" font-family="Inter,sans-serif" opacity="0"><animate attributeName="opacity" values="0;0;0;0.9;0" dur="2.5s" repeatCount="3"/>aplicar aquí</text>
+    <text x="100" y="126" text-anchor="middle" font-size="9" fill="#aaa" font-family="Inter,sans-serif">Evita ojos · labios · nariz</text>
+  </svg>`,
+  eye: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+    <path d="M40 55 Q100 20 160 55 Q100 90 40 55 Z" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
+    <ellipse cx="100" cy="55" rx="16" ry="20" fill="#8bb4d4" stroke="#6a94b4" stroke-width="1"/>
+    <ellipse cx="100" cy="55" rx="9" ry="12" fill="#3d3d3d"/>
+    <circle cx="106" cy="50" r="3" fill="white"/>
+    <path d="M44 58 Q100 88 156 58" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <g><animateTransform attributeName="transform" type="translate" values="0,0;0,-8;0,0" dur="1.5s" repeatCount="3" additive="sum"/>
+      <rect x="88" y="95" width="24" height="10" rx="5" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
+      <rect x="96" y="85" width="8" height="14" rx="4" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
+      <text x="100" y="103" text-anchor="middle" font-size="6.5" fill="#c8a882" font-family="Inter,sans-serif">anular</text>
+    </g>
+    <circle cx="100" cy="78" r="0" fill="none" stroke="#c8a882" stroke-width="1.2" opacity="0">
+      <animate attributeName="r" values="0;18" begin="0.7s" dur="1.5s" repeatCount="3"/>
+      <animate attributeName="opacity" values="0.6;0" begin="0.7s" dur="1.5s" repeatCount="3"/>
+    </circle>
+    <text x="100" y="126" text-anchor="middle" font-size="9" fill="#aaa" font-family="Inter,sans-serif">Dedo anular · presión ultra suave</text>
+  </svg>`
+};
+
 const ICONS = {
   check:"M4 12l5 5L20 7", plus:"M12 5v14M5 12h14", close:"M5 5l14 14M19 5L5 19",
   chevronRight:"M9 6l6 6-6 6", flame:"M12 3c0 4-5 5-5 10a5 5 0 0010 0c0-2-1-4-1-4s-1 2-2 2 1-4-2-8z",
@@ -68,20 +191,30 @@ const DATA = {
   user:{name:"Juan Pablo",streak:1,goal:"Reducir manchas · piel uniforme"},
   routines:{
     morning:{id:"morning",label:"Mañana",total:5,minutes:10,steps:[
-      {id:"m1",cat:"Limpieza",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:2,tone:"#e8b75c",why:"pH bajo: limpia sin alterar la barrera. Quita el sebo nocturno y prepara la piel.",tip:"Tamaño de una moneda de $100. Masajea 60 seg en círculos, enjuaga con agua fría.",critical:true},
-      {id:"m2",cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",why:"Ginseng + antioxidantes. Rehidrata y actúa como primer para los sérums.",tip:"Vierte el centro de la palma. Da 5 palmaditas suaves hasta absorber."},
-      {id:"m3",cat:"Sérum",name:"Dark Spot Correcting Glow Serum",brand:"Axis-Y",min:1.5,tone:"#d6a47a",star:true,why:"Niacinamida 5% + Squalane: aclara manchas, minimiza poros y unifica el tono.",tip:"3-4 gotas del gotero. Distribuye presionando suavemente."},
-      {id:"m4",cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",why:"Sella todo lo anterior. Crea un colchón de hidratación antes del SPF.",tip:"Tamaño de un garbanzo. Aplica en 5 puntos y distribuye hacia arriba."},
-      {id:"m5",cat:"Protector solar",name:"Centella Hyalu-Cica Sun Serum SPF50+",brand:"Skin1004",min:1,tone:"#f0c674",critical:true,why:"SPF50+ PA++++. SIN ESTO el sérum aclarante no funciona — genera manchas.",tip:"Media cucharadita para cara + cuello + orejas. Espera 15 min antes de salir."},
+      {id:"m1",animId:"circular",animo:"¡Arranca el día con todo! Esta limpieza es tu reset — piel limpia, mente clara. 60 segundos bien dados marcan la diferencia.",cat:"Limpieza",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:2,tone:"#e8b75c",why:"pH bajo: limpia sin alterar la barrera. Quita el sebo nocturno y prepara la piel.",tip:"Tamaño de una moneda de $100. Masajea 60 seg en círculos, enjuaga con agua fría.",critical:true},
+      {id:"m2",animId:"patting",animo:"Este es el secreto del glass skin. El ginseng está preparando tu piel para absorber todo lo que viene. ¡Dale las palmaditas!",cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",why:"Ginseng + antioxidantes. Rehidrata y actúa como primer para los sérums.",tip:"Vierte el centro de la palma. Da 5 palmaditas suaves hasta absorber."},
+      {id:"m3",animId:"dropper",animo:"La niacinamida trabaja despacio pero seguro. Cada gota está reduciendo esas manchas que tanto molestan. ¡Constancia!",cat:"Sérum",name:"Dark Spot Correcting Glow Serum",brand:"Axis-Y",min:1.5,tone:"#d6a47a",star:true,why:"Niacinamida 5% + Squalane: aclara manchas, minimiza poros y unifica el tono.",tip:"3-4 gotas del gotero. Distribuye presionando suavemente."},
+      {id:"m4",animId:"spreading",animo:"Casi llegamos. Esta crema sella todo tu trabajo de esta mañana. Distribúyela con cariño hacia arriba.",cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",why:"Sella todo lo anterior. Crea un colchón de hidratación antes del SPF.",tip:"Tamaño de un garbanzo. Aplica en 5 puntos y distribuye hacia arriba."},
+      {id:"m5",animId:"spf",animo:"¡El paso más importante del día! Sin esto, la niacinamida genera más manchas en vez de quitarlas. Siempre, sin excepción. 🌞",cat:"Protector solar",name:"Centella Hyalu-Cica Sun Serum SPF50+",brand:"Skin1004",min:1,tone:"#f0c674",critical:true,why:"SPF50+ PA++++. SIN ESTO el sérum aclarante no funciona — genera manchas.",tip:"Media cucharadita para cara + cuello + orejas. Espera 15 min antes de salir."},
     ]},
     night:{id:"night",label:"Noche",total:7,minutes:17,steps:[
-      {id:"n1",cat:"Doble limpieza · Aceite",name:"Clean It Zero Cleansing Balm",brand:"Banila Co",min:2,tone:"#e8b75c",why:"Disuelve SPF, sebo y maquillaje a base de aceite. Imprescindible para limpiar bien.",tip:"Cara SECA, tamaño de una avellana. 60 seg masaje, agrega agua para emulsificar."},
-      {id:"n2",cat:"Doble limpieza · Agua",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:1.5,tone:"#c89b5e",why:"Elimina los residuos del balm. Deja la piel lista para absorber los activos.",tip:"Misma cantidad que en la mañana: moneda de $100."},
-      {id:"n3",cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",why:"Rehidrata y equilibra el pH post-limpieza. Abre el camino para los activos.",tip:"Centro de la palma. Palmotea suavemente."},
-      {id:"n4",cat:"Essence reparadora",name:"Snail Repair Intensive Essence",brand:"Mizon",min:1.5,tone:"#d6a47a",why:"Mucín de caracol: repara micro-daños y genera base hidratante para el retinal.",tip:"Tamaño de una avellana. Palmotea suavemente sobre toda la cara."},
-      {id:"n5",cat:"Ampoule",name:"Madagascar Centella Ampoule",brand:"Skin1004",min:1.5,tone:"#a8b8c8",why:"Centella de Madagascar: calma inflamación y fortalece la barrera cutánea.",tip:"3-4 gotas. Distribuye presionando suavemente."},
-      {id:"n6",cat:"Sérum reparador",name:"Revive Serum: Ginseng + Snail Mucin",brand:"Beauty of Joseon",min:2,tone:"#d6c2a0",why:"Ginseng + snail mucin: repara y regenera toda la noche sin interferencias.",tip:"3-4 gotas del gotero. Palmotea suavemente."},
-      {id:"n7",cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",why:"Sella todos los activos. Mantiene la hidratación durante las 7-8 horas de sueño.",tip:"Tamaño de un garbanzo. Sella todo y permite que los activos trabajen."},
+      {id:"n1",animId:"circular_oil",animo:"Bienvenida la noche. Este balm va a disolver todo el SPF y suciedad del día — el agua sola no puede. ¡Es momento de relajarse!",cat:"Doble limpieza · Aceite",name:"Clean It Zero Cleansing Balm",brand:"Banila Co",min:2,tone:"#e8b75c",why:"Disuelve SPF, sebo y maquillaje a base de aceite. Imprescindible para limpiar bien.",tip:"Cara SECA, tamaño de una avellana. 60 seg masaje, agrega agua para emulsificar."},
+      {id:"n2",animId:"circular",animo:"Segunda pasada para dejar la piel realmente limpia. Tu rutina nocturna empieza bien cuando la base está perfecta.",cat:"Doble limpieza · Agua",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:1.5,tone:"#c89b5e",why:"Elimina los residuos del balm. Deja la piel lista para absorber los activos.",tip:"Misma cantidad que en la mañana: moneda de $100."},
+      {id:"n3",animId:"patting",animo:"El ginseng rehidrata y abre los canales. Cada palmadita es un mensaje de amor a tu piel. ¡Tómate tu tiempo!",cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",why:"Rehidrata y equilibra el pH post-limpieza. Abre el camino para los activos.",tip:"Centro de la palma. Palmotea suavemente."},
+      {id:"n4",animId:"patting",animo:"El caracol lleva siglos reparando. Este mucín está rellenando micro-daños mientras lo aplicas. Tu piel te lo va a agradecer.",cat:"Essence reparadora",name:"Snail Repair Intensive Essence",brand:"Mizon",min:1.5,tone:"#d6a47a",why:"Mucín de caracol: repara micro-daños y genera base hidratante para el retinal.",tip:"Tamaño de una avellana. Palmotea suavemente sobre toda la cara."},
+      {id:"n5",animId:"dropper",animo:"La centella calma todo. Antes de los activos fuertes, necesitas esta base tranquilizadora. ¡Tu piel está lista!",cat:"Ampoule",name:"Madagascar Centella Ampoule",brand:"Skin1004",min:1.5,tone:"#a8b8c8",why:"Centella de Madagascar: calma inflamación y fortalece la barrera cutánea.",tip:"3-4 gotas. Distribuye presionando suavemente."},
+      {id:"n6",animId:"dropper",animo:"El ginseng + mucín trabajan toda la noche sin competencia. Esta es tu noche de reparación profunda. ¡Descansa bien!",cat:"Sérum reparador",name:"Revive Serum: Ginseng + Snail Mucin",brand:"Beauty of Joseon",min:2,tone:"#d6c2a0",why:"Ginseng + snail mucin: repara y regenera toda la noche sin interferencias.",tip:"3-4 gotas del gotero. Palmotea suavemente."},
+      {id:"n7",animId:"spreading",animo:"El cierre perfecto. Este escudo de ácido hialurónico va a mantener toda la hidratación durante 7 horas de sueño. ¡Lo lograste!",cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",why:"Sella todos los activos. Mantiene la hidratación durante las 7-8 horas de sueño.",tip:"Tamaño de un garbanzo. Sella todo y permite que los activos trabajen."},
+    ]},
+    nightRetinal:{id:"nightRetinal",label:"Noche · Retinal",total:8,minutes:28,steps:[
+      {id:"r1",animId:"circular_oil",animo:"Noche de retinal, la más poderosa. Empieza con la base perfecta — este balm disuelve todo para que los activos penetren bien.",cat:"Doble limpieza · Aceite",name:"Clean It Zero Cleansing Balm",brand:"Banila Co",min:2,tone:"#e8b75c",why:"Disuelve SPF, sebo y maquillaje a base de aceite. Imprescindible para limpiar bien.",tip:"Cara SECA, tamaño de una avellana. 60 seg masaje, agrega agua para emulsificar."},
+      {id:"r2",animId:"circular",animo:"Segunda limpieza para tener el lienzo perfecto. El retinal necesita piel limpia para trabajar bien.",cat:"Doble limpieza · Agua",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:1.5,tone:"#c89b5e",why:"Elimina los residuos del balm. Deja la piel lista para absorber los activos.",tip:"Misma cantidad que en la mañana: moneda de $100."},
+      {id:"r3",animId:"patting",animo:"El ginseng prepara la piel. Esta hidratación inicial es importante — reduce la irritación del retinal que viene.",cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",why:"Rehidrata y equilibra el pH. Abre el camino para los activos nocturnos.",tip:"Centro de la palma. Palmotea suavemente."},
+      {id:"r4",animId:"patting",animo:"El caracol está construyendo tu armadura. Esta capa hidratante hace que el retinal sea más tolerable. ¡Sin saltarte!",cat:"Essence reparadora",name:"Snail Repair Intensive Essence",brand:"Mizon",min:1.5,tone:"#d6a47a",why:"Crea una base hidratante que ayuda a la piel a tolerar mejor el retinal.",tip:"Tamaño de una avellana. Palmotea suavemente."},
+      {id:"r5",animId:"dropper",animo:"Centella asiática al rescate. Después de esto, ESPERA 10-15 min antes del retinal. Cepíllate los dientes en ese tiempo. 🦷",cat:"Ampoule calmante",name:"Madagascar Centella Ampoule",brand:"Skin1004",min:1.5,tone:"#a8b8c8",why:"Centella calma la inflamación y fortalece la barrera cutánea antes del retinal.",tip:"3-4 gotas. Distribuye presionando suavemente. Luego ESPERA 10-15 min."},
+      {id:"r6",animId:"retinal",animo:"¡El activo estrella! El retinal 2% está estimulando colágeno en este momento. Una gota es suficiente — más no es mejor. Resultados en 4-8 semanas.",cat:"Retinal facial",name:"Seoul 1988 Serum — Retinal 2%",brand:"K-Secret",min:1,tone:"#c04030",star:true,why:"Retinal 2%: estimula colágeno, reduce arrugas finas y unifica el tono. El activo anti-edad más potente.",tip:"1 SOLA gota para toda la cara. Evita ojos (1 cm), labios y nariz."},
+      {id:"r7",animId:"eye",animo:"La zona más delicada merece el cuidado más suave. El dedo anular, presión de pluma. Un grano de arroz para los dos ojos.",cat:"Contorno de ojos",name:"Revive Eye Serum: Ginseng + Retinal",brand:"Beauty of Joseon",min:2,tone:"#e0c8b0",why:"Retinal suave para la zona más delicada. Reduce ojeras y líneas finas.",tip:"UN grano de arroz para AMBOS ojos. Solo con el dedo anular, presión ultra suave."},
+      {id:"r8",animId:"spreading",animo:"¡Técnica buffer! Esta crema reduce la irritación del retinal sin cancelar su eficacia. Capa generosa y a dormir. ¡Excelente noche!",cat:"Hidratante selladora",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",why:"Buffer sobre el retinal: reduce irritación sin cancelar su eficacia.",tip:"Tamaño de un garbanzo. Sella el retinal con una capa generosa."},
     ]},
   },
   history: (() => {
@@ -206,6 +339,10 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip}){
       <div style={{width:4,height:4,borderRadius:2,background:P.accent,marginTop:7,flexShrink:0}}/>
       <div style={{fontSize:12,color:P.muted,fontStyle:"italic",lineHeight:1.4}}>{step.tip}</div>
     </div>}
+    {step.animo&&<div style={{margin:"12px 18px 0",padding:"12px 14px",borderRadius:14,background:`linear-gradient(135deg,${P.accentSoft},${P.cream})`,border:`1px solid ${P.accent}30`}}>
+      <div style={{fontSize:11,color:P.accent,fontWeight:700,letterSpacing:.3,textTransform:"uppercase",marginBottom:4}}>💪 Motivación</div>
+      <div style={{fontSize:13,color:P.text,lineHeight:1.5}}>{step.animo}</div>
+    </div>}
     <div style={{display:"flex",gap:8,padding:14}}>
       <button onClick={e=>{e.stopPropagation();onSkip();}} style={{flex:1,height:46,borderRadius:14,background:"transparent",border:`1px solid ${P.border}`,color:P.muted,fontSize:14,fontWeight:500,cursor:"pointer"}}>Saltar</button>
       <button onClick={e=>{e.stopPropagation();onComplete();}} style={{flex:2,height:46,borderRadius:14,background:P.text,border:"none",color:P.cardOnText,fontSize:14,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,letterSpacing:-.1}}>
@@ -233,13 +370,24 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip}){
 
 // ─── MODE TOGGLE ────────────────────────────────
 function ModeToggle({mode,onChange}){
-  return <div style={{display:"flex",padding:4,borderRadius:14,background:P.cream,border:`1px solid ${P.border}`,margin:"0 16px"}}>
-    {[{id:"morning",label:"Mañana",icon:"sun"},{id:"night",label:"Noche",icon:"moon"}].map(o=>{
-      const a=mode===o.id;
-      return <button key={o.id} onClick={()=>onChange(o.id)} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:13.5,fontWeight:600,letterSpacing:-.1,display:"flex",alignItems:"center",justifyContent:"center",gap:8,cursor:"pointer",transition:"all 0.2s",boxShadow:a?"0 1px 3px rgba(0,0,0,0.06)":"none"}}>
-        <Icon name={o.icon} size={14} color={a?P.text:P.muted}/>{o.label}
-      </button>;
-    })}
+  const isNight = mode==="night"||mode==="nightRetinal";
+  return <div>
+    <div style={{display:"flex",padding:4,borderRadius:14,background:P.cream,border:`1px solid ${P.border}`,margin:"0 16px"}}>
+      {[{id:"morning",label:"Mañana",icon:"sun"},{id:"night",label:"Noche",icon:"moon"}].map(o=>{
+        const a = o.id==="morning" ? mode==="morning" : isNight;
+        return <button key={o.id} onClick={()=>onChange(o.id==="morning"?"morning":"night")} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:13.5,fontWeight:600,letterSpacing:-.1,display:"flex",alignItems:"center",justifyContent:"center",gap:8,cursor:"pointer",transition:"all 0.2s",boxShadow:a?"0 1px 3px rgba(0,0,0,0.06)":"none"}}>
+          <Icon name={o.icon} size={14} color={a?P.text:P.muted}/>{o.label}
+        </button>;
+      })}
+    </div>
+    {isNight&&<div style={{display:"flex",gap:6,padding:"8px 16px 0"}}>
+      {[{id:"night",label:"⚪ Sin Retinal"},{id:"nightRetinal",label:"🔴 Con Retinal"}].map(o=>{
+        const a=mode===o.id;
+        return <button key={o.id} onClick={()=>onChange(o.id)} style={{flex:1,height:32,borderRadius:10,border:`1.5px solid ${a?(o.id==="nightRetinal"?"#c04030":P.accent):P.border}`,background:a?(o.id==="nightRetinal"?"#fff0ee":P.accentSoft):"transparent",color:a?(o.id==="nightRetinal"?"#c04030":P.text):P.muted,fontSize:12,fontWeight:600,cursor:"pointer",transition:"all 0.2s",letterSpacing:-.1}}>
+          {o.label}
+        </button>;
+      })}
+    </div>}
   </div>;
 }
 
@@ -602,9 +750,10 @@ function App(){
   const [diary,setDiary]=React.useState(DATA.diary);
 
   React.useEffect(()=>{setDoneSteps(new Set());setActiveIdx(null);},[mode]);
+  const handleSetMode=(m)=>{ setMode(m); };
 
   const streak=getStreak(history);
-  const routine=DATA.routines[mode];
+  const routine=DATA.routines[mode]||DATA.routines.night;
   const completedCount=routine.steps.filter(s=>doneSteps.has(s.id)).length;
   const completedMin=routine.steps.filter(s=>doneSteps.has(s.id)).reduce((a,s)=>a+s.min,0);
   const isFinished=completedCount===routine.steps.length;
@@ -621,7 +770,7 @@ function App(){
 
   const handleCompleteClose=()=>{
     const today=new Date().toISOString().split("T")[0];
-    const session={date:today,time:new Date().toTimeString().slice(0,5),routine:mode,steps:completedCount};
+    const rLabel=mode==="morning"?"morning":mode==="nightRetinal"?"pm_retinal":"pm_normal";const session={date:today,time:new Date().toTimeString().slice(0,5),routine:rLabel,steps:completedCount};
     const newH=[...history,session];setHistory(newH);saveHistory(newH);
     setShowComplete(false);setDoneSteps(new Set());setActiveIdx(null);
   };
@@ -636,7 +785,7 @@ function App(){
 
   return <div style={{width:"100%",height:"100%",background:P.bg,color:P.text,position:"relative",overflow:"hidden"}}>
     <div style={{height:"100%",overflowY:"auto",paddingBottom:110,scrollbarWidth:"none"}}>
-      {tab==="today"&&<TodayScreen mode={mode} setMode={setMode} routine={routine} stepState={stepState} onTap={onTap} onComplete={onComplete} onSkip={onSkip} completedCount={completedCount} completedMin={completedMin} isFinished={isFinished} onShowComplete={()=>setShowComplete(true)} streak={streak}/>}
+      {tab==="today"&&<TodayScreen mode={mode} setMode={handleSetMode} routine={routine} stepState={stepState} onTap={onTap} onComplete={onComplete} onSkip={onSkip} completedCount={completedCount} completedMin={completedMin} isFinished={isFinished} onShowComplete={()=>setShowComplete(true)} streak={streak}/>}
       {tab==="history"&&<HistoryScreen history={history} diary={diary} streak={streak} onAddPhoto={()=>setShowCamera(true)}/>}
       {tab==="progress"&&<ProgressScreen achievements={DATA.achievements} onAddPhoto={()=>setShowCamera(true)}/>}
       {tab==="shelf"&&<ShelfScreen products={DATA.products}/>}
