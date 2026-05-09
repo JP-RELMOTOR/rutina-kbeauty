@@ -1,1334 +1,659 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mi Rutina de Skincare</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<title>Mi Rutina K-Beauty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@400;500&display=swap');
-
-  :root {
-    --cream: #faf8f5;
-    --white: #ffffff;
-    --blush: #f5e6e0;
-    --sage: #e8ede8;
-    --night: #1a1a2e;
-    --night-soft: #2d2d4e;
-    --gold: #c9a96e;
-    --coral: #e07060;
-    --green: #4a7c59;
-    --text: #2c2c2c;
-    --muted: #888;
-    --border: #e8e2da;
-    --shadow: 0 4px 24px rgba(0,0,0,0.08);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  header {
-    text-align: center;
-    padding: 36px 20px 24px;
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-  }
-
-  header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
-
-  header p {
-    color: var(--muted);
-    font-size: 0.85rem;
-    margin-top: 4px;
-  }
-
-  /* MODE TOGGLE */
-  .mode-toggle {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    padding: 20px 16px 0;
-  }
-
-  .mode-btn {
-    flex: 1;
-    max-width: 160px;
-    padding: 12px 20px;
-    border: 2px solid var(--border);
-    border-radius: 50px;
-    background: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    color: var(--muted);
-  }
-
-  .mode-btn.am.active {
-    background: #fffbe8;
-    border-color: #e8c84a;
-    color: #7a6a00;
-  }
-
-  .mode-btn.pm.active {
-    background: var(--night);
-    border-color: var(--night);
-    color: #fff;
-  }
-
-  /* PM SUBMODE */
-  .pm-submode {
-    display: none;
-    gap: 8px;
-    justify-content: center;
-    padding: 12px 16px 0;
-  }
-
-  .pm-submode.visible { display: flex; }
-
-  .sub-btn {
-    flex: 1;
-    max-width: 160px;
-    padding: 10px 16px;
-    border: 1.5px solid var(--border);
-    border-radius: 50px;
-    background: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    color: var(--muted);
-  }
-
-  .sub-btn.retinal.active {
-    background: #fff0ee;
-    border-color: var(--coral);
-    color: var(--coral);
-  }
-
-  .sub-btn.normal.active {
-    background: var(--sage);
-    border-color: #6aab7a;
-    color: #2d6040;
-  }
-
-  /* SUMMARY BAR */
-  .summary {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    align-items: center;
-    padding: 16px;
-    font-size: 0.8rem;
-    color: var(--muted);
-  }
-
-  .summary span {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-weight: 500;
-  }
-
-  /* STEPS CONTAINER */
-  .steps {
-    padding: 0 16px 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-
-  /* STEP CARD */
-  .step-card {
-    background: var(--white);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    animation: slideIn 0.3s ease both;
-  }
-
-  .step-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .step-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-  }
-
-  .step-num {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 600;
-    flex-shrink: 0;
-  }
-
-  .am-mode .step-num { background: #fffbe8; color: #7a6a00; }
-  .pm-retinal-mode .step-num { background: #fff0ee; color: var(--coral); }
-  .pm-normal-mode .step-num { background: var(--sage); color: #2d6040; }
-
-  .step-info { flex: 1; min-width: 0; }
-  .step-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-  .step-name { font-size: 0.92rem; font-weight: 600; color: var(--text); line-height: 1.3; margin-top: 1px; }
-
-  .step-time {
-    font-size: 0.78rem;
-    color: var(--muted);
-    background: var(--cream);
-    border-radius: 20px;
-    padding: 3px 10px;
-    flex-shrink: 0;
-  }
-
-  /* EXPANDED CONTENT */
-  .step-body {
-    display: none;
-    padding: 0 16px 16px;
-    animation: expand 0.25s ease;
-  }
-
-  .step-body.open { display: block; }
-
-  @keyframes expand {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-
-  .product-visual {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    background: var(--cream);
-    border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 12px;
-  }
-
-  .product-img {
-    width: 80px;
-    height: 100px;
-    border-radius: 10px;
-    object-fit: cover;
-    background: #eee;
-    flex-shrink: 0;
-    border: 1px solid var(--border);
-  }
-
-  .product-img-fallback {
-    width: 80px;
-    height: 100px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #f0ece6, #e8e2da);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    flex-shrink: 0;
-    border: 1px solid var(--border);
-  }
-
-  .product-details { flex: 1; }
-  .product-brand {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    margin-bottom: 2px;
-  }
-  .product-fullname {
-    font-size: 0.88rem;
-    font-weight: 600;
-    line-height: 1.35;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-  .product-badge {
-    display: inline-block;
-    font-size: 0.68rem;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
-
-  .badge-hydra { background: #e8f4ff; color: #2a7ac4; }
-  .badge-repair { background: #fff0e8; color: #c06030; }
-  .badge-bright { background: #f5ffe8; color: #3a7020; }
-  .badge-retinal { background: #fff0ee; color: var(--coral); }
-  .badge-sun { background: #fffbe8; color: #8a6a00; }
-  .badge-cleanse { background: #f0f0ff; color: #5050b0; }
-
-  .instructions {
-    font-size: 0.85rem;
-    line-height: 1.65;
-    color: #444;
-    margin-bottom: 10px;
-  }
-
-  .tip {
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    background: #fffbe8;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 0.8rem;
-    color: #7a6a00;
-    line-height: 1.5;
-  }
-  .tip.red { background: #fff0ee; color: #c04030; }
-  .tip.green { background: #f0fff4; color: #2d6040; }
-
-  .tip-icon { flex-shrink: 0; margin-top: 1px; }
-
-  /* PAUSE CARD */
-  .pause-card {
-    background: linear-gradient(135deg, #fff0ee, #ffe8e4);
-    border-radius: 20px;
-    padding: 18px 20px;
-    text-align: center;
-    border: 1px dashed var(--coral);
-    animation: slideIn 0.3s ease both;
-  }
-
-  .pause-card .pause-icon { font-size: 2rem; margin-bottom: 6px; }
-  .pause-card h3 { font-size: 1rem; font-weight: 600; color: var(--coral); }
-  .pause-card p { font-size: 0.82rem; color: #888; margin-top: 4px; }
-
-  /* SECTION DIVIDER */
-  .section-divider {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 8px 0 4px;
-    font-size: 0.75rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 500;
-    animation: slideIn 0.3s ease both;
-  }
-  .section-divider::before, .section-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* PROGRESS */
-  .progress-bar {
-    position: fixed;
-    top: 0; left: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #e8c84a, var(--coral));
-    transition: width 0.4s ease;
-    z-index: 100;
-  }
-
-  .mode-btn.cal.active {
-    background: #f0f8ff;
-    border-color: #4a90d9;
-    color: #1a5fa0;
-  }
-
-  /* CALENDAR */
-  #calendarView {
-    display: none;
-    padding: 0 16px 32px;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-  #calendarView.visible { display: block; }
-
-  .cal-phase {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 12px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-  }
-  .cal-phase-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .week-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    margin-bottom: 14px;
-  }
-
-  .day-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .day-name {
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
-  .day-dot {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-  }
-
-  .day-dot.retinal { background: #fff0ee; color: var(--coral); border: 2px solid var(--coral); }
-  .day-dot.normal  { background: var(--sage); color: #2d6040; border: 2px solid #6aab7a; }
-  .day-dot.rest    { background: #f5f5f5; color: #bbb; border: 2px solid #e0e0e0; }
-
-  .day-label {
-    font-size: 0.6rem;
-    color: var(--muted);
-    text-align: center;
-    line-height: 1.2;
-  }
-
-  .cal-legend {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 4px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.78rem;
-    color: #555;
-  }
-  .legend-dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .legend-dot.retinal { background: var(--coral); }
-  .legend-dot.normal  { background: #6aab7a; }
-  .legend-dot.rest    { background: #ccc; }
-
-  .cal-rule {
-    background: var(--cream);
-    border-radius: 12px;
-    padding: 12px 14px;
-    font-size: 0.82rem;
-    color: #555;
-    line-height: 1.6;
-    margin-top: 10px;
-  }
-  .cal-rule strong { color: var(--text); }
-
-  .cal-note {
-    background: #fff0ee;
-    border-radius: 12px;
-    padding: 12px 14px;
-    font-size: 0.8rem;
-    color: #c04030;
-    line-height: 1.6;
-    margin-top: 10px;
-    border: 1px solid #ffd0c8;
-  }
-
-
-  .step-why {
-    font-size: 0.75rem;
-    color: #a07850;
-    font-style: italic;
-    padding: 0 16px 10px 60px;
-    line-height: 1.4;
-    margin-top: -4px;
-  }
-  .am-mode .step-why { color: #9a8030; }
-  .pm-retinal-mode .step-why { color: #b05040; }
-  .pm-normal-mode .step-why { color: #3a7050; }
-
-
-  /* STEP ANIMATIONS */
-  .step-animation {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 14px;
-    background: var(--cream);
-    border-radius: 14px;
-    padding: 14px 10px 10px;
-  }
-  .step-animation svg { width: 100%; max-width: 240px; height: auto; }
-
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:#f6efe2;font-family:'Inter',system-ui,-apple-system,sans-serif;color:#1d1812;-webkit-font-smoothing:antialiased;}
+#root{position:fixed;inset:0;overflow:hidden;}
+::-webkit-scrollbar{display:none;}
+@keyframes stepRise{from{transform:translateY(8px);opacity:.6}to{transform:translateY(0);opacity:1}}
+@keyframes fadeUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f6efe2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="K-Beauty">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 </head>
 <body>
+<div id="root"></div>
 
-<div class="progress-bar" id="progressBar" style="width:0%"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
 
-<header>
-  <h1>✨ Mi Rutina K-Beauty</h1>
-  <p>Toca cada paso para ver instrucciones y foto del producto</p>
-</header>
+<script type="text/babel" data-presets="env,react">
+// ─── PALETA ─────────────────────────────────────
+const P = {
+  bg:"#f6efe2", card:"#fefcf7", cream:"#f1ead9",
+  text:"#1d1812", muted:"#9c9282", accent:"#c89849",
+  accentSoft:"#f3e3bf", border:"rgba(29,24,18,0.07)",
+  shadow:"rgba(80,55,20,0.18)", cardOnText:"#fefcf7", cardOnAccent:"#1d1812",
+};
 
-<div class="mode-toggle">
-  <button class="mode-btn am active" onclick="setMode('am')">☀️ Mañana</button>
-  <button class="mode-btn pm" onclick="setMode('pm')">🌙 Noche</button>
-  <button class="mode-btn cal" onclick="setMode('cal')">📅 Semana</button>
-</div>
+// ─── ICONOS ─────────────────────────────────────
+const ICONS = {
+  check:"M4 12l5 5L20 7", plus:"M12 5v14M5 12h14", close:"M5 5l14 14M19 5L5 19",
+  chevronRight:"M9 6l6 6-6 6", flame:"M12 3c0 4-5 5-5 10a5 5 0 0010 0c0-2-1-4-1-4s-1 2-2 2 1-4-2-8z",
+  sun:"M12 4v2M12 18v2M4 12H2M22 12h-2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4",
+  moon:"M20 14.5A8 8 0 119.5 4a7 7 0 0010.5 10.5z",
+  camera:"M4 8h3l2-3h6l2 3h3v11H4z M12 11a3.5 3.5 0 100 7 3.5 3.5 0 000-7z",
+  calendar:"M4 7h16v13H4z M4 7V5h16v2 M8 3v4 M16 3v4 M4 11h16",
+  sparkle:"M12 4l1.8 4.2L18 10l-4.2 1.8L12 16l-1.8-4.2L6 10l4.2-1.8L12 4z",
+  drop:"M12 3s-6 7-6 11a6 6 0 0012 0c0-4-6-11-6-11z",
+  bell:"M6 17h12l-1.5-2V11a4.5 4.5 0 00-9 0v4L6 17z M10 20a2 2 0 004 0",
+  chart:"M4 20V8M10 20v-9M16 20V4M22 20H2", pause:"M6 4h4v16H6z M14 4h4v16h-4z",
+  play:"M6 4l14 8-14 8z", bookmark:"M6 4h12v17l-6-4-6 4z",
+  star:"M12 4l2.5 5.5L20 10l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z",
+  photo:"M3 4h18v16H3z M3 10h18 M9 4v6 M15 4v6",
+};
+function Icon({name,size=20,color="currentColor",sw=1.6,fill="none",style={}}) {
+  const d=ICONS[name]; if(!d) return null;
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,...style}}><path d={d}/></svg>;
+}
 
-<div class="pm-submode" id="pmSubmode">
-  <button class="sub-btn retinal active" onclick="setPmSub('retinal')">🔴 Con Retinal</button>
-  <button class="sub-btn normal" onclick="setPmSub('normal')">⚪ Sin Retinal</button>
-</div>
+// ─── DATA ────────────────────────────────────────
+const DATA = {
+  user:{name:"Juan Pablo",streak:1,goal:"Reducir manchas · piel uniforme"},
+  routines:{
+    morning:{id:"morning",label:"Mañana",total:5,minutes:10,steps:[
+      {id:"m1",cat:"Limpieza",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:2,tone:"#e8b75c",why:"pH bajo: limpia sin alterar la barrera. Quita el sebo nocturno y prepara la piel.",tip:"Tamaño de una moneda de $100. Masajea 60 seg en círculos, enjuaga con agua fría.",critical:true},
+      {id:"m2",cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",why:"Ginseng + antioxidantes. Rehidrata y actúa como primer para los sérums.",tip:"Vierte el centro de la palma. Da 5 palmaditas suaves hasta absorber."},
+      {id:"m3",cat:"Sérum",name:"Dark Spot Correcting Glow Serum",brand:"Axis-Y",min:1.5,tone:"#d6a47a",star:true,why:"Niacinamida 5% + Squalane: aclara manchas, minimiza poros y unifica el tono.",tip:"3-4 gotas del gotero. Distribuye presionando suavemente."},
+      {id:"m4",cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",why:"Sella todo lo anterior. Crea un colchón de hidratación antes del SPF.",tip:"Tamaño de un garbanzo. Aplica en 5 puntos y distribuye hacia arriba."},
+      {id:"m5",cat:"Protector solar",name:"Centella Hyalu-Cica Sun Serum SPF50+",brand:"Skin1004",min:1,tone:"#f0c674",critical:true,why:"SPF50+ PA++++. SIN ESTO el sérum aclarante no funciona — genera manchas.",tip:"Media cucharadita para cara + cuello + orejas. Espera 15 min antes de salir."},
+    ]},
+    night:{id:"night",label:"Noche",total:7,minutes:17,steps:[
+      {id:"n1",cat:"Doble limpieza · Aceite",name:"Clean It Zero Cleansing Balm",brand:"Banila Co",min:2,tone:"#e8b75c",why:"Disuelve SPF, sebo y maquillaje a base de aceite. Imprescindible para limpiar bien.",tip:"Cara SECA, tamaño de una avellana. 60 seg masaje, agrega agua para emulsificar."},
+      {id:"n2",cat:"Doble limpieza · Agua",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:1.5,tone:"#c89b5e",why:"Elimina los residuos del balm. Deja la piel lista para absorber los activos.",tip:"Misma cantidad que en la mañana: moneda de $100."},
+      {id:"n3",cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",why:"Rehidrata y equilibra el pH post-limpieza. Abre el camino para los activos.",tip:"Centro de la palma. Palmotea suavemente."},
+      {id:"n4",cat:"Essence reparadora",name:"Snail Repair Intensive Essence",brand:"Mizon",min:1.5,tone:"#d6a47a",why:"Mucín de caracol: repara micro-daños y genera base hidratante para el retinal.",tip:"Tamaño de una avellana. Palmotea suavemente sobre toda la cara."},
+      {id:"n5",cat:"Ampoule",name:"Madagascar Centella Ampoule",brand:"Skin1004",min:1.5,tone:"#a8b8c8",why:"Centella de Madagascar: calma inflamación y fortalece la barrera cutánea.",tip:"3-4 gotas. Distribuye presionando suavemente."},
+      {id:"n6",cat:"Sérum reparador",name:"Revive Serum: Ginseng + Snail Mucin",brand:"Beauty of Joseon",min:2,tone:"#d6c2a0",why:"Ginseng + snail mucin: repara y regenera toda la noche sin interferencias.",tip:"3-4 gotas del gotero. Palmotea suavemente."},
+      {id:"n7",cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",why:"Sella todos los activos. Mantiene la hidratación durante las 7-8 horas de sueño.",tip:"Tamaño de un garbanzo. Sella todo y permite que los activos trabajen."},
+    ]},
+  },
+  history: (() => {
+    const saved = localStorage.getItem("kb_history");
+    return saved ? JSON.parse(saved) : [];
+  })(),
+  diary: (() => {
+    const saved = localStorage.getItem("kb_diary");
+    return saved ? JSON.parse(saved) : [];
+  })(),
+  products:[
+    {id:"p1",cat:"Limpieza",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",tone:"#e8b75c",fill:72,critical:false},
+    {id:"p2",cat:"Limpieza aceite",name:"Clean It Zero Cleansing Balm",brand:"Banila Co",tone:"#d4a86a",fill:65,critical:false},
+    {id:"p3",cat:"Tónico",name:"Ginseng Essence Water",brand:"Beauty of Joseon",tone:"#c89b5e",fill:80,critical:false},
+    {id:"p4",cat:"Essence",name:"Snail Repair Intensive Essence",brand:"Mizon",tone:"#b08860",fill:90,critical:false},
+    {id:"p5",cat:"Ampoule",name:"Madagascar Centella Ampoule",brand:"Skin1004",tone:"#a8b8c8",fill:85,critical:false},
+    {id:"p6",cat:"Sérum",name:"Dark Spot Correcting Glow",brand:"Axis-Y",tone:"#d6a47a",fill:78,critical:false},
+    {id:"p7",cat:"Sérum reparador",name:"Revive Serum Ginseng+Snail",brand:"Beauty of Joseon",tone:"#d6c2a0",fill:88,critical:false},
+    {id:"p8",cat:"Contorno ojos",name:"Revive Eye Serum (Retinal)",brand:"Beauty of Joseon",tone:"#e0c8b0",fill:92,critical:false},
+    {id:"p9",cat:"Retinal facial",name:"Seoul 1988 Serum Retinal 2%",brand:"K-Secret",tone:"#c04030",fill:95,critical:false},
+    {id:"p10",cat:"Retinal ojos",name:"Seoul 1988 Eye Cream Retinal 4%",brand:"K-Secret",tone:"#a03020",fill:95,critical:false},
+    {id:"p11",cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",tone:"#bcd2c0",fill:70,critical:false},
+    {id:"p12",cat:"Protector solar",name:"Centella Hyalu-Cica SPF50+",brand:"Skin1004",tone:"#f0c674",fill:40,critical:true},
+  ],
+  achievements:[
+    {id:"a1",label:"Primera rutina",unlocked:true,icon:"sparkle"},
+    {id:"a2",label:"7 días seguidos",unlocked:false,icon:"flame",progress:0.14},
+    {id:"a3",label:"30 días con SPF",unlocked:false,icon:"sun",progress:0.03},
+    {id:"a4",label:"4 fotos de progreso",unlocked:false,icon:"camera",progress:0},
+  ],
+};
 
-<div class="summary" id="summaryBar">
-  <span id="stepCount">6 pasos</span>
-  <span id="timeCount">⏱ ~9 min</span>
-</div>
+// ─── STORAGE HELPERS ────────────────────────────
+function saveHistory(h){ localStorage.setItem("kb_history",JSON.stringify(h)); }
+function saveDiary(d){ localStorage.setItem("kb_diary",JSON.stringify(d)); }
+function getStreak(history){
+  const dates=[...new Set(history.map(s=>s.date))].sort().reverse();
+  if(!dates.length) return 0;
+  let streak=0,today=new Date().toISOString().split("T")[0];
+  let check=today;
+  for(const d of dates){
+    if(d===check){streak++;const dt=new Date(check);dt.setDate(dt.getDate()-1);check=dt.toISOString().split("T")[0];}
+    else if(d<check) break;
+  }
+  return streak;
+}
 
-<div class="steps" id="stepsContainer"></div>
+// ─── PROGRESS RING ──────────────────────────────
+function ProgressRing({pct=0,size=64,stroke=4,color=P.text,track=P.cream,children}){
+  const r=(size-stroke)/2,c=2*Math.PI*r;
+  return <div style={{width:size,height:size,position:"relative"}}>
+    <svg width={size} height={size} style={{transform:"rotate(-90deg)"}}>
+      <circle cx={size/2} cy={size/2} r={r} stroke={track} strokeWidth={stroke} fill="none"/>
+      <circle cx={size/2} cy={size/2} r={r} stroke={color} strokeWidth={stroke} fill="none"
+        strokeDasharray={c} strokeDashoffset={c*(1-pct)} strokeLinecap="round"
+        style={{transition:"stroke-dashoffset 0.4s ease"}}/>
+    </svg>
+    {children&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>{children}</div>}
+  </div>;
+}
 
+// ─── STEP CARD ──────────────────────────────────
+function StepCard({step,idx,state,onTap,onComplete,onSkip}){
+  const isActive=state==="active",isDone=state==="done";
+  const totalSec=Math.round(step.min*60);
+  const [secLeft,setSecLeft]=React.useState(totalSec);
+  const [running,setRunning]=React.useState(false);
+  React.useEffect(()=>{ if(isActive){setSecLeft(totalSec);setRunning(true);}else setRunning(false);},[isActive,totalSec]);
+  React.useEffect(()=>{ if(!running||secLeft<=0) return; const id=setInterval(()=>setSecLeft(s=>Math.max(0,s-1)),1000); return()=>clearInterval(id);},[running,secLeft]);
+  const pct=isActive?1-secLeft/totalSec:0;
+  const mm=String(Math.floor(secLeft/60)).padStart(2,"0");
+  const ss=String(secLeft%60).padStart(2,"0");
+  const base={background:P.card,borderRadius:22,marginBottom:10,border:`1px solid ${P.border}`,cursor:isActive?"default":"pointer",position:"relative",overflow:"hidden",transition:"all 0.35s cubic-bezier(0.2,0.8,0.2,1)"};
+  const numBubble=<div style={{width:36,height:36,borderRadius:18,background:isDone?P.accent:isActive?P.accentSoft:P.cream,color:isDone?P.cardOnAccent:P.text,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:600,flexShrink:0,border:isDone?"none":`1px solid ${P.border}`}}>
+    {isDone?<Icon name="check" size={18} color={P.cardOnAccent} sw={2.5}/>:idx+1}
+  </div>;
 
-<div id="calendarView">
-
-  <div style="padding: 16px 0 8px; text-align:center; animation: slideIn 0.3s ease both;">
-    <p style="font-size:0.85rem; color:var(--muted)">Tu plan semanal de retinal</p>
-  </div>
-
-  <!-- FASE 1 -->
-  <div class="cal-phase" style="animation: slideIn 0.2s ease both;">
-    <div class="cal-phase-title">⚡ Fase 1 — Primeras 2 semanas (adaptación)</div>
-    <div class="week-grid">
-      <div class="day-cell">
-        <span class="day-name">Lun</span>
-        <div class="day-dot retinal">🔴</div>
-        <span class="day-label">Retinal</span>
+  if(isDone) return <div style={{...base,padding:"12px 18px",opacity:.55}} onClick={onTap}>
+    <div style={{display:"flex",alignItems:"center",gap:14}}>
+      {numBubble}
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:10,letterSpacing:1.4,textTransform:"uppercase",color:P.muted,marginBottom:2}}>{step.cat}</div>
+        <div style={{fontSize:14,fontWeight:500,color:P.text,textDecoration:"line-through",textDecorationColor:P.muted,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{step.name}</div>
       </div>
-      <div class="day-cell">
-        <span class="day-name">Mar</span>
-        <div class="day-dot normal">⚪</div>
-        <span class="day-label">Sin<br>retinal</span>
-      </div>
-      <div class="day-cell">
-        <span class="day-name">Mié</span>
-        <div class="day-dot normal">⚪</div>
-        <span class="day-label">Sin<br>retinal</span>
-      </div>
-      <div class="day-cell">
-        <span class="day-name">Jue</span>
-        <div class="day-dot retinal">🔴</div>
-        <span class="day-label">Retinal</span>
-      </div>
-      <div class="day-cell">
-        <span class="day-name">Vie</span>
-        <div class="day-dot normal">⚪</div>
-        <span class="day-label">Sin<br>retinal</span>
-      </div>
-      <div class="day-cell">
-        <span class="day-name">Sáb</span>
-        <div class="day-dot rest">-</div>
-        <span class="day-label">Descanso</span>
-      </div>
-      <div class="day-cell">
-        <span class="day-name">Dom</span>
-        <div class="day-dot rest">-</div>
-        <span class="day-label">Descanso</span>
+      <div style={{fontSize:11,color:P.muted}}>✓ {step.min} min</div>
+    </div>
+  </div>;
+
+  if(isActive) return <div style={{...base,padding:0,boxShadow:`0 12px 36px -12px ${P.shadow},0 0 0 2px ${P.accent}20`,border:`1.5px solid ${P.accent}`,animation:"stepRise 0.45s cubic-bezier(0.2,0.8,0.2,1)"}}>
+    <div style={{padding:"16px 18px 0",display:"flex",alignItems:"flex-start",gap:14}}>
+      {numBubble}
+      <div style={{flex:1,minWidth:0,paddingTop:1}}>
+        <div style={{fontSize:10,letterSpacing:1.4,textTransform:"uppercase",color:P.accent,marginBottom:4,fontWeight:600}}>{step.cat}</div>
+        <div style={{fontSize:17,fontFamily:"'Instrument Serif',Georgia,serif",fontWeight:500,color:P.text,lineHeight:1.2,letterSpacing:-0.2}}>{step.name}</div>
+        <div style={{fontSize:12,color:P.muted,marginTop:3}}>{step.brand}</div>
       </div>
     </div>
-    <div class="cal-rule">2x por semana: <strong>Lunes y Jueves.</strong> Tu piel necesita tiempo para adaptarse al retinal sin irritarse.</div>
-  </div>
-
-  <!-- FASE 2 -->
-  <div class="cal-phase" style="animation: slideIn 0.35s ease both;">
-    <div class="cal-phase-title">🚀 Fase 2 — Desde la semana 3 (si no hay irritación)</div>
-    <div class="week-grid">
-      <div class="day-cell">
-        <span class="day-name">Lun</span>
-        <div class="day-dot retinal">🔴</div>
-        <span class="day-label">Retinal</span>
+    <div style={{display:"flex",alignItems:"center",gap:16,padding:"16px 18px 0"}}>
+      <div style={{width:86,height:110,borderRadius:14,flexShrink:0,background:`linear-gradient(160deg,${step.tone},${step.tone}cc)`,position:"relative",overflow:"hidden",display:"flex",alignItems:"flex-end",justifyContent:"center",border:`1px solid ${P.border}`}}>
+        <div style={{position:"absolute",inset:"8% 32%",borderRadius:6,background:"linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.05))",border:"1px solid rgba(255,255,255,.5)"}}/>
+        <div style={{position:"relative",zIndex:1,fontSize:8,fontFamily:"var(--mono,'JetBrains Mono',monospace)",color:"rgba(255,255,255,.95)",letterSpacing:.5,padding:"4px 8px",background:"rgba(0,0,0,.18)",borderRadius:4,marginBottom:14,textTransform:"uppercase"}}>{step.brand.split(" ")[0]}</div>
       </div>
-      <div class="day-cell">
-        <span class="day-name">Mar</span>
-        <div class="day-dot normal">⚪</div>
-        <span class="day-label">Sin<br>retinal</span>
-      </div>
-      <div class="day-cell">
-        <span class="day-name">Mié</span>
-        <div class="day-dot retinal">🔴</div>
-        <span class="day-label">Retinal</span>
-      </div>
-      <div class="day-cell">
-        <span class="day-name">Jue</span>
-        <div class="day-dot normal">⚪</div>
-        <span class="day-label">Sin<br>retinal</span>
-      </div>
-      <div class="day-cell">
-        <span class="day-name">Vie</span>
-        <div class="day-dot retinal">🔴</div>
-        <span class="day-label">Retinal</span>
-      </div>
-      <div class="day-cell">
-        <span class="day-name">Sáb</span>
-        <div class="day-dot normal">⚪</div>
-        <span class="day-label">Sin<br>retinal</span>
-      </div>
-      <div class="day-cell">
-        <span class="day-name">Dom</span>
-        <div class="day-dot rest">-</div>
-        <span class="day-label">Descanso</span>
+      <div style={{flex:1}}>
+        <div style={{fontSize:10,letterSpacing:1.4,textTransform:"uppercase",color:P.muted,marginBottom:8}}>Tiempo recomendado</div>
+        <div style={{display:"flex",alignItems:"center",gap:14}}>
+          <ProgressRing pct={pct} size={64} stroke={4} color={P.accent} track={P.cream}>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:14,fontWeight:600,color:P.text,letterSpacing:-.5}}>{mm}:{ss}</div>
+          </ProgressRing>
+          <button onClick={e=>{e.stopPropagation();setRunning(r=>!r);}} style={{width:38,height:38,borderRadius:19,border:`1px solid ${P.border}`,background:P.cream,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:P.text}}>
+            <Icon name={running?"pause":"play"} size={14} fill={P.text} color={P.text}/>
+          </button>
+        </div>
       </div>
     </div>
-    <div class="cal-rule">3x por semana: <strong>Lunes, Miércoles y Viernes.</strong> Siempre deja un día de descanso entre cada noche de retinal.</div>
-  </div>
-
-  <!-- Ojo alternado -->
-  <div class="cal-phase" style="animation: slideIn 0.45s ease both;">
-    <div class="cal-phase-title">👁️ Contorno de ojos en noches de retinal</div>
-    <div class="week-grid" id="eyeGrid">
-      <!-- filled by JS -->
+    <div style={{padding:"14px 18px 0"}}>
+      <div style={{background:P.cream,borderRadius:12,padding:"10px 12px",fontSize:13,color:P.text,lineHeight:1.45}}>
+        <div style={{fontSize:9,letterSpacing:1.3,textTransform:"uppercase",color:P.muted,marginBottom:4,fontWeight:600}}>Por qué</div>
+        {step.why}
+      </div>
     </div>
-    <div class="cal-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#4a90d9"></div> BoJ Revive Eye (suave)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--coral)"></div> K-Secret Eye Cream (potente 4%)</div>
+    {step.tip&&<div style={{padding:"10px 18px 0",display:"flex",gap:8,alignItems:"flex-start"}}>
+      <div style={{width:4,height:4,borderRadius:2,background:P.accent,marginTop:7,flexShrink:0}}/>
+      <div style={{fontSize:12,color:P.muted,fontStyle:"italic",lineHeight:1.4}}>{step.tip}</div>
+    </div>}
+    <div style={{display:"flex",gap:8,padding:14}}>
+      <button onClick={e=>{e.stopPropagation();onSkip();}} style={{flex:1,height:46,borderRadius:14,background:"transparent",border:`1px solid ${P.border}`,color:P.muted,fontSize:14,fontWeight:500,cursor:"pointer"}}>Saltar</button>
+      <button onClick={e=>{e.stopPropagation();onComplete();}} style={{flex:2,height:46,borderRadius:14,background:P.text,border:"none",color:P.cardOnText,fontSize:14,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,letterSpacing:-.1}}>
+        <Icon name="check" size={16} color={P.cardOnText} sw={2.5}/>Listo
+      </button>
     </div>
-    <div class="cal-rule">Alterna entre los dos productos de ojo para no sobrecargar la zona. El K-Secret es más fuerte — úsalo máximo 1x/semana al inicio.</div>
-  </div>
+  </div>;
 
-  <!-- Señales de alerta -->
-  <div class="cal-phase" style="animation: slideIn 0.55s ease both;">
-    <div class="cal-phase-title">⚠️ Señales para bajar la frecuencia</div>
-    <div class="cal-note">
-      Si notas <strong>peeling, enrojecimiento intenso o ardor</strong> después de una noche de retinal → baja de nuevo a Fase 1 por 1 semana, y aplica más crema como buffer antes del retinal.
+  return <div style={{...base,padding:18}} onClick={onTap}>
+    <div style={{display:"flex",alignItems:"center",gap:14}}>
+      {numBubble}
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,flexWrap:"wrap"}}>
+          <span style={{fontSize:10,letterSpacing:1.4,textTransform:"uppercase",color:P.muted,fontWeight:600}}>{step.cat}</span>
+          {step.star&&<span style={{fontSize:9,color:P.accent,background:P.accentSoft,padding:"2px 6px",borderRadius:6,fontWeight:600,letterSpacing:.4}}>CLAVE</span>}
+          {step.critical&&<span style={{fontSize:9,color:"#a8511e",background:"#f4d6c1",padding:"2px 6px",borderRadius:6,fontWeight:600,letterSpacing:.4}}>NO SALTES</span>}
+        </div>
+        <div style={{fontSize:16,fontFamily:"'Instrument Serif',Georgia,serif",fontWeight:500,color:P.text,lineHeight:1.25,letterSpacing:-.2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{step.name}</div>
+        <div style={{fontSize:11.5,color:P.muted,marginTop:2}}>{step.brand} · {step.min} min</div>
+      </div>
+      <Icon name="chevronRight" size={18} color={P.muted}/>
     </div>
-    <div class="cal-rule" style="margin-top:10px">
-      <strong>Nunca uses retinal si:</strong> tienes la piel irritada, quemada por el sol, o con brotes activos. Espera que sane primero.
+  </div>;
+}
+
+// ─── MODE TOGGLE ────────────────────────────────
+function ModeToggle({mode,onChange}){
+  return <div style={{display:"flex",padding:4,borderRadius:14,background:P.cream,border:`1px solid ${P.border}`,margin:"0 16px"}}>
+    {[{id:"morning",label:"Mañana",icon:"sun"},{id:"night",label:"Noche",icon:"moon"}].map(o=>{
+      const a=mode===o.id;
+      return <button key={o.id} onClick={()=>onChange(o.id)} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:13.5,fontWeight:600,letterSpacing:-.1,display:"flex",alignItems:"center",justifyContent:"center",gap:8,cursor:"pointer",transition:"all 0.2s",boxShadow:a?"0 1px 3px rgba(0,0,0,0.06)":"none"}}>
+        <Icon name={o.icon} size={14} color={a?P.text:P.muted}/>{o.label}
+      </button>;
+    })}
+  </div>;
+}
+
+// ─── COMPLETE SHEET ─────────────────────────────
+function CompleteSheet({stats,onPhoto,onClose}){
+  return <div style={{position:"absolute",inset:0,zIndex:80,background:P.bg,display:"flex",flexDirection:"column",animation:"fadeUp 0.5s cubic-bezier(0.2,0.8,0.2,1)"}}>
+    <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 24px",textAlign:"center"}}>
+      <div style={{width:96,height:96,borderRadius:48,background:`radial-gradient(circle at 30% 30%,${P.accentSoft},${P.accent})`,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:22,boxShadow:`0 20px 50px -10px ${P.accent}80`,animation:"pulse 2s ease-in-out infinite"}}>
+        <Icon name="sparkle" size={42} fill={P.cardOnAccent} color={P.cardOnAccent} sw={1}/>
+      </div>
+      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:30,fontWeight:500,color:P.text,letterSpacing:-.6,lineHeight:1.1,marginBottom:8}}>Rutina completa</div>
+      <div style={{fontSize:14,color:P.muted,lineHeight:1.5,maxWidth:280}}>{stats.completed}/{stats.total} pasos en {stats.minutes} min. Día {stats.streak} de tu racha 🔥</div>
+      <div style={{display:"flex",gap:10,marginTop:26}}>
+        {[{v:`${stats.completed}/${stats.total}`,l:"Pasos"},{v:`${stats.minutes}m`,l:"Tiempo"},{v:`${stats.streak}d`,l:"Racha"}].map(s=>
+          <div key={s.l} style={{padding:"10px 14px",borderRadius:14,background:P.card,border:`1px solid ${P.border}`,minWidth:72,textAlign:"center"}}>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:18,fontWeight:600,color:P.text}}>{s.v}</div>
+            <div style={{fontSize:10,color:P.muted,letterSpacing:.6,textTransform:"uppercase",marginTop:2}}>{s.l}</div>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
+    <div style={{padding:"0 16px 16px"}}>
+      <div style={{background:P.card,borderRadius:22,padding:16,border:`1px solid ${P.border}`,display:"flex",gap:14,alignItems:"center",marginBottom:10}}>
+        <div style={{width:56,height:70,borderRadius:10,flexShrink:0,background:"linear-gradient(140deg,#d6c2a5,#a78a64)",position:"relative",overflow:"hidden",border:`1px solid ${P.border}`}}>
+          <svg viewBox="0 0 56 70" style={{position:"absolute",inset:0}}><ellipse cx="28" cy="32" rx="14" ry="18" fill="rgba(0,0,0,0.12)"/></svg>
+          <div style={{position:"absolute",bottom:4,left:4,fontFamily:"'JetBrains Mono',monospace",fontSize:8,color:"rgba(255,255,255,.9)",background:"rgba(0,0,0,.4)",padding:"1px 5px",borderRadius:3}}>Antes</div>
+        </div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:14,fontWeight:600,color:P.text,marginBottom:2,letterSpacing:-.1}}>¿Foto de progreso?</div>
+          <div style={{fontSize:12,color:P.muted,lineHeight:1.4}}>Compara con la última y verás los avances.</div>
+        </div>
+        <button onClick={onPhoto} style={{width:44,height:44,borderRadius:22,border:"none",background:P.text,color:P.cardOnText,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>
+          <Icon name="camera" size={18} color={P.cardOnText} sw={1.6}/>
+        </button>
+      </div>
+      <div style={{display:"flex",gap:8}}>
+        <button onClick={onClose} style={{flex:1,height:50,borderRadius:16,border:`1px solid ${P.border}`,background:"transparent",color:P.muted,fontSize:14,fontWeight:500,cursor:"pointer"}}>Más tarde</button>
+        <button onClick={onClose} style={{flex:1,height:50,borderRadius:16,border:"none",background:P.accent,color:P.cardOnAccent,fontSize:14,fontWeight:600,cursor:"pointer",letterSpacing:-.1}}>Terminar</button>
+      </div>
+    </div>
+  </div>;
+}
 
-</div>
+// ─── PHOTO CAPTURE ──────────────────────────────
+function PhotoCaptureScreen({onClose,onSave}){
+  const [captured,setCaptured]=React.useState(false);
+  const [feel,setFeel]=React.useState(null);
+  const [note,setNote]=React.useState("");
+  if(captured) return <div style={{position:"absolute",inset:0,zIndex:90,background:P.bg,display:"flex",flexDirection:"column",animation:"fadeUp 0.4s",overflowY:"auto"}}>
+    <div style={{padding:"60px 20px 20px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:26,fontWeight:500,color:P.text,letterSpacing:-.4}}>Comparar</div>
+      <button onClick={onClose} style={{width:36,height:36,borderRadius:18,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Icon name="close" size={16} color={P.text} sw={2}/></button>
+    </div>
+    <div style={{padding:"0 16px",display:"flex",gap:10}}>
+      {[{d:"Antes",t1:"#c4a87f",t2:"#a78a64",spots:6},{d:"Hoy",t1:"#d6c2a5",t2:"#b89e80",spots:4}].map((ph,i)=>
+        <div key={i} style={{flex:1}}><div style={{aspectRatio:"3/4",borderRadius:16,overflow:"hidden",background:`linear-gradient(140deg,${ph.t1},${ph.t2})`,position:"relative",border:`1px solid ${P.border}`}}>
+          <svg viewBox="0 0 100 130" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
+            <ellipse cx="50" cy="58" rx="28" ry="38" fill="rgba(0,0,0,0.08)"/>
+            {Array.from({length:ph.spots}).map((_,j)=><circle key={j} cx={32+(j*7)%38} cy={45+(j*11)%30} r={1.4} fill="rgba(80,40,20,0.4)"/>)}
+          </svg>
+          <div style={{position:"absolute",top:8,left:8,fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:"white",background:"rgba(0,0,0,.4)",padding:"3px 7px",borderRadius:4,letterSpacing:.5}}>{ph.d}</div>
+        </div></div>
+      )}
+    </div>
+    <div style={{padding:"14px 16px 0"}}>
+      <div style={{background:P.card,borderRadius:18,padding:16,border:`1px solid ${P.border}`}}>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}><Icon name="sparkle" size={14} color={P.accent} fill={P.accent} sw={1}/><div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.accent,fontWeight:600}}>Análisis automático</div></div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+          {[{l:"Manchas",v:"−43%"},{l:"Tono",v:"+12%"},{l:"Hidratación",v:"+8%"},{l:"Brillo T",v:"−21%"}].map(s=>
+            <div key={s.l}><div style={{fontSize:10,color:P.muted,marginBottom:2}}>{s.l}</div><div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:18,fontWeight:600,color:"#5b8a5b"}}>{s.v}</div></div>
+          )}
+        </div>
+      </div>
+    </div>
+    <div style={{padding:"14px 16px 0"}}>
+      <div style={{fontSize:11,color:P.muted,marginBottom:8,letterSpacing:.4,textTransform:"uppercase",fontWeight:600}}>¿Cómo se siente la piel hoy?</div>
+      <div style={{display:"flex",gap:8,marginBottom:12}}>
+        {[{id:"great",e:"😍",l:"Genial"},{id:"good",e:"🙂",l:"Bien"},{id:"meh",e:"😐",l:"Regular"},{id:"bad",e:"😬",l:"Mal"}].map(f=>
+          <button key={f.id} onClick={()=>setFeel(f.id)} style={{flex:1,padding:"10px 4px",borderRadius:14,background:feel===f.id?P.accentSoft:P.card,border:`1.5px solid ${feel===f.id?P.accent:P.border}`,cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
+            <div style={{fontSize:22}}>{f.e}</div><div style={{fontSize:10,color:P.muted,marginTop:2}}>{f.l}</div>
+          </button>
+        )}
+      </div>
+      <textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Notas (opcional)..." style={{width:"100%",boxSizing:"border-box",padding:12,borderRadius:14,border:`1px solid ${P.border}`,background:P.card,color:P.text,fontSize:13,fontFamily:"inherit",resize:"none",outline:"none",minHeight:56}}/>
+    </div>
+    <div style={{padding:16}}>
+      <button onClick={()=>onSave&&onSave(feel,note)} style={{width:"100%",height:52,borderRadius:16,border:"none",background:P.text,color:P.cardOnText,fontSize:15,fontWeight:600,cursor:"pointer",letterSpacing:-.1}}>Guardar en historial</button>
+    </div>
+  </div>;
 
+  return <div style={{position:"absolute",inset:0,zIndex:90,background:"#0d0a07",display:"flex",flexDirection:"column",animation:"fadeUp 0.3s"}}>
+    <div style={{padding:"60px 20px 20px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <button onClick={onClose} style={{width:36,height:36,borderRadius:18,border:"none",background:"rgba(255,255,255,.12)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Icon name="close" size={16} color="white" sw={2}/></button>
+      <div style={{color:"white",fontSize:13,fontFamily:"'JetBrains Mono',monospace",letterSpacing:.5}}>FOTO DE PROGRESO</div>
+      <div style={{width:36}}/>
+    </div>
+    <div style={{flex:1,position:"relative",margin:"0 16px",borderRadius:24,overflow:"hidden",background:"linear-gradient(160deg,#2a2418,#1a1612)"}}>
+      <svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
+        <defs><mask id="co"><rect width="300" height="400" fill="white"/><ellipse cx="150" cy="200" rx="90" ry="125" fill="black"/></mask></defs>
+        <rect width="300" height="400" fill="rgba(0,0,0,0.55)" mask="url(#co)"/>
+        <ellipse cx="150" cy="200" rx="90" ry="125" fill="none" stroke={P.accent} strokeWidth="2" strokeDasharray="6 4"/>
+      </svg>
+      <div style={{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",textAlign:"center",color:"rgba(255,255,255,.85)",fontSize:12,fontFamily:"'JetBrains Mono',monospace",letterSpacing:.6}}>
+        ALINEA TU CARA<div style={{marginTop:4,fontSize:10,opacity:.7}}>Sin maquillaje · luz natural</div>
+      </div>
+      <div style={{position:"absolute",top:16,left:16,right:16,background:"rgba(0,0,0,.5)",backdropFilter:"blur(10px)",borderRadius:12,padding:"8px 12px",display:"flex",gap:14,justifyContent:"space-around",color:"rgba(255,255,255,.85)",fontSize:10.5,letterSpacing:.3}}>
+        <span>☀ Luz OK</span><span>👤 Cara centrada</span><span>📐 Mismo ángulo</span>
+      </div>
+    </div>
+    <div style={{padding:"20px 20px 40px",display:"flex",justifyContent:"center",alignItems:"center",gap:30}}>
+      <div style={{width:44,height:44}}/>
+      <button onClick={()=>setCaptured(true)} style={{width:76,height:76,borderRadius:38,background:"white",border:"4px solid rgba(255,255,255,.5)",boxShadow:"0 0 0 2px white,0 8px 24px rgba(0,0,0,.3)",cursor:"pointer",padding:0}}/>
+      <button onClick={onClose} style={{width:44,height:44,borderRadius:22,border:"none",background:"rgba(255,255,255,.12)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Icon name="camera" size={18} color="white"/></button>
+    </div>
+  </div>;
+}
+
+// ─── TODAY SCREEN ────────────────────────────────
+function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,completedCount,completedMin,isFinished,onShowComplete,streak}){
+  const now=new Date(),h=now.getHours();
+  const greeting=mode==="morning"?"Buen día, Juan Pablo":"Buenas noches, Juan Pablo";
+  return <div>
+    <div style={{padding:"60px 20px 14px"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+        <div>
+          <div style={{fontSize:12,color:P.muted,letterSpacing:.3,marginBottom:2}}>{greeting}</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:30,fontWeight:500,color:P.text,letterSpacing:-.6,lineHeight:1.05}}>Tu rutina de hoy</div>
+        </div>
+        <div style={{padding:"6px 12px",borderRadius:14,background:P.card,border:`1px solid ${P.border}`,display:"flex",alignItems:"center",gap:6,fontSize:12,fontWeight:600,color:P.text}}>
+          🔥 {streak}d
+        </div>
+      </div>
+    </div>
+    <ModeToggle mode={mode} onChange={setMode}/>
+    <div style={{padding:"16px 16px 18px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+        <div style={{fontSize:11,color:P.muted,letterSpacing:.4,textTransform:"uppercase",fontWeight:600}}>Progreso</div>
+        <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:12,color:P.text,fontWeight:600}}>
+          {completedCount}/{routine.total}<span style={{color:P.muted,marginLeft:8}}>· {Math.round(completedMin)}/{routine.minutes} min</span>
+        </div>
+      </div>
+      <div style={{height:6,borderRadius:3,background:P.cream,overflow:"hidden"}}>
+        <div style={{height:"100%",width:`${(completedCount/routine.total)*100}%`,background:P.accent,transition:"width 0.5s cubic-bezier(0.2,0.8,0.2,1)",borderRadius:3}}/>
+      </div>
+    </div>
+    <div style={{padding:"0 16px"}}>
+      {routine.steps.map((s,i)=><StepCard key={s.id} step={s} idx={i} state={stepState(s,i)} onTap={()=>onTap(i)} onComplete={()=>onComplete(s,i)} onSkip={()=>onSkip(s,i)}/>)}
+    </div>
+    {isFinished&&<div style={{padding:"12px 16px"}}>
+      <button onClick={onShowComplete} style={{width:"100%",height:54,borderRadius:18,border:"none",background:P.accent,color:P.cardOnAccent,fontSize:15,fontWeight:600,cursor:"pointer",letterSpacing:-.1,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+        <Icon name="sparkle" size={16} color={P.cardOnAccent} fill={P.cardOnAccent} sw={1}/>Cerrar rutina y registrar
+      </button>
+    </div>}
+    <div style={{height:100}}/>
+  </div>;
+}
+
+// ─── HISTORY SCREEN ──────────────────────────────
+function HistoryScreen({history,diary,streak,onAddPhoto}){
+  const today=new Date().toISOString().split("T")[0];
+  const dates=[...new Set(history.map(s=>s.date))].sort().reverse();
+  const last14=[];
+  for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);last14.push(d.toISOString().split("T")[0]);}
+  const byDate={};history.forEach(s=>{if(!byDate[s.date])byDate[s.date]={m:0,n:0};if(s.routine==="morning")byDate[s.date].m=1;else byDate[s.date].n=1;});
+  const w1=last14.slice(0,7),w2=last14.slice(7);
+  const days=["L","M","X","J","V","S","D"];
+  const totalDays=dates.length;
+  const pct=totalDays?Math.round((dates.filter(d=>byDate[d]?.m&&byDate[d]?.n).length/totalDays)*100):0;
+
+  const cell=(ds,i)=>{const dObj=byDate[ds]||{};const m=!!dObj.m,n=!!dObj.n;const isT=ds===today;const dayLetter=days[new Date(ds+"T12:00:00").getDay()===0?6:new Date(ds+"T12:00:00").getDay()-1];
+    return <div key={ds} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:6}}>
+      <div style={{fontSize:10,color:P.muted,letterSpacing:.4,fontWeight:600}}>{dayLetter}</div>
+      <div style={{width:30,height:38,borderRadius:9,position:"relative",overflow:"hidden",border:isT?`1.5px solid ${P.accent}`:`1px solid ${P.border}`,background:!m&&!n?P.cream:P.card}}>
+        {m&&<div style={{position:"absolute",top:0,left:0,right:0,height:"50%",background:P.accentSoft}}/>}
+        {n&&<div style={{position:"absolute",bottom:0,left:0,right:0,height:"50%",background:P.text,opacity:.85}}/>}
+        {isT&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:P.accent,fontWeight:700,letterSpacing:.5,zIndex:2}}>HOY</div>}
+      </div>
+    </div>;
+  };
+
+  return <div>
+    <div style={{padding:"60px 20px 14px"}}>
+      <div style={{fontSize:12,color:P.muted,letterSpacing:.3,marginBottom:2}}>Tu evolución</div>
+      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:30,fontWeight:500,color:P.text,letterSpacing:-.6,lineHeight:1.05}}>Historial</div>
+    </div>
+    <div style={{margin:"0 16px 14px",padding:18,borderRadius:22,background:`linear-gradient(135deg,${P.text},${P.text}dd)`,color:P.cardOnText,position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",right:-30,top:-40,width:160,height:160,borderRadius:80,background:P.accent,filter:"blur(60px)",opacity:.5}}/>
+      <div style={{position:"relative",zIndex:1}}>
+        <div style={{fontSize:10,letterSpacing:1.4,textTransform:"uppercase",opacity:.65,marginBottom:6,fontWeight:600}}>Racha actual</div>
+        <div style={{display:"flex",alignItems:"baseline",gap:8}}>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:44,fontWeight:500,lineHeight:1,letterSpacing:-1}}>{streak}</div>
+          <div style={{fontSize:14,opacity:.7}}>días</div>
+          <div style={{marginLeft:"auto",fontSize:22}}>🔥</div>
+        </div>
+        <div style={{fontSize:12,opacity:.7,marginTop:6}}>Meta: 14 días · ¡sigue así!</div>
+      </div>
+    </div>
+    <div style={{margin:"0 16px 14px",padding:"16px 16px 18px",borderRadius:22,background:P.card,border:`1px solid ${P.border}`}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+        <div style={{fontSize:14,fontWeight:600,color:P.text,letterSpacing:-.1}}>Últimas 2 semanas</div>
+        <div style={{display:"flex",gap:10,fontSize:10,color:P.muted}}>
+          <div style={{display:"flex",alignItems:"center",gap:4}}><div style={{width:8,height:8,borderRadius:2,background:P.accentSoft}}/>AM</div>
+          <div style={{display:"flex",alignItems:"center",gap:4}}><div style={{width:8,height:8,borderRadius:2,background:P.text}}/>PM</div>
+        </div>
+      </div>
+      <div style={{display:"flex",gap:6,marginBottom:8}}>{w1.map((d,i)=>cell(d,i))}</div>
+      <div style={{display:"flex",gap:6}}>{w2.map((d,i)=>cell(d,i))}</div>
+    </div>
+    <div style={{margin:"0 16px 14px",padding:4,borderRadius:22,background:P.card,border:`1px solid ${P.border}`,display:"grid",gridTemplateColumns:"1fr 1fr",gap:1,overflow:"hidden"}}>
+      {[{v:`${pct}%`,l:"Consistencia"},{v:totalDays,l:"Días registrados"},{v:0,l:"Fotos"},{v:`${history.length*14}m`,l:"Tiempo total"}].map((s,i)=>
+        <div key={i} style={{padding:14,background:P.card,borderRight:i%2===0?`1px solid ${P.border}`:"none",borderBottom:i<2?`1px solid ${P.border}`:"none"}}>
+          <div style={{fontSize:10,color:P.muted,letterSpacing:.4,textTransform:"uppercase",fontWeight:600,marginBottom:4}}>{s.l}</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:26,fontWeight:500,color:P.text,letterSpacing:-.5}}>{s.v}</div>
+        </div>
+      )}
+    </div>
+    <div style={{margin:"0 0 14px"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px 10px"}}>
+        <div style={{fontSize:14,fontWeight:600,color:P.text,letterSpacing:-.1}}>Diario de piel</div>
+        <button style={{background:"none",border:"none",color:P.accent,fontSize:12,fontWeight:600,cursor:"pointer"}}>+ Nueva</button>
+      </div>
+      {diary.length===0?<div style={{margin:"0 16px",padding:"20px",borderRadius:22,background:P.card,border:`1px solid ${P.border}`,textAlign:"center",color:P.muted,fontSize:13}}>Aún no hay notas. Usa "Nueva" para añadir.</div>:
+      <div style={{margin:"0 16px",borderRadius:22,background:P.card,border:`1px solid ${P.border}`,overflow:"hidden"}}>
+        {diary.map((d,i)=>{const c={good:{bg:"#dde9dd",fg:"#3d6b3d"},warn:{bg:"#f4d6c1",fg:"#a8511e"},normal:{bg:P.cream,fg:P.muted}}[d.tag]||{bg:P.cream,fg:P.muted};
+          return <div key={i} style={{padding:"14px 16px",borderBottom:i<diary.length-1?`1px solid ${P.border}`:"none",display:"flex",gap:12,alignItems:"flex-start"}}>
+            <div style={{width:36,height:36,borderRadius:10,flexShrink:0,background:c.bg,fontSize:18,display:"flex",alignItems:"center",justifyContent:"center"}}>{d.feel}</div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:10,color:P.muted,marginBottom:3,letterSpacing:.3,fontWeight:600,textTransform:"uppercase"}}>{d.date}</div>
+              <div style={{fontSize:13.5,color:P.text,lineHeight:1.45}}>{d.note}</div>
+            </div>
+          </div>;
+        })}
+      </div>}
+    </div>
+    <div style={{height:100}}/>
+  </div>;
+}
+
+// ─── PROGRESS SCREEN ─────────────────────────────
+function ProgressScreen({achievements,onAddPhoto}){
+  return <div>
+    <div style={{padding:"60px 20px 14px"}}>
+      <div style={{fontSize:12,color:P.muted,letterSpacing:.3,marginBottom:2}}>Cambios visibles</div>
+      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:30,fontWeight:500,color:P.text,letterSpacing:-.6,lineHeight:1.05}}>Progreso</div>
+    </div>
+    <div style={{margin:"0 16px 14px"}}>
+      <div style={{padding:16,borderRadius:22,background:P.card,border:`1px solid ${P.border}`}}>
+        <div style={{display:"flex",gap:10,marginBottom:14}}>
+          {[{d:"Hace 14d",t1:"#c4a87f",t2:"#a78a64",spots:7,lb:"ANTES"},{d:"Hoy",t1:"#d6c2a5",t2:"#b89e80",spots:4,lb:"AHORA"}].map((ph,i)=>
+            <div key={i} style={{flex:1}}>
+              <div style={{aspectRatio:"3/4",borderRadius:14,overflow:"hidden",background:`linear-gradient(140deg,${ph.t1},${ph.t2})`,position:"relative",border:`1px solid ${P.border}`}}>
+                <svg viewBox="0 0 100 130" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
+                  <ellipse cx="50" cy="58" rx="28" ry="38" fill="rgba(0,0,0,0.08)"/>
+                  {Array.from({length:ph.spots}).map((_,j)=><circle key={j} cx={32+(j*7)%38} cy={45+(j*11)%30} r={1.4} fill="rgba(80,40,20,0.4)"/>)}
+                </svg>
+                <div style={{position:"absolute",top:8,left:8,fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:"white",background:"rgba(0,0,0,.4)",padding:"2px 6px",borderRadius:3,letterSpacing:.5}}>{ph.lb} · {ph.d}</div>
+              </div>
+            </div>
+          )}
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+          {[{l:"Manchas",v:"−43%"},{l:"Tono",v:"+12%"},{l:"Hidratación",v:"+8%"},{l:"Brillo zona T",v:"−21%"}].map(s=>
+            <div key={s.l} style={{padding:"10px 12px",background:P.cream,borderRadius:12}}>
+              <div style={{fontSize:10,color:P.muted,marginBottom:2}}>{s.l}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:16,fontWeight:600,color:"#5b8a5b"}}>{s.v}</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+    <div style={{margin:"0 0 14px"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px 10px"}}>
+        <div style={{fontSize:14,fontWeight:600,color:P.text,letterSpacing:-.1}}>Fotos de progreso</div>
+        <button style={{background:"none",border:"none",color:P.accent,fontSize:12,fontWeight:600,cursor:"pointer"}}>Ver todo</button>
+      </div>
+      <div style={{display:"flex",gap:8,overflowX:"auto",padding:"0 16px 4px"}}>
+        <button onClick={onAddPhoto} style={{width:78,height:100,borderRadius:14,border:`1.5px dashed ${P.border}`,background:P.cream,flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6,color:P.muted,cursor:"pointer"}}>
+          <Icon name="plus" size={18} color={P.muted}/><div style={{fontSize:9.5,fontWeight:600,letterSpacing:.4}}>NUEVA</div>
+        </button>
+        {[{d:"Hace 14d",t1:"#c4a87f",t2:"#a78a64",spots:7},{d:"Hace 7d",t1:"#d0b692",t2:"#b29672",spots:5}].map((ph,i)=>
+          <div key={i} style={{width:78,height:100,borderRadius:14,flexShrink:0,background:`linear-gradient(140deg,${ph.t1},${ph.t2})`,position:"relative",overflow:"hidden",border:`1px solid ${P.border}`}}>
+            <svg viewBox="0 0 78 100" style={{position:"absolute",inset:0}}><ellipse cx="39" cy="46" rx="20" ry="28" fill="rgba(0,0,0,.1)"/>{Array.from({length:ph.spots}).map((_,j)=><circle key={j} cx={28+(j*5)%22} cy={36+(j*9)%22} r={1} fill="rgba(80,40,20,.45)"/>)}</svg>
+            <div style={{position:"absolute",bottom:4,left:4,fontFamily:"'JetBrains Mono',monospace",fontSize:8,color:"rgba(255,255,255,.95)",background:"rgba(0,0,0,.4)",padding:"1px 5px",borderRadius:3}}>{ph.d}</div>
+          </div>
+        )}
+      </div>
+    </div>
+    <div style={{padding:"0 16px 14px"}}>
+      <div style={{fontSize:14,fontWeight:600,color:P.text,marginBottom:10,letterSpacing:-.1}}>Logros</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+        {achievements.map(a=><div key={a.id} style={{padding:14,borderRadius:18,background:a.unlocked?P.card:P.cream,border:`1px solid ${P.border}`,opacity:a.unlocked?1:.7}}>
+          <div style={{width:36,height:36,borderRadius:18,background:a.unlocked?P.accentSoft:P.card,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
+            <Icon name={a.icon} size={18} color={a.unlocked?P.accent:P.muted} fill={a.unlocked?P.accent:"none"} sw={1.4}/>
+          </div>
+          <div style={{fontSize:13,fontWeight:600,color:P.text,lineHeight:1.3,letterSpacing:-.1}}>{a.label}</div>
+          {!a.unlocked&&a.progress!=null&&<div style={{marginTop:6,height:4,borderRadius:2,background:P.border,overflow:"hidden"}}><div style={{height:"100%",width:`${a.progress*100}%`,background:P.accent}}/></div>}
+        </div>)}
+      </div>
+    </div>
+    <div style={{height:100}}/>
+  </div>;
+}
+
+// ─── SHELF SCREEN ────────────────────────────────
+function ShelfScreen({products}){
+  return <div>
+    <div style={{padding:"60px 20px 14px"}}>
+      <div style={{fontSize:12,color:P.muted,letterSpacing:.3,marginBottom:2}}>Mis productos</div>
+      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:30,fontWeight:500,color:P.text,letterSpacing:-.6,lineHeight:1.05}}>Estante</div>
+    </div>
+    <div style={{padding:"0 16px 14px"}}>
+      <div style={{display:"flex",gap:8,padding:"10px 14px",borderRadius:14,background:P.card,border:`1px solid ${P.border}`,alignItems:"center",marginBottom:10}}>
+        <Icon name="bell" size={16} color={P.accent}/>
+        <div style={{flex:1,fontSize:12.5,color:P.text,lineHeight:1.4}}><strong style={{fontWeight:600}}>SPF se acaba pronto.</strong><span style={{color:P.muted}}> El Skin1004 está al 40%.</span></div>
+        <button style={{background:P.accent,color:P.cardOnAccent,border:"none",borderRadius:10,padding:"6px 10px",fontSize:11,fontWeight:600,cursor:"pointer"}}>Pedir</button>
+      </div>
+      <div style={{background:P.card,borderRadius:22,border:`1px solid ${P.border}`,overflow:"hidden"}}>
+        {products.map((p,i)=><div key={p.id} style={{display:"flex",alignItems:"center",gap:12,padding:14,borderBottom:i<products.length-1?`1px solid ${P.border}`:"none"}}>
+          <div style={{width:44,height:56,borderRadius:8,flexShrink:0,background:`linear-gradient(160deg,${p.tone},${p.tone}cc)`,position:"relative",overflow:"hidden",border:`1px solid ${P.border}`}}>
+            <div style={{position:"absolute",inset:"8% 28%",borderRadius:3,background:"linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.05))",border:"1px solid rgba(255,255,255,.5)"}}/>
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:10,color:P.muted,letterSpacing:1,textTransform:"uppercase",fontWeight:600,marginBottom:1}}>{p.cat}</div>
+            <div style={{fontSize:14,fontWeight:500,color:P.text,lineHeight:1.25,letterSpacing:-.1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.name}</div>
+            <div style={{fontSize:11,color:P.muted,marginTop:2}}>{p.brand}</div>
+          </div>
+          <div style={{width:28,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+            <div style={{width:6,height:28,borderRadius:3,background:P.cream,position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",bottom:0,left:0,right:0,height:`${p.fill}%`,background:p.critical?"#a8511e":P.accent}}/>
+            </div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:P.muted}}>{p.fill}%</div>
+          </div>
+        </div>)}
+      </div>
+    </div>
+    <div style={{height:100}}/>
+  </div>;
+}
+
+// ─── TAB BAR ─────────────────────────────────────
+function TabBar({tab,onTab}){
+  const items=[{id:"today",label:"Hoy",icon:"drop"},{id:"history",label:"Historial",icon:"calendar"},{id:"progress",label:"Progreso",icon:"chart"},{id:"shelf",label:"Estante",icon:"bookmark"}];
+  return <div style={{position:"absolute",left:12,right:12,bottom:28,zIndex:30,borderRadius:28,background:P.card,border:`1px solid ${P.border}`,boxShadow:`0 12px 30px -8px ${P.shadow}`,display:"flex",padding:6}}>
+    {items.map(it=>{const a=tab===it.id;return <button key={it.id} onClick={()=>onTab(it.id)} style={{flex:1,height:50,borderRadius:22,border:"none",background:a?P.text:"transparent",color:a?P.cardOnText:P.muted,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,cursor:"pointer",transition:"all 0.25s"}}>
+      <Icon name={it.icon} size={18} color={a?P.cardOnText:P.muted}/>
+      <div style={{fontSize:9.5,fontWeight:600,letterSpacing:.3}}>{it.label}</div>
+    </button>;})}
+  </div>;
+}
+
+// ─── APP ─────────────────────────────────────────
+function App(){
+  const [tab,setTab]=React.useState("today");
+  const [mode,setMode]=React.useState("morning");
+  const [activeIdx,setActiveIdx]=React.useState(null);
+  const [doneSteps,setDoneSteps]=React.useState(new Set());
+  const [showComplete,setShowComplete]=React.useState(false);
+  const [showCamera,setShowCamera]=React.useState(false);
+  const [history,setHistory]=React.useState(DATA.history);
+  const [diary,setDiary]=React.useState(DATA.diary);
+
+  React.useEffect(()=>{setDoneSteps(new Set());setActiveIdx(null);},[mode]);
+
+  const streak=getStreak(history);
+  const routine=DATA.routines[mode];
+  const completedCount=routine.steps.filter(s=>doneSteps.has(s.id)).length;
+  const completedMin=routine.steps.filter(s=>doneSteps.has(s.id)).reduce((a,s)=>a+s.min,0);
+  const isFinished=completedCount===routine.steps.length;
+
+  const stepState=(s,i)=>doneSteps.has(s.id)?"done":i===activeIdx?"active":"pending";
+  const onTap=(i)=>setActiveIdx(i);
+  const onComplete=(s,i)=>{
+    const next=new Set(doneSteps);next.add(s.id);setDoneSteps(next);
+    const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!next.has(st.id));
+    if(nextIdx===-1){setActiveIdx(null);setTimeout(()=>setShowComplete(true),350);}
+    else setActiveIdx(nextIdx);
+  };
+  const onSkip=(s,i)=>{const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!doneSteps.has(st.id));setActiveIdx(nextIdx===-1?null:nextIdx);};
+
+  const handleCompleteClose=()=>{
+    const today=new Date().toISOString().split("T")[0];
+    const session={date:today,time:new Date().toTimeString().slice(0,5),routine:mode,steps:completedCount};
+    const newH=[...history,session];setHistory(newH);saveHistory(newH);
+    setShowComplete(false);setDoneSteps(new Set());setActiveIdx(null);
+  };
+
+  const handleSaveDiary=(feel,note)=>{
+    if(!feel&&!note){setShowCamera(false);return;}
+    const moods={great:"😍",good:"🙂",meh:"😐",bad:"😬"};
+    const entry={date:"Hoy",feel:moods[feel]||"🙂",note:note||"Foto tomada.",tag:feel==="bad"?"warn":feel==="great"?"good":"normal"};
+    const newD=[entry,...diary].slice(0,20);setDiary(newD);saveDiary(newD);
+    setShowCamera(false);
+  };
+
+  return <div style={{width:"100%",height:"100%",background:P.bg,color:P.text,position:"relative",overflow:"hidden"}}>
+    <div style={{height:"100%",overflowY:"auto",paddingBottom:110,scrollbarWidth:"none"}}>
+      {tab==="today"&&<TodayScreen mode={mode} setMode={setMode} routine={routine} stepState={stepState} onTap={onTap} onComplete={onComplete} onSkip={onSkip} completedCount={completedCount} completedMin={completedMin} isFinished={isFinished} onShowComplete={()=>setShowComplete(true)} streak={streak}/>}
+      {tab==="history"&&<HistoryScreen history={history} diary={diary} streak={streak} onAddPhoto={()=>setShowCamera(true)}/>}
+      {tab==="progress"&&<ProgressScreen achievements={DATA.achievements} onAddPhoto={()=>setShowCamera(true)}/>}
+      {tab==="shelf"&&<ShelfScreen products={DATA.products}/>}
+    </div>
+    <TabBar tab={tab} onTab={setTab}/>
+    {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.total,minutes:Math.round(completedMin),streak}} onPhoto={()=>{setShowComplete(false);setShowCamera(true);}} onClose={handleCompleteClose}/>}
+    {showCamera&&<PhotoCaptureScreen onClose={()=>setShowCamera(false)} onSave={handleSaveDiary}/>}
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
 
 <script>
-
-const animations = {
-  circular: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="100" cy="68" rx="38" ry="46" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
-    <circle cx="86" cy="58" r="3.5" fill="#d9c4aa"/>
-    <circle cx="114" cy="58" r="3.5" fill="#d9c4aa"/>
-    <path d="M89 80 Q100 87 111 80" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
-    <ellipse cx="100" cy="68" rx="57" ry="64" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="16 10" opacity="0.7">
-      <animateTransform attributeName="transform" type="rotate" from="0 100 68" to="360 100 68" dur="2.5s" repeatCount="3"/>
-    </ellipse>
-    <polygon points="153,32 162,22 164,35" fill="#2563eb" opacity="0.7">
-      <animateTransform attributeName="transform" type="rotate" from="0 100 68" to="360 100 68" dur="2.5s" repeatCount="3"/>
-    </polygon>
-    <text x="100" y="126" text-anchor="middle" font-size="9.5" fill="#999" font-family="DM Sans,sans-serif">Masajea en círculos · 60 segundos</text>
-  </svg>`,
-
-  circular_oil: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="100" cy="68" rx="38" ry="46" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
-    <circle cx="86" cy="58" r="3.5" fill="#d9c4aa"/>
-    <circle cx="114" cy="58" r="3.5" fill="#d9c4aa"/>
-    <path d="M89 80 Q100 87 111 80" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
-    <ellipse cx="100" cy="68" rx="57" ry="64" fill="none" stroke="#9b59b6" stroke-width="2.5" stroke-dasharray="16 10" opacity="0.7">
-      <animateTransform attributeName="transform" type="rotate" from="0 100 68" to="360 100 68" dur="2.5s" repeatCount="3"/>
-    </ellipse>
-    <polygon points="153,32 162,22 164,35" fill="#9b59b6" opacity="0.7">
-      <animateTransform attributeName="transform" type="rotate" from="0 100 68" to="360 100 68" dur="2.5s" repeatCount="3"/>
-    </polygon>
-    <circle cx="170" cy="30" r="6" fill="#a8d8ea" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;1;1;0" dur="2.5s" repeatCount="3"/>
-      <animate attributeName="cy" values="10;30" dur="2.5s" repeatCount="3"/>
-    </circle>
-    <circle cx="180" cy="45" r="4" fill="#a8d8ea" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;0;1;0" dur="2.5s" repeatCount="3"/>
-    </circle>
-    <text x="100" y="118" text-anchor="middle" font-size="9" fill="#999" font-family="DM Sans,sans-serif">Cara seca → masajea → agrega agua</text>
-    <text x="100" y="128" text-anchor="middle" font-size="9" fill="#a8d8ea" font-family="DM Sans,sans-serif">💧 emulsifica y enjuaga</text>
-  </svg>`,
-
-  patting: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="100" cy="82" rx="36" ry="42" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
-    <circle cx="87" cy="72" r="3" fill="#d9c4aa"/>
-    <circle cx="113" cy="72" r="3" fill="#d9c4aa"/>
-    <path d="M90 92 Q100 99 110 92" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
-    <g opacity="0.85">
-      <animateTransform attributeName="transform" type="translate" values="0,0;0,10;0,0" dur="1.6s" repeatCount="3" additive="sum"/>
-      <ellipse cx="72" cy="28" rx="14" ry="8" fill="#f5e6d3" stroke="#c8a882" stroke-width="1.2"/>
-      <rect x="62" y="28" width="4" height="14" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
-      <rect x="67.5" y="26" width="4" height="16" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
-      <rect x="73" y="26" width="4" height="16" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
-      <rect x="78.5" y="28" width="3.5" height="13" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
-    </g>
-    <g opacity="0.85">
-      <animateTransform attributeName="transform" type="translate" values="0,0;0,10;0,0" dur="1.6s" repeatCount="3" additive="sum"/>
-      <ellipse cx="128" cy="28" rx="14" ry="8" fill="#f5e6d3" stroke="#c8a882" stroke-width="1.2"/>
-      <rect x="118" cy="28" x="118" y="28" width="4" height="14" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
-      <rect x="123.5" y="26" width="4" height="16" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
-      <rect x="129" y="26" width="4" height="16" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
-      <rect x="134.5" y="28" width="3.5" height="13" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
-    </g>
-    <circle cx="100" cy="82" r="0" fill="none" stroke="#2563eb" stroke-width="1.5" opacity="0">
-      <animate attributeName="r" values="0;30" begin="0.8s" dur="1.6s" repeatCount="3"/>
-      <animate attributeName="opacity" values="0.7;0" begin="0.8s" dur="1.6s" repeatCount="3"/>
-    </circle>
-    <text x="100" y="126" text-anchor="middle" font-size="9.5" fill="#999" font-family="DM Sans,sans-serif">Palmotea suavemente · no frotes</text>
-  </svg>`,
-
-  dropper: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="100" cy="95" rx="36" ry="30" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
-    <circle cx="88" cy="88" r="2.5" fill="#d9c4aa"/>
-    <circle cx="112" cy="88" r="2.5" fill="#d9c4aa"/>
-    <path d="M91 102 Q100 107 109 102" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
-    <rect x="90" y="5" width="20" height="30" rx="4" fill="#e8e0d8" stroke="#b8a898" stroke-width="1.2"/>
-    <ellipse cx="100" cy="5" rx="10" ry="6" fill="#d8d0c8" stroke="#b8a898" stroke-width="1"/>
-    <rect x="97" y="35" width="6" height="12" rx="3" fill="#b8a898"/>
-    <ellipse cx="100" cy="50" rx="5" ry="7" fill="#a8d4f8" opacity="0">
-      <animate attributeName="cy" values="47;80" dur="1.2s" repeatCount="3"/>
-      <animate attributeName="opacity" values="0;1;1;0" dur="1.2s" repeatCount="3"/>
-    </ellipse>
-    <ellipse cx="100" cy="50" rx="4" ry="6" fill="#a8d4f8" opacity="0">
-      <animate attributeName="cy" values="47;80" begin="0.4s" dur="1.2s" repeatCount="3"/>
-      <animate attributeName="opacity" values="0;1;1;0" begin="0.4s" dur="1.2s" repeatCount="3"/>
-    </ellipse>
-    <ellipse cx="100" cy="50" rx="3.5" ry="5.5" fill="#a8d4f8" opacity="0">
-      <animate attributeName="cy" values="47;80" begin="0.8s" dur="1.2s" repeatCount="3"/>
-      <animate attributeName="opacity" values="0;1;1;0" begin="0.8s" dur="1.2s" repeatCount="3"/>
-    </ellipse>
-    <text x="100" y="126" text-anchor="middle" font-size="9.5" fill="#999" font-family="DM Sans,sans-serif">2-3 gotas · presiona suavemente</text>
-  </svg>`,
-
-  spreading: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="100" cy="70" rx="38" ry="46" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
-    <circle cx="86" cy="60" r="3.5" fill="#d9c4aa"/>
-    <circle cx="114" cy="60" r="3.5" fill="#d9c4aa"/>
-    <path d="M89 82 Q100 89 111 82" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="100" y1="70" x2="65" y2="48" stroke="#4a7c59" stroke-width="2.5" stroke-linecap="round" opacity="0">
-      <animate attributeName="opacity" values="0;0.8;0" dur="2s" repeatCount="3"/>
-      <animate attributeName="x2" values="100;65" dur="2s" repeatCount="3"/>
-      <animate attributeName="y2" values="70;48" dur="2s" repeatCount="3"/>
-    </line>
-    <line x1="100" y1="70" x2="135" y2="48" stroke="#4a7c59" stroke-width="2.5" stroke-linecap="round" opacity="0">
-      <animate attributeName="opacity" values="0;0.8;0" dur="2s" repeatCount="3"/>
-      <animate attributeName="x2" values="100;135" dur="2s" repeatCount="3"/>
-      <animate attributeName="y2" values="70;48" dur="2s" repeatCount="3"/>
-    </line>
-    <line x1="100" y1="70" x2="72" y2="75" stroke="#4a7c59" stroke-width="2" stroke-linecap="round" opacity="0">
-      <animate attributeName="opacity" values="0;0;0.8;0" dur="2s" repeatCount="3"/>
-    </line>
-    <line x1="100" y1="70" x2="128" y2="75" stroke="#4a7c59" stroke-width="2" stroke-linecap="round" opacity="0">
-      <animate attributeName="opacity" values="0;0;0.8;0" dur="2s" repeatCount="3"/>
-    </line>
-    <line x1="100" y1="70" x2="100" y2="100" stroke="#4a7c59" stroke-width="2" stroke-linecap="round" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;0.8;0" dur="2s" repeatCount="3"/>
-    </line>
-    <text x="100" y="126" text-anchor="middle" font-size="9.5" fill="#999" font-family="DM Sans,sans-serif">Distribuye hacia arriba y hacia afuera</text>
-  </svg>`,
-
-  spf: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="100" cy="72" rx="38" ry="46" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
-    <circle cx="86" cy="62" r="3.5" fill="#d9c4aa"/>
-    <circle cx="114" cy="62" r="3.5" fill="#d9c4aa"/>
-    <path d="M89 84 Q100 91 111 84" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="22" cy="28" r="14" fill="#f7c948" opacity="0.8"/>
-    <line x1="22" y1="8" x2="22" y2="2" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="36" y1="14" x2="40" y2="10" stroke="#f7c948" stroke-width="2" stroke-linecap="round"/>
-    <line x1="42" y1="28" x2="48" y2="28" stroke="#f7c948" stroke-width="2" stroke-linecap="round"/>
-    <line x1="36" y1="42" x2="40" y2="46" stroke="#f7c948" stroke-width="2" stroke-linecap="round"/>
-    <rect x="62" y="26" width="0" height="92" rx="2" fill="#f7c948" opacity="0.35">
-      <animate attributeName="width" values="0;76;76;0" dur="2.5s" repeatCount="3"/>
-    </rect>
-    <text x="100" y="126" text-anchor="middle" font-size="9.5" fill="#999" font-family="DM Sans,sans-serif">Capa uniforme · cara, cuello y orejas</text>
-  </svg>`,
-
-  retinal: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="100" cy="70" rx="38" ry="46" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
-    <ellipse cx="85" cy="60" rx="14" ry="9" fill="#ffdddd" stroke="#e07060" stroke-width="1.2" opacity="0">
-      <animate attributeName="opacity" values="0;0.85;0.85;0" dur="2.5s" repeatCount="3"/>
-    </ellipse>
-    <ellipse cx="115" cy="60" rx="14" ry="9" fill="#ffdddd" stroke="#e07060" stroke-width="1.2" opacity="0">
-      <animate attributeName="opacity" values="0;0.85;0.85;0" dur="2.5s" repeatCount="3"/>
-    </ellipse>
-    <ellipse cx="100" cy="84" rx="14" ry="6" fill="#ffdddd" stroke="#e07060" stroke-width="1.2" opacity="0">
-      <animate attributeName="opacity" values="0;0.85;0.85;0" dur="2.5s" repeatCount="3"/>
-    </ellipse>
-    <text x="85" y="55" text-anchor="middle" font-size="7.5" fill="#e07060" font-weight="bold" font-family="DM Sans,sans-serif" opacity="0">
-      <animate attributeName="opacity" values="0;0;1;1;0" dur="2.5s" repeatCount="3"/>
-      evitar
-    </text>
-    <text x="115" y="55" text-anchor="middle" font-size="7.5" fill="#e07060" font-weight="bold" font-family="DM Sans,sans-serif" opacity="0">
-      <animate attributeName="opacity" values="0;0;1;1;0" dur="2.5s" repeatCount="3"/>
-      evitar
-    </text>
-    <ellipse cx="100" cy="70" rx="22" ry="26" fill="#d4edda" stroke="#4a7c59" stroke-width="1.2" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;0.6;0" dur="2.5s" repeatCount="3"/>
-    </ellipse>
-    <text x="100" y="72" text-anchor="middle" font-size="8" fill="#2d6040" font-family="DM Sans,sans-serif" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;0.9;0" dur="2.5s" repeatCount="3"/>
-      aplicar aquí
-    </text>
-    <text x="100" y="126" text-anchor="middle" font-size="9.5" fill="#999" font-family="DM Sans,sans-serif">Evita ojos · labios · nariz</text>
-  </svg>`,
-
-  eye: `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-    <path d="M40 55 Q100 20 160 55 Q100 90 40 55 Z" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/>
-    <ellipse cx="100" cy="55" rx="16" ry="20" fill="#8bb4d4" stroke="#6a94b4" stroke-width="1"/>
-    <ellipse cx="100" cy="55" rx="9" ry="12" fill="#3d3d3d"/>
-    <circle cx="106" cy="50" r="3" fill="white"/>
-    <path d="M40 55 Q100 20 160 55" fill="none" stroke="#d9c4aa" stroke-width="2"/>
-    <path d="M44 58 Q100 88 156 58" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-dasharray="4 3"/>
-    <g>
-      <animateTransform attributeName="transform" type="translate" values="0,0;0,-8;0,0" dur="1.5s" repeatCount="3" additive="sum"/>
-      <rect x="88" y="95" width="24" height="10" rx="5" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
-      <rect x="96" y="85" width="8" height="14" rx="4" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/>
-      <text x="100" y="103" text-anchor="middle" font-size="6.5" fill="#c8a882" font-family="DM Sans,sans-serif">anular</text>
-    </g>
-    <circle cx="100" cy="78" r="0" fill="none" stroke="#c8a882" stroke-width="1.2" opacity="0">
-      <animate attributeName="r" values="0;18" begin="0.7s" dur="1.5s" repeatCount="3"/>
-      <animate attributeName="opacity" values="0.6;0" begin="0.7s" dur="1.5s" repeatCount="3"/>
-    </circle>
-    <text x="100" y="126" text-anchor="middle" font-size="9.5" fill="#999" font-family="DM Sans,sans-serif">Dedo anular · presión ultra suave</text>
-  </svg>`
-};
-
-const products = {
-  cosrxCleanser: {
-    brand: 'COSRX',
-    name: 'Low pH Good Morning Gel Cleanser',
-    img: 'https://cdn.shopify.com/s/files/1/0899/8862/8852/files/014bacaa5033868972397215d3e45eb86d42f763e510ef21908e9c8aa3c3ec94.jpg?v=1747656928&width=300',
-    emoji: '🧴',
-    badge: 'cleanse',
-    badgeText: 'Limpieza'
-  },
-  banilaCo: {
-    brand: 'Banila Co',
-    name: 'Clean It Zero Cleansing Balm',
-    img: 'https://images.yesstyle.com/image/0000404059/3.jpg',
-    emoji: '🌸',
-    badge: 'cleanse',
-    badgeText: 'Doble limpieza'
-  },
-  bojToner: {
-    brand: 'Beauty of Joseon',
-    name: 'Ginseng Essence Water',
-    img: 'https://beautyofjoseon.com/cdn/shop/products/ginseng-essence-water.jpg',
-    emoji: '💧',
-    badge: 'hydra',
-    badgeText: 'Tónico'
-  },
-  mizonSnail: {
-    brand: 'Mizon',
-    name: 'Snail Repair Intensive Essence',
-    img: 'https://images.yesstyle.com/image/0000393271/3.jpg',
-    emoji: '🐌',
-    badge: 'repair',
-    badgeText: 'Essence reparadora'
-  },
-  skin1004Ampoule: {
-    brand: 'Skin1004',
-    name: 'Madagascar Centella Ampoule',
-    img: 'https://skin1004.com/cdn/shop/products/centella-ampoule.jpg',
-    emoji: '🌿',
-    badge: 'repair',
-    badgeText: 'Ampoule calmante'
-  },
-  bojReviveSerum: {
-    brand: 'Beauty of Joseon',
-    name: 'Revive Serum: Ginseng + Snail Mucin',
-    img: 'https://beautyofjoseon.com/cdn/shop/products/revive-serum.jpg',
-    emoji: '✨',
-    badge: 'repair',
-    badgeText: 'Suero reparador'
-  },
-  axisY: {
-    brand: 'Axis-Y',
-    name: 'Dark Spot Correcting Glow Serum',
-    img: 'https://images.yesstyle.com/image/0000439563/3.jpg',
-    emoji: '🌟',
-    badge: 'bright',
-    badgeText: 'Iluminador'
-  },
-  bojEyeSerum: {
-    brand: 'Beauty of Joseon',
-    name: 'Revive Eye Serum: Ginseng + Retinal',
-    img: 'https://beautyofjoseon.com/cdn/shop/products/revive-eye-serum.jpg',
-    emoji: '👁️',
-    badge: 'retinal',
-    badgeText: 'Contorno ojos'
-  },
-  kSecretSerum: {
-    brand: 'K-Secret',
-    name: 'Seoul 1988 Serum — Retinal 2%',
-    img: 'https://images.yesstyle.com/image/0000459821/3.jpg',
-    emoji: '🔴',
-    badge: 'retinal',
-    badgeText: 'Retinal facial'
-  },
-  kSecretEye: {
-    brand: 'K-Secret',
-    name: 'Seoul 1988 Eye Cream — Retinal 4%',
-    img: 'https://images.yesstyle.com/image/0000459822/3.jpg',
-    emoji: '🔴',
-    badge: 'retinal',
-    badgeText: 'Contorno ojos retinal'
-  },
-  cosrxCream: {
-    brand: 'COSRX',
-    name: 'Hyaluronic Acid Intensive Cream',
-    img: 'https://cdn.shopify.com/s/files/1/0899/8862/8852/files/cosrx-ha-cream.jpg',
-    emoji: '🧊',
-    badge: 'hydra',
-    badgeText: 'Hidratante'
-  },
-  skin1004Spf: {
-    brand: 'Skin1004',
-    name: 'Centella Hyalu-Cica Water-Fit Sun Serum SPF50+',
-    img: 'https://skin1004.com/cdn/shop/products/sun-serum.jpg',
-    emoji: '☀️',
-    badge: 'sun',
-    badgeText: 'Protector solar'
-  }
-};
-
-const routines = {
-  am: {
-    steps: 5,
-    time: '~10 min',
-    steps_data: [
-      {
-        label: 'Limpieza',
-        why: 'El COSRX con pH bajo limpia sin alterar la barrera cutánea. Elimina el sebo acumulado durante la noche y deja la piel lista para absorber el tónico y el sérum.',
-        animId: 'circular',
-        product: 'cosrxCleanser',
-        time: '2 min',
-        instructions: 'Mójate la cara con agua tibia. Saca una cantidad del tamaño de una moneda de $100 (no más — usar más no limpia mejor). Espúmalo entre las manos y masajea en círculos suaves por 60 segundos. Enjuaga con agua fría para cerrar los poros.',
-        tip: '💡 En la mañana no necesitas doble limpieza, el gel solo es suficiente.',
-        tipType: ''
-      },
-      {
-        label: 'Tónico/Essence',
-        why: 'El ginseng aporta antioxidantes y rehidrata tras el lavado. Equilibra el pH y actúa como primer: sin este paso los sérums penetran mucho menos profundo.',
-        animId: 'patting',
-        product: 'bojToner',
-        time: '1.5 min',
-        instructions: 'Vierte el equivalente a llenar el centro de tu palma (aprox. 4-5 gotas). Caliéntalo un segundo entre las manos y luego palmotea suavemente sobre cara y cuello. Espera que absorba.',
-        tip: '💡 No uses algodón — las palmas de las manos lo aplican mejor sin desperdiciar producto.',
-        tipType: ''
-      },
-      {
-        label: 'Sérum iluminador',
-        why: 'Niacinamida 5% + Squalane: reduce manchas oscuras, minimiza poros y unifica el tono con el tiempo. De día potencia la efectividad del protector solar contra pigmentación.',
-        animId: 'dropper',
-        product: 'axisY',
-        time: '1.5 min',
-        instructions: '3-4 gotas del gotero — tamaño de un garbanzo pequeño. Distribuye presionando suavemente en frente, mejillas, nariz y mentón. Espera que absorba antes del siguiente paso.',
-        tip: '💡 Niacinamida en mañana = potencia el efecto del SPF y unifica tono durante el día. El BoJ Revive Serum va en la noche.',
-        tipType: ''
-      },
-      {
-        label: 'Crema hidratante',
-        why: 'El ácido hialurónico retiene agua en la piel. Sella todo lo anterior y crea una barrera suave que protege antes del SPF. Evita que la piel se reseque durante el día.',
-        animId: 'spreading',
-        product: 'cosrxCream',
-        time: '2 min',
-        instructions: 'Toma una cantidad del tamaño de un garbanzo — equivale a una moneda de $500. Aplica en 5 puntos (frente, 2 mejillas, nariz, mentón) y distribuye con movimientos ascendentes hasta cuello.',
-        tip: '💡 Aplica siempre de abajo hacia arriba para no bajar la piel con el tiempo.',
-        tipType: ''
-      },
-      {
-        label: 'Protector solar ☀️',
-        why: 'SPF50+ PA++++: bloquea rayos UVA y UVB. Sin protección solar, el retinal y la niacinamida que usas de noche generan manchas en lugar de reducirlas. Es el paso más importante.',
-        animId: 'spf',
-        product: 'skin1004Spf',
-        time: '1 min',
-        instructions: 'Media cucharadita (2 ml) para cara + cuello + orejas — más de lo que crees necesitar. Aplica en 5 puntos y distribuye uniformemente. Espera 15 minutos antes de salir al sol.',
-        tip: '🔴 ¡NUNCA salir sin SPF! Este paso es el más importante de toda la rutina de mañana.',
-        tipType: 'red'
-      }
-    ]
-  },
-  pm_retinal: {
-    steps: 9,
-    time: '~28 min',
-    steps_data: [
-      {
-        label: 'Doble limpieza — Aceite',
-        why: 'El Cleansing Balm disuelve con aceites el SPF, sebo y maquillaje resistente al agua. El agua sola no puede eliminar esto. Sin este paso, los poros se tapan acumulando residuos.',
-        animId: 'circular_oil',
-        product: 'banilaCo',
-        time: '2 min',
-        instructions: 'Con la cara completamente SECA, toma una cantidad del tamaño de una avellana (no más — el balm es concentrado). Masajea en círculos por toda la cara por 60 segundos. Agrega agua — verás que se vuelve lechoso. Enjuaga bien.',
-        tip: '💡 Aplícalo siempre en cara seca. El agua al inicio impide que disuelva el maquillaje correctamente.',
-        tipType: ''
-      },
-      {
-        label: 'Doble limpieza — Agua',
-        why: 'Segunda limpieza para retirar los residuos emulsionados por el balm. El pH bajo del COSRX respeta la barrera cutánea y deja la piel lista para absorber todos los activos.',
-        animId: 'circular',
-        product: 'cosrxCleanser',
-        time: '1.5 min',
-        instructions: 'Misma cantidad: tamaño de una moneda de $100. Segunda limpieza para eliminar residuos del balm y cualquier impureza restante. Misma técnica que en la mañana.',
-        tip: '💡 La doble limpieza es clave por la noche — elimina todo lo que el balm soltó.',
-        tipType: ''
-      },
-      {
-        label: 'Tónico/Essence',
-        why: 'Rehidrata y restaura el pH post-limpieza. El ginseng nutre y el formato essence prepara la piel para que los sérums siguientes penetren hasta un 40% más profundo.',
-        animId: 'patting',
-        product: 'bojToner',
-        time: '1.5 min',
-        instructions: 'Palmotea suavemente sobre la piel limpia. Prepara la piel para absorber mejor los siguientes pasos.',
-        tip: '',
-        tipType: ''
-      },
-      {
-        label: 'Essence reparadora',
-        why: 'El mucín de caracol Mizon repara micro-daños del día, estimula colágeno y genera una capa hidratante que ayuda a la piel a tolerar mejor el retinal que viene después.',
-        animId: 'patting',
-        product: 'mizonSnail',
-        time: '1.5 min',
-        instructions: 'Toma una cantidad del tamaño de una avellana — suficiente para cubrir cara y cuello. Palmotea suavemente sobre toda la cara. El filtrato de caracol repara y prepara la piel para el retinal.',
-        tip: '💡 Genera una base hidratante que ayuda a tolerar mejor el retinal.',
-        tipType: ''
-      },
-      {
-        label: 'Ampoule calmante',
-        why: 'La centella de Madagascar calma rojeces y fortalece la barrera cutánea. Es el escudo de protección antes del retinal: reduce significativamente la posible irritación.',
-        animId: 'dropper',
-        product: 'skin1004Ampoule',
-        time: '1.5 min',
-        instructions: '3-4 gotas del gotero — el equivalente al tamaño de un garbanzo. Distribuye presionando suavemente. La centella asiática calma y fortalece la barrera cutánea antes del retinal.',
-        tip: '💡 La centella reduce la irritación que puede generar el retinal.',
-        tipType: ''
-      },
-      {
-        label: '⏸️ PAUSA OBLIGATORIA',
-        pause: true,
-        time: '10-15 min',
-        instructions: 'Espera que la piel absorba completamente los pasos anteriores y que el pH suba. Aprovecha para cepillarte los dientes.',
-        tip: '🔴 Esta pausa es crítica. Aplicar retinal sobre pH bajo o piel húmeda aumenta la irritación.',
-        tipType: 'red'
-      },
-      {
-        label: 'Retinal facial',
-        why: 'Retinal 2% (más potente que el retinol clásico): estimula la producción de colágeno, acelera la renovación celular, reduce arrugas finas y unifica el tono. Resultados visibles en 4-8 semanas.',
-        animId: 'retinal',
-        product: 'kSecretSerum',
-        time: '1 min',
-        instructions: '1 sola gota para toda la cara — no más. Distribuye con el dedo índice evitando: contorno de ojos (1 cm), bordes de labios y fosas nasales. Capa ultra fina y uniforme.',
-        tip: '🔴 Empieza 2x/semana. Sube a 3x solo cuando tu piel lo tolere sin irritarse. Si pica mucho, espera más minutos después de la hidratación.',
-        tipType: 'red'
-      },
-      {
-        label: 'Contorno de ojos',
-        why: 'La zona del ojo es la más delicada y la primera en mostrar envejecimiento. El retinal suave del BoJ + retinal 4% del K-Secret estimulan colágeno y reducen ojeras y líneas finas.',
-        animId: 'eye',
-        product: 'bojEyeSerum',
-        time: '2 min',
-        instructions: 'Usa la cantidad de UN grano de arroz para AMBOS ojos (así de poco — usar más causa milia). Alterna: Lun/Mié → BoJ Revive Eye Serum. Vie → K-Secret 1988 Eye Cream. Toca SOLO con el dedo anular, presión ultra suave.',
-        tip: '💡 El dedo anular es el más débil — el ideal para la zona del ojo.',
-        tipType: ''
-      },
-      {
-        label: 'Crema selladora',
-        why: 'Técnica buffer: aplicar crema encima del retinal ralentiza su absorción y reduce la irritación sin cancelar su eficacia. El ácido hialurónico también intensifica la hidratación nocturna.',
-        animId: 'spreading',
-        product: 'cosrxCream',
-        time: '2 min',
-        instructions: 'Tamaño de un garbanzo — igual que siempre. En noches de retinal puedes ser un poco más generoso: la crema actúa como buffer y reduce la irritación.',
-        tip: '✅ Aplicar crema encima del retinal (técnica "buffer") reduce la irritación sin reducir eficacia.',
-        tipType: 'green'
-      }
-    ]
-  },
-  pm_normal: {
-    steps: 7,
-    time: '~17 min',
-    steps_data: [
-      {
-        label: 'Doble limpieza — Aceite',
-        why: 'El Cleansing Balm disuelve SPF, sebo y maquillaje a base de aceite. El agua sola no puede eliminar esto — por eso es el primer paso.',
-        animId: 'circular_oil',
-        product: 'banilaCo',
-        time: '2 min',
-        instructions: 'Con la cara completamente SECA, toma una cantidad del tamaño de una avellana (no más — el balm es concentrado). Masajea en círculos por toda la cara por 60 segundos. Agrega agua — verás que se vuelve lechoso. Enjuaga bien.',
-        tip: '💡 Aplícalo siempre en cara seca. El agua al inicio impide que disuelva bien el maquillaje.',
-        tipType: ''
-      },
-      {
-        label: 'Doble limpieza — Agua',
-        why: 'Limpia los residuos que soltó el aceite. El pH bajo del COSRX respeta la barrera cutánea y deja la piel lista para absorber activos.',
-        animId: 'circular',
-        product: 'cosrxCleanser',
-        time: '1.5 min',
-        instructions: 'Misma cantidad: tamaño de una moneda de $100. Segunda limpieza para eliminar residuos del balm. Misma técnica que siempre.',
-        tip: '',
-        tipType: ''
-      },
-      {
-        label: 'Tónico/Essence',
-        why: 'El ginseng rehidrata y restaura el pH post-limpieza. Actúa como primer para que los sérums siguientes penetren hasta un 40% mejor.',
-        animId: 'patting',
-        product: 'bojToner',
-        time: '1.5 min',
-        instructions: 'Igual que en la mañana: el centro de la palma. Palmotea sobre la piel limpia para preparar la absorción de los siguientes pasos.',
-        tip: '',
-        tipType: ''
-      },
-      {
-        label: 'Essence reparadora',
-        why: 'El mucín de caracol de Mizon repara micro-daños, estimula la producción de colágeno y regenera la barrera cutánea mientras duermes.',
-        animId: 'patting',
-        product: 'mizonSnail',
-        time: '1.5 min',
-        instructions: 'Toma una cantidad del tamaño de una avellana. Palmotea suavemente sobre toda la cara y cuello. El mucin de caracol repara y regenera mientras duermes.',
-        tip: '',
-        tipType: ''
-      },
-      {
-        label: 'Ampoule calmante',
-        why: 'La centella asiática de Madagascar calma rojeces, reduce inflamación y fortalece la barrera cutánea. En noches sin retinal, es tu tratamiento calmante principal.',
-        animId: 'dropper',
-        product: 'skin1004Ampoule',
-        time: '1.5 min',
-        instructions: '3-4 gotas del gotero — el equivalente al tamaño de un garbanzo. Distribuye presionando suavemente. Centella asiática calma y fortalece la barrera de la piel overnight.',
-        tip: '',
-        tipType: ''
-      },
-      {
-        label: 'Sérum reparador 🌙',
-        why: 'El BoJ Revive Serum tiene ginseng (antioxidante, antienvejecimiento) + snail mucin (reparador, hidratante). En noches sin retinal trabaja libre y sin interferencias. Esta es su noche.',
-        animId: 'dropper',
-        product: 'bojReviveSerum',
-        time: '2 min',
-        instructions: '3-4 gotas del gotero — tamaño de un garbanzo. Palmotea suavemente. El ginseng + snail mucin trabaja toda la noche para reparar y regenerar. Este es su momento ideal.',
-        tip: '✅ Este sérum va SOLO en la noche, no en la mañana. Así sabes exactamente qué te está reparando.',
-        tipType: 'green'
-      },
-      {
-        label: 'Crema hidratante',
-        why: 'El ácido hialurónico intensivo sella todos los activos y mantiene la hidratación durante las 7-8 horas de sueño. La piel se despierta más suave, firme y recuperada.',
-        animId: 'spreading',
-        product: 'cosrxCream',
-        time: '2 min',
-        instructions: 'Tamaño de un garbanzo. Sella toda la humedad y permite que los activos trabajen profundo mientras duermes.',
-        tip: '💡 Esta es tu noche de recuperación. La piel también necesita descanso de los activos fuertes.',
-        tipType: ''
-      }
-    ]
-  }
-};
-
-let currentMode = 'am';
-let currentPmSub = 'retinal';
-let openStep = -1;
-
-function setMode(mode) {
-  currentMode = mode;
-  openStep = -1;
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.mode-btn.${mode}`).classList.add('active');
-
-  const pmSub = document.getElementById('pmSubmode');
-  const calView = document.getElementById('calendarView');
-  const summaryBar = document.getElementById('summaryBar');
-  const stepsContainer = document.getElementById('stepsContainer');
-
-  if (mode === 'cal') {
-    pmSub.classList.remove('visible');
-    calView.classList.add('visible');
-    summaryBar.style.display = 'none';
-    stepsContainer.style.display = 'none';
-    renderEyeGrid();
-    document.getElementById('progressBar').style.width = '0%';
-  } else {
-    calView.classList.remove('visible');
-    summaryBar.style.display = '';
-    stepsContainer.style.display = '';
-    if (mode === 'pm') {
-      pmSub.classList.add('visible');
-    } else {
-      pmSub.classList.remove('visible');
-    }
-    renderSteps();
-  }
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
 }
-
-function renderEyeGrid() {
-  const days = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-  // In phase 2: retinal on Mon/Wed/Fri
-  const retinalDays = [0, 2, 4]; // indices
-  // Alternate eye products: Mon=BoJ, Wed=K-Secret, Fri=BoJ
-  const eyeProducts = ['BoJ', 'K-S', 'BoJ'];
-  const grid = document.getElementById('eyeGrid');
-  if (!grid) return;
-  grid.innerHTML = days.map((d, i) => {
-    if (!retinalDays.includes(i)) {
-      return `<div class="day-cell">
-        <span class="day-name">${d}</span>
-        <div class="day-dot rest" style="font-size:0.7rem">-</div>
-        <span class="day-label">No aplica</span>
-      </div>`;
-    }
-    const pIdx = retinalDays.indexOf(i);
-    const prod = eyeProducts[pIdx];
-    const isBoJ = prod === 'BoJ';
-    const color = isBoJ ? '#4a90d9' : 'var(--coral)';
-    const border = isBoJ ? '#4a90d9' : 'var(--coral)';
-    return `<div class="day-cell">
-      <span class="day-name">${d}</span>
-      <div class="day-dot" style="background:${isBoJ?'#e8f4ff':'#fff0ee'};color:${color};border:2px solid ${border};font-size:0.6rem;font-weight:700">${prod}</div>
-      <span class="day-label">${isBoJ?'BoJ<br>Revive':'K-Secret<br>Eye'}</span>
-    </div>`;
-  }).join('');
-}
-
-function setPmSub(sub) {
-  currentPmSub = sub;
-  openStep = -1;
-  document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.sub-btn.${sub}`).classList.add('active');
-  renderSteps();
-}
-
-function getRoutine() {
-  if (currentMode === 'am') return routines.am;
-  return currentPmSub === 'retinal' ? routines.pm_retinal : routines.pm_normal;
-}
-
-function getModeClass() {
-  if (currentMode === 'am') return 'am-mode';
-  return currentPmSub === 'retinal' ? 'pm-retinal-mode' : 'pm-normal-mode';
-}
-
-function renderSteps() {
-  const routine = getRoutine();
-  const modeClass = getModeClass();
-  
-  document.getElementById('stepCount').textContent = routine.steps + ' pasos';
-  document.getElementById('timeCount').textContent = '⏱ ' + routine.time;
-  
-  const container = document.getElementById('stepsContainer');
-  container.innerHTML = '';
-  container.className = 'steps ' + modeClass;
-
-  let realStep = 0;
-
-  routine.steps_data.forEach((step, idx) => {
-    const delay = idx * 60;
-
-    // PAUSE CARD
-    if (step.pause) {
-      const div = document.createElement('div');
-      div.className = 'pause-card';
-      div.style.animationDelay = delay + 'ms';
-      div.innerHTML = `
-        <div class="pause-icon">⏸️</div>
-        <h3>PAUSA ${step.time}</h3>
-        <p>${step.instructions}</p>
-        ${step.tip ? `<div class="tip red" style="margin-top:10px;text-align:left"><span class="tip-icon">⚠️</span>${step.tip}</div>` : ''}
-      `;
-      container.appendChild(div);
-      return;
-    }
-
-    realStep++;
-    const prod = products[step.product];
-    const isOpen = openStep === idx;
-
-    const card = document.createElement('div');
-    card.className = 'step-card';
-    card.style.animationDelay = delay + 'ms';
-
-    const badgeClass = `badge-${prod ? prod.badge : 'hydra'}`;
-
-    card.innerHTML = `
-      <div class="step-header" onclick="toggleStep(${idx})">
-        <div class="step-num">${realStep}</div>
-        <div class="step-info">
-          <div class="step-label">${step.label}</div>
-          <div class="step-name">${prod ? prod.name : ''}</div>
-        </div>
-        <div class="step-time">${step.time}</div>
-      </div>
-      ${step.why ? `<div class="step-why">${step.why}</div>` : ''}
-      <div class="step-body ${isOpen ? 'open' : ''}" id="body-${idx}">
-        ${step.animId && animations[step.animId] ? `<div class="step-animation">${animations[step.animId]}</div>` : ''}
-
-        <p class="instructions">${step.instructions}</p>
-        ${step.tip ? `<div class="tip ${step.tipType}"><span class="tip-icon">${step.tipType === 'red' ? '⚠️' : step.tipType === 'green' ? '✅' : '💡'}</span><span>${step.tip.replace(/^[💡🔴✅]\s?/, '')}</span></div>` : ''}
-      </div>
-    `;
-
-    container.appendChild(card);
-  });
-
-  updateProgress();
-}
-
-function toggleStep(idx) {
-  if (openStep === idx) {
-    openStep = -1;
-  } else {
-    openStep = idx;
-  }
-  renderSteps();
-  
-  // Scroll to opened card
-  setTimeout(() => {
-    const body = document.getElementById('body-' + idx);
-    if (body && body.classList.contains('open')) {
-      body.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  }, 50);
-}
-
-function updateProgress() {
-  const routine = getRoutine();
-  const total = routine.steps_data.length;
-  const completed = openStep >= 0 ? ((openStep + 1) / total * 100) : 0;
-  document.getElementById('progressBar').style.width = completed + '%';
-}
-
-renderSteps();
 </script>
 </body>
 </html>

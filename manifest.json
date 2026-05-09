@@ -1,0 +1,15 @@
+{
+  "name": "Mi Rutina K-Beauty",
+  "short_name": "K-Beauty",
+  "description": "Rutina de skincare coreano paso a paso",
+  "start_url": "/rutina-kbeauty/",
+  "scope": "/rutina-kbeauty/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6efe2",
+  "theme_color": "#f6efe2",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
