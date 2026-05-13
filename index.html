@@ -821,7 +821,7 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
     <div style={{padding:"0 16px"}}>
       {routine.steps.map((s,i)=>{
         const nextReal=routine.steps.slice(i+1).find(st=>!doneSteps.has(st.id));
-        return<StepCard key={s.id} step={s} idx={i} state={stepState(s,i)} onTap={()=>onTap(i)} onComplete={()=>onComplete(s,i)} onSkip={()=>onSkip(s,i)} nextName={nextReal?nextReal.name:null}/>;
+        return<StepCard key={s.id} step={s} idx={i} state={stepState(s,i)} onTap={()=>onTap(i)} onComplete={()=>onComplete(s,i)} onSkip={()=>onSkip(s,i)} nextName={nextReal?nextReal.name:null} onIngredient={onIngredient}/>;
       })}
     </div>
     {isFinished&&<div style={{padding:"8px 16px"}}>
