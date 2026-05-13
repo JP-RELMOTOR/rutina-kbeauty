@@ -754,6 +754,15 @@ function HistoryScreen({history,streak,phase}){
           <div style={{fontSize:14,opacity:.7}}>días seguidos 🔥</div>
         </div>
         <div style={{fontSize:12,opacity:.65,marginTop:6}}>Meta: 30 días · ¡tú puedes, Mijal!</div>
+        <div style={{marginTop:14,paddingTop:12,borderTop:"1px solid rgba(254,252,247,.12)",display:"flex",alignItems:"center",gap:8}}>
+          <div style={{display:"flex",gap:4}}>
+            {[0,1].map(i=><span key={i} style={{fontSize:16,opacity:i<freezeInfo.freezesLeft?1:.25}}>🥶</span>)}
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:12,fontWeight:600,opacity:.9}}>{freezeInfo.freezesLeft===2?"Tienes 2 comodines este mes":freezeInfo.freezesLeft===1?"1 comodín disponible":"Sin comodines · 2 nuevos el día 1"}</div>
+            <div style={{fontSize:10.5,opacity:.55,marginTop:1}}>Salta un día sin romper la racha (máx 2/mes)</div>
+          </div>
+        </div>
       </div>
     </div>
     <div style={{margin:"0 16px 14px",padding:"16px",borderRadius:22,background:P.card,border:`1px solid ${P.border}`}}>
