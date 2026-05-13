@@ -1371,6 +1371,7 @@ function App(){
   const [showAudio,setShowAudio]=React.useState(false);
   const [audioActive,setAudioActive]=React.useState(null);
   const [audioVolume,setAudioVolume]=React.useState(0.5);
+  const [activeIngredient,setActiveIngredient]=React.useState(null);
 
   function handleAudioSelect(mode){
     if(mode){
