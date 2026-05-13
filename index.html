@@ -1492,11 +1492,38 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
     }
   } catch(_) {}
 
+  // ─── VERSION POLLING (detecta cambios en index.html, no depende del SW) ───
+  // Cuando GitHub Pages tiene un index.html más nuevo que el que la app cargó,
+  // dispara `pwa-update-available` y aparece el banner. Funciona también si solo
+  // cambia el contenido (no el SW).
+  let __initialLastMod = null;
+  async function pollVersion(){
+    if (document.visibilityState !== "visible") return;
+    try {
+      const r = await fetch("./?_v=" + Date.now(), {method:"HEAD", cache:"no-store"});
+      if (!r.ok) return;
+      const remote = r.headers.get("Last-Modified") || r.headers.get("ETag") || "";
+      if (!remote) return;
+      if (__initialLastMod === null) {
+        __initialLastMod = remote;
+        return;
+      }
+      if (remote !== __initialLastMod) {
+        window.dispatchEvent(new CustomEvent("pwa-update-available"));
+      }
+    } catch(_) {}
+  }
+  pollVersion(); // baseline capture
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") pollVersion();
+  });
+  setInterval(pollVersion, 5 * 60 * 1000); // cada 5 min mientras esté abierta
+
+  // ─── SERVICE WORKER ─────────────────────────────────────────
   if (!("serviceWorker" in navigator)) return;
   const reg = await navigator.serviceWorker.register("sw.js").catch(() => null);
   if (!reg) return;
 
-  // Check for updates each time the app comes to the foreground.
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") reg.update().catch(()=>{});
   });
@@ -1514,7 +1541,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
   if (reg.installing) track(reg.installing);
   reg.addEventListener("updatefound", () => reg.installing && track(reg.installing));
 
-  // Reload the page once the new SW takes control.
   let reloaded = false;
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (reloaded) return;
