@@ -1065,6 +1065,8 @@ function App(){
       {tab==="progress"&&<ProgressScreen history={history} streak={streak}/>}
     </div>
     <TabBar tab={tab} onTab={setTab}/>
+    {hasUpdate&&!updateDismissed&&<UpdateBanner onApply={handleApplyUpdate} onDismiss={()=>setUpdateDismissed(true)}/>}
+    {showSettings&&<SettingsSheet onClose={()=>setShowSettings(false)} history={history} diary={diary} photos={photos} phase={phase} onPhaseChange={handlePhaseChange} onDataRestored={handleDataRestored}/>}
     {showMood&&<MoodCheck onDone={handleMoodDone}/>}
     {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>{setShowComplete(false);setTimeout(()=>setShowCamera(true),200);}} onClose={handleCompleteClose}/>}
     {showCamera&&<PhotoCapture onClose={()=>setShowCamera(false)} onSave={handlePhotoSave}/>}
