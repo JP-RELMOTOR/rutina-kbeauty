@@ -83,6 +83,34 @@ async function dbGetPhotos(){
     req.onerror=()=>res([]);
   });
 }
+async function dbClearPhotos(){
+  const db=await getDB(); if(!db) return;
+  return new Promise(res=>{
+    const tx=db.transaction("photos","readwrite");
+    tx.objectStore("photos").clear();
+    tx.oncomplete=()=>res(true);
+    tx.onerror=()=>res(false);
+  });
+}
+async function dbBulkAddPhotos(arr){
+  const db=await getDB(); if(!db) return;
+  return new Promise(res=>{
+    const tx=db.transaction("photos","readwrite");
+    const store=tx.objectStore("photos");
+    (arr||[]).forEach(p=>{const c={...p};delete c.id;store.add(c);});
+    tx.oncomplete=()=>res(true);
+    tx.onerror=()=>res(false);
+  });
+}
+async function getStorageEstimate(){
+  try{
+    if(navigator.storage&&navigator.storage.estimate){
+      const e=await navigator.storage.estimate();
+      return {used:e.usage||0,quota:e.quota||0};
+    }
+  }catch(_){}
+  return {used:0,quota:0};
+}
 
 // ─── HELPERS ────────────────────────────────────
 const ls=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}};
