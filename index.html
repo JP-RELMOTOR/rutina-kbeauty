@@ -204,6 +204,14 @@ function getDayLabel(){
   return days[getDOW()];
 }
 function todayStr(){return new Date().toISOString().split("T")[0];}
+// Backup reminder cada 2 semanas (día 1 y día 15 de cada mes). Persistido para no repetirse el mismo día.
+function shouldShowBackupReminder(){
+  const today=todayStr();
+  const day=parseInt(today.slice(-2),10);
+  if(day!==1&&day!==15)return false;
+  return ls("kb_last_backup_reminder","")!==today;
+}
+function markBackupReminderSeen(){lsSet("kb_last_backup_reminder",todayStr());}
 // Streak con "comodines": hasta 2 días salteados al mes que NO rompen la racha.
 // (Como Duolingo streak freezes — auto-aplicados, no requiere tap.)
 const MAX_FREEZES_PER_MONTH=2;
