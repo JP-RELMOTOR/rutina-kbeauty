@@ -1595,6 +1595,18 @@ function App(){
   const [audioVolume,setAudioVolume]=React.useState(0.5);
   const [activeIngredient,setActiveIngredient]=React.useState(null);
   const [showImport,setShowImport]=React.useState(false);
+  const [backupReminderOpen,setBackupReminderOpen]=React.useState(()=>shouldShowBackupReminder());
+
+  async function handleBackupExport(){
+    try{await exportAllData();}catch(_){}
+    markBackupReminderSeen();
+    setBackupReminderOpen(false);
+    haptic("medium");
+  }
+  function handleBackupDismiss(){
+    markBackupReminderSeen();
+    setBackupReminderOpen(false);
+  }
 
   async function handleImportDone(){
     const p=await dbGetPhotos();
