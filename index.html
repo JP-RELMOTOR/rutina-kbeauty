@@ -1074,8 +1074,6 @@ function App(){
   const [phase,setPhase]=React.useState(()=>parseInt(ls("kb_phase","2")));
   const [activeIdx,setActiveIdx]=React.useState(null);
   const [doneSteps,setDoneSteps]=React.useState(new Set());
-  const [showMood,setShowMood]=React.useState(false);
-  const [moodOfSession,setMoodOfSession]=React.useState(null);
   const [showComplete,setShowComplete]=React.useState(false);
   const [showCamera,setShowCamera]=React.useState(false);
   const [history,setHistory]=React.useState(()=>ls("kb_history",[]));
