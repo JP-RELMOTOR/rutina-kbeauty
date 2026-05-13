@@ -128,16 +128,34 @@ function getDayLabel(){
   return days[getDOW()];
 }
 function todayStr(){return new Date().toISOString().split("T")[0];}
-function getStreak(hist){
-  const dates=[...new Set(hist.map(s=>s.date))].sort().reverse();
-  if(!dates.length)return 0;
-  let streak=0,check=todayStr();
-  for(const d of dates){
-    if(d===check){streak++;const dt=new Date(check);dt.setDate(dt.getDate()-1);check=dt.toISOString().split("T")[0];}
-    else if(d<check)break;
+// Streak con "comodines": hasta 2 días salteados al mes que NO rompen la racha.
+// (Como Duolingo streak freezes — auto-aplicados, no requiere tap.)
+const MAX_FREEZES_PER_MONTH=2;
+function _computeStreakInfo(hist){
+  const dates=new Set(hist.map(s=>s.date));
+  const today=todayStr();
+  const currentMonth=today.slice(0,7);
+  let streak=0,check=today,consecGaps=0;
+  const freezesByMonth={};
+  for(let i=0;i<400;i++){
+    if(dates.has(check)){streak++;consecGaps=0;}
+    else if(check===today){consecGaps=0;}
+    else{
+      consecGaps++;
+      if(consecGaps>1)break;
+      const m=check.slice(0,7);
+      freezesByMonth[m]=(freezesByMonth[m]||0)+1;
+      if(freezesByMonth[m]>MAX_FREEZES_PER_MONTH)break;
+      streak++;
+    }
+    const dt=new Date(check+"T12:00:00");dt.setDate(dt.getDate()-1);
+    check=dt.toISOString().split("T")[0];
   }
-  return streak;
+  const usedThisMonth=freezesByMonth[currentMonth]||0;
+  return {streak,usedThisMonth,freezesLeft:Math.max(0,MAX_FREEZES_PER_MONTH-usedThisMonth)};
 }
+function getStreak(hist){return _computeStreakInfo(hist).streak;}
+function getFreezeInfo(hist){return _computeStreakInfo(hist);}
 
 // ─── ICONS ──────────────────────────────────────
 const IC={
