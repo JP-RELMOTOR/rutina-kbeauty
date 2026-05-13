@@ -270,6 +270,133 @@ const ROUTINES={
   ]},
 };
 
+// ─── INGREDIENTS GLOSSARY ────────────────────────
+// Cada entrada se hace match buscando substring en el nombre del chip (ingrediente.a)
+const INGREDIENTS=[
+  {key:"betaína salicilato", name:"Betaína Salicilato (BHA)", emoji:"🧪", type:"Exfoliante químico (BHA)",
+    works:"Penetra el sebo dentro de los poros y disuelve células muertas. Es la versión natural del ácido salicílico, derivada de la remolacha.",
+    expect:"Poros menos visibles, menos puntos negros y comedones en 2-4 semanas. Limpieza más profunda sin irritación.",
+    caution:"Es exfoliante suave en un limpiador. Sin riesgo significativo. No combines con otros exfoliantes el mismo día."},
+  {key:"tea tree", name:"Tea Tree Oil", emoji:"🌿", type:"Aceite esencial antibacteriano",
+    works:"Tiene propiedades antibacterianas naturales. En cleansers ayuda a combatir bacterias asociadas al acné.",
+    expect:"Menos brotes inflamatorios, piel más equilibrada en pieles propensas al acné.",
+    caution:"Puede sensibilizar en altas concentraciones. En cleansers va muy diluido — sin riesgo."},
+  {key:"ginseng", name:"Ginseng (Panax)", emoji:"🌱", type:"Antioxidante anti-edad",
+    works:"Tiene más de 70 compuestos activos (ginsenósidos) que estimulan circulación, producción de colágeno y defensa antioxidante.",
+    expect:"Piel más luminosa, firme y con mejor tono en 4-6 semanas. Reduce signos de cansancio.",
+    caution:"Sin precauciones especiales. Es uno de los ingredientes más seguros del K-beauty."},
+  {key:"fermento", name:"Fermentos (galactomyces, etc.)", emoji:"🧫", type:"Probióticos para la piel",
+    works:"Filtrados de fermentación que contienen aminoácidos, vitaminas y minerales que la piel absorbe fácilmente. Potencian la penetración de otros activos.",
+    expect:"Mejor textura, brillo natural y piel más receptiva a tratamientos posteriores.",
+    caution:"Generalmente bien tolerados. Si tienes alergia a levaduras, consulta antes."},
+  {key:"adenosina", name:"Adenosina", emoji:"⚡", type:"Anti-edad suave",
+    works:"Estimula la producción de colágeno y reduce arrugas finas. Es una molécula naturalmente presente en las células.",
+    expect:"Líneas finas suavizadas en 4-8 semanas. Piel más elástica.",
+    caution:"Muy bien tolerada. Sin contraindicaciones."},
+  {key:"niacinamida", name:"Niacinamida (Vitamina B3)", emoji:"💎", type:"Multifuncional · vitamina B3",
+    works:"Inhibe la melanogénesis (aclara manchas), aumenta producción de ceramidas (refuerza barrera), regula sebo y reduce inflamación.",
+    expect:"Tono más uniforme, manchas más claras, poros menos visibles en 4-8 semanas.",
+    caution:"Concentraciones >5% pueden picar al inicio. Si pica: usa cada 2 días hasta que la piel se acostumbre."},
+  {key:"squalane", name:"Squalane", emoji:"💧", type:"Hidratante ligero · barrera",
+    works:"Hidrocarburo saturado idéntico al sebo natural de la piel. No es comedogénico y absorbe sin sensación grasosa.",
+    expect:"Piel hidratada sin verse aceitosa. Refuerza la barrera lipídica.",
+    caution:"Apto para piel grasa y acneica. Sin contraindicaciones."},
+  {key:"sea buckthorn", name:"Espino Amarillo (Sea Buckthorn)", emoji:"🍊", type:"Antioxidante potente",
+    works:"Una de las fuentes más ricas de omega-7 y vitamina C natural. Repara tejido y reduce manchas.",
+    expect:"Piel con más vitalidad, mejor cicatrización, tono más vibrante.",
+    caution:"Color naranja intenso — puede teñir temporalmente. Lávate las manos después de aplicar."},
+  {key:"ácido hialurónico", name:"Ácido Hialurónico", emoji:"🌊", type:"Humectante (atrae agua)",
+    works:"Cada molécula retiene hasta 1000 veces su peso en agua. Profundiza hasta capas medias de la piel cuando es de bajo peso molecular.",
+    expect:"Piel rebotada, con efecto 'plumped'. Líneas de deshidratación desaparecen.",
+    caution:"En climas secos, aplícalo sobre piel húmeda y séllalo con crema. Sino puede deshidratar al evaporarse."},
+  {key:"panthenol", name:"Panthenol (Pro-Vitamina B5)", emoji:"🧴", type:"Calmante · reparador",
+    works:"Se convierte en ácido pantoténico al penetrar. Reduce inflamación, mejora cicatrización y refuerza la barrera.",
+    expect:"Piel más calmada, menos rojeces, mejor recuperación post-irritación.",
+    caution:"Excelente para piel sensible. Sin contraindicaciones conocidas."},
+  {key:"ceramida", name:"Ceramida NP", emoji:"🛡️", type:"Lípido · refuerza barrera",
+    works:"Compone hasta el 50% de la barrera natural de la piel. Reponerlas tópicamente restaura la función protectora.",
+    expect:"Menos sensibilidad, menos pérdida de agua, piel más resiliente en 2-4 semanas.",
+    caution:"Imprescindible si tienes barrera dañada. Sin contraindicaciones."},
+  {key:"spf", name:"SPF50+ PA++++", emoji:"☀️", type:"Protección solar UVA + UVB",
+    works:"SPF50+ bloquea ~98% de UVB. PA++++ es la máxima protección contra UVA, que es lo que envejece y causa manchas.",
+    expect:"Sin protector solar, todo lo demás de tu rutina anti-manchas y anti-edad NO funciona.",
+    caution:"Re-aplica cada 2 horas con exposición solar. Necesitas media cucharadita para cara + cuello."},
+  {key:"centella", name:"Centella Asiática (CICA)", emoji:"🌿", type:"Calmante · regenerador",
+    works:"Sus 4 compuestos activos (asiaticósido, madecassósido, ácido asiático y madecásico) estimulan colágeno y calman inflamación.",
+    expect:"Piel calmada, menos rojeces, mejor recuperación. Especialmente potente antes/después del retinal.",
+    caution:"Uno de los ingredientes más seguros que existen. Apto incluso para piel muy sensible."},
+  {key:"acerola", name:"Acerola Berry", emoji:"🍒", type:"Vitamina C natural",
+    works:"Fruta con la mayor concentración natural de vitamina C — hasta 65× más que una naranja. Antioxidante potente.",
+    expect:"Brillo, defensa contra contaminación y radicales libres, aclarado suave.",
+    caution:"En cleansers la concentración es baja, no hay riesgo. Vitamina C directa va aparte."},
+  {key:"vitamina e", name:"Vitamina E (Tocoferol)", emoji:"🌻", type:"Antioxidante liposoluble",
+    works:"Protege los lípidos de la membrana celular de la oxidación. Sinergiza con vitamina C.",
+    expect:"Piel más protegida del daño ambiental, mejor cicatrización.",
+    caution:"Sin contraindicaciones conocidas en concentraciones cosméticas."},
+  {key:"aceite de éster", name:"Aceite de éster natural", emoji:"🫒", type:"Solvente lipídico (limpieza)",
+    works:"Disuelve maquillaje, sebo y SPF gracias al principio 'lo similar disuelve lo similar'. Esencial en doble limpieza.",
+    expect:"Piel realmente limpia sin resecar — algo que el agua sola no puede hacer.",
+    caution:"En piel acneica, asegúrate que sea no-comedogénico. El Banila Co Clean It Zero es seguro."},
+  {key:"mucín de caracol", name:"Snail Mucin (Mucín filtrado)", emoji:"🐌", type:"Reparador · regenerador",
+    works:"Mezcla natural de glicoproteínas, ácido hialurónico, glicólico, péptidos y colágeno. Multifunción: hidrata, repara, regenera.",
+    expect:"Piel más rebotada, mejor cicatrización, menos líneas finas en 4-8 semanas.",
+    caution:"Es un filtrado purificado, no 'baba viva'. En marcas serias (Mizon, BoJ) sin sufrimiento animal."},
+  {key:"alantoína", name:"Alantoína", emoji:"🌾", type:"Calmante · suavizante",
+    works:"Promueve la exfoliación suave del estrato córneo dañado y la regeneración celular. Calma inflamación.",
+    expect:"Piel más suave, menos textura áspera, calma post-tratamiento.",
+    caution:"Muy bien tolerada. Apta para piel sensible y pieles con eczema."},
+  {key:"glicerina", name:"Glicerina", emoji:"💦", type:"Humectante (atrae agua)",
+    works:"Humectante más usado en cosmética. Atrae agua del ambiente y de capas más profundas hacia la superficie de la piel.",
+    expect:"Hidratación inmediata, piel más suave al tacto.",
+    caution:"En climas extremadamente secos puede deshidratar si no se sella con crema."},
+  {key:"retinal", name:"Retinal (Retinaldehído)", emoji:"🔴", type:"Vitamina A · anti-edad potente",
+    works:"Es el paso intermedio entre retinol y ácido retinoico. 11× más potente que el retinol con menos irritación. Acelera renovación celular.",
+    expect:"Líneas finas reducidas, manchas aclaradas, textura mejorada, brillo en 4-12 semanas. Resultados visibles.",
+    caution:"AUMENTA sensibilidad al sol — SPF obligatorio AM. Usa solo en noches indicadas. Si pica/seca, baja frecuencia. Evita ojos (1cm), bordes labios y nariz."},
+  {key:"bakuchiol", name:"Bakuchiol", emoji:"🌸", type:"Análogo natural del retinol",
+    works:"Extracto de Psoralea corylifolia. Estimula colágeno con menos irritación. Sinergiza con retinal para potenciar efecto y reducir reacciones.",
+    expect:"Apoyo al retinal — más resultado, menos irritación. Apto incluso en embarazo (a diferencia del retinol).",
+    caution:"Muy bien tolerado. Sin restricciones."},
+];
+function findIngredient(name){
+  if(!name)return null;
+  const low=name.toLowerCase();
+  return INGREDIENTS.find(i=>low.includes(i.key))||null;
+}
+
+// ─── INGREDIENT SHEET ────────────────────────────
+function IngredientSheet({ingredient,onClose}){
+  if(!ingredient)return null;
+  return<div style={{position:"absolute",inset:0,zIndex:78,background:"rgba(29,24,18,.5)",display:"flex",alignItems:"flex-end"}} onClick={onClose}>
+    <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxHeight:"88%",overflowY:"auto",background:P.bg,borderRadius:"28px 28px 0 0",padding:"18px 20px 36px",animation:"slideUp .35s ease",WebkitOverflowScrolling:"touch"}}>
+      <div style={{width:40,height:4,borderRadius:2,background:P.cream,margin:"0 auto 18px"}}/>
+      <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:6,gap:12}}>
+        <div style={{flex:1}}>
+          <div style={{fontSize:36,marginBottom:6}}>{ingredient.emoji}</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:26,color:P.text,letterSpacing:"-.4px",lineHeight:1.1}}>{ingredient.name}</div>
+          <div style={{fontSize:12,color:P.accent,marginTop:4,fontWeight:600,letterSpacing:.3}}>{ingredient.type}</div>
+        </div>
+        <button onClick={onClose} style={{width:34,height:34,borderRadius:17,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}><Icon n="close" size={14} color={P.text} sw={2}/></button>
+      </div>
+
+      <div style={{marginTop:18,padding:14,borderRadius:16,background:P.card,border:`1px solid ${P.border}`}}>
+        <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:6}}>Cómo funciona</div>
+        <div style={{fontSize:13.5,color:P.text,lineHeight:1.55}}>{ingredient.works}</div>
+      </div>
+
+      <div style={{marginTop:10,padding:14,borderRadius:16,background:P.card,border:`1px solid ${P.border}`}}>
+        <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.green,fontWeight:700,marginBottom:6}}>Qué esperar</div>
+        <div style={{fontSize:13.5,color:P.text,lineHeight:1.55}}>{ingredient.expect}</div>
+      </div>
+
+      <div style={{marginTop:10,padding:14,borderRadius:16,background:P.cream,border:`1px solid ${P.border}`}}>
+        <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.retinal,fontWeight:700,marginBottom:6}}>Precauciones</div>
+        <div style={{fontSize:13,color:P.text,lineHeight:1.55,opacity:.85}}>{ingredient.caution}</div>
+      </div>
+    </div>
+  </div>;
+}
+
 // ─── DAILY TIPS DATA ─────────────────────────────
 // 35 curated tips. Categories: técnica · ingrediente · mito · piel · ritual · producto
 const TIPS=[
