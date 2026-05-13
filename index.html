@@ -485,7 +485,7 @@ function DayPlanBanner({phase,onStartRoutine}){
 }
 
 // ─── STEP CARD ───────────────────────────────────
-function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName}){
+function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient}){
   if(nextName) step={...step,_next:nextName};
   const isActive=state==="active",isDone=state==="done";
   const totalSec=Math.round(step.min*60);
