@@ -1120,18 +1120,8 @@ function App(){
   function stepState(s,i){return doneSteps.has(s.id)?"done":i===activeIdx?"active":"pending";}
 
   function handleTap(i){
-    if(!started&&i===0&&!doneSteps.has(routine.steps[0].id)){
-      setShowMood(true);
-      setStarted(true);
-      return;
-    }
+    if(!started)setStarted(true);
     setActiveIdx(i);
-  }
-
-  function handleMoodDone(mood){
-    setMoodOfSession(mood);
-    setShowMood(false);
-    setActiveIdx(0);
   }
 
   function handleComplete(s,i){
