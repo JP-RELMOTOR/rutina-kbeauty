@@ -986,7 +986,7 @@ function CompleteSheet({stats,onPhoto,onClose}){
 }
 
 // ─── TODAY SCREEN ────────────────────────────────
-function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,completedCount,completedMin,isFinished,onShowComplete,streak,phase,doneSteps,onOpenSettings,onOpenAudio,audioActive,onIngredient}){
+function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,completedCount,completedMin,isFinished,onShowComplete,streak,phase,doneSteps,onOpenSettings,onOpenAudio,audioActive,onIngredient,backupReminderOpen,onBackupExport,onBackupDismiss}){
   const greeting=getGreeting();
   return<div>
     <div style={{padding:"56px 20px 10px",position:"relative"}}>
