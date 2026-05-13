@@ -888,6 +888,46 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
-<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
+<script>
+(async function(){
+  // Persistent storage: ask iOS not to evict our IndexedDB / localStorage.
+  try {
+    if (navigator.storage && navigator.storage.persist) {
+      const persisted = await navigator.storage.persisted();
+      if (!persisted) await navigator.storage.persist();
+    }
+  } catch(_) {}
+
+  if (!("serviceWorker" in navigator)) return;
+  const reg = await navigator.serviceWorker.register("sw.js").catch(() => null);
+  if (!reg) return;
+
+  // Check for updates each time the app comes to the foreground.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") reg.update().catch(()=>{});
+  });
+
+  function announce(worker){
+    window.__pwaWaitingWorker = worker;
+    window.dispatchEvent(new CustomEvent("pwa-update-available"));
+  }
+  function track(worker){
+    worker.addEventListener("statechange", () => {
+      if (worker.state === "installed" && navigator.serviceWorker.controller) announce(worker);
+    });
+  }
+  if (reg.waiting && navigator.serviceWorker.controller) announce(reg.waiting);
+  if (reg.installing) track(reg.installing);
+  reg.addEventListener("updatefound", () => reg.installing && track(reg.installing));
+
+  // Reload the page once the new SW takes control.
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloaded) return;
+    reloaded = true;
+    window.location.reload();
+  });
+})();
+</script>
 </body>
 </html>
