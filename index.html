@@ -102,6 +102,82 @@ async function dbBulkAddPhotos(arr){
     tx.onerror=()=>res(false);
   });
 }
+// Read EXIF DateTimeOriginal from a JPEG file. Returns "YYYY-MM-DD" or null.
+// Pure JS, no library — parses JPEG markers + TIFF directly. Handles both endian.
+async function readExifDate(file){
+  try{
+    const buf=await file.slice(0,131072).arrayBuffer();
+    const view=new DataView(buf);
+    if(view.getUint16(0)!==0xFFD8)return null; // not JPEG
+    let offset=2;
+    while(offset<view.byteLength-2){
+      const marker=view.getUint16(offset);
+      offset+=2;
+      if(marker===0xFFE1){
+        const segLen=view.getUint16(offset);offset+=2;
+        if(view.byteLength<offset+6){return null;}
+        // Check "Exif\0\0"
+        if(view.getUint8(offset)!==0x45||view.getUint8(offset+1)!==0x78||view.getUint8(offset+2)!==0x69||view.getUint8(offset+3)!==0x66)continue;
+        const tiffStart=offset+6;
+        const le=view.getUint16(tiffStart)===0x4949;
+        const g16=o=>view.getUint16(o,le),g32=o=>view.getUint32(o,le);
+        const ifd0=tiffStart+g32(tiffStart+4);
+        const n0=g16(ifd0);
+        for(let i=0;i<n0;i++){
+          const e=ifd0+2+i*12;
+          if(g16(e)===0x8769){
+            const exifIfd=tiffStart+g32(e+8);
+            const n1=g16(exifIfd);
+            for(let j=0;j<n1;j++){
+              const ee=exifIfd+2+j*12;
+              const tag=g16(ee);
+              if(tag===0x9003||tag===0x9004){
+                const valOff=tiffStart+g32(ee+8);
+                let str="";
+                for(let k=0;k<19&&valOff+k<view.byteLength;k++){
+                  const c=view.getUint8(valOff+k);
+                  if(c===0)break;
+                  str+=String.fromCharCode(c);
+                }
+                const m=str.match(/^(\d{4}):(\d{2}):(\d{2})/);
+                if(m)return `${m[1]}-${m[2]}-${m[3]}`;
+              }
+            }
+            return null;
+          }
+        }
+        return null;
+      }else{
+        if(marker===0xFFD9||marker===0xFFDA)return null;
+        const segLen=view.getUint16(offset);offset+=segLen;
+      }
+    }
+  }catch(_){}
+  return null;
+}
+
+// Compress an image file to a JPEG data URL (max 900px on long edge, 72% quality).
+function compressImage(file){
+  return new Promise(res=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement("canvas");
+        const MAX=900,ratio=Math.min(MAX/img.width,MAX/img.height,1);
+        canvas.width=Math.round(img.width*ratio);
+        canvas.height=Math.round(img.height*ratio);
+        canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+        res(canvas.toDataURL("image/jpeg",.72));
+      };
+      img.onerror=()=>res(null);
+      img.src=ev.target.result;
+    };
+    reader.onerror=()=>res(null);
+    reader.readAsDataURL(file);
+  });
+}
+
 async function getStorageEstimate(){
   try{
     if(navigator.storage&&navigator.storage.estimate){
