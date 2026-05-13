@@ -1569,6 +1569,13 @@ function App(){
   const [audioActive,setAudioActive]=React.useState(null);
   const [audioVolume,setAudioVolume]=React.useState(0.5);
   const [activeIngredient,setActiveIngredient]=React.useState(null);
+  const [showImport,setShowImport]=React.useState(false);
+
+  async function handleImportDone(){
+    const p=await dbGetPhotos();
+    setPhotos(p||[]);
+    haptic("medium");
+  }
 
   function handleAudioSelect(mode){
     if(mode){
