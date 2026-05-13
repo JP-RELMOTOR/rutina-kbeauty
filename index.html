@@ -1234,6 +1234,29 @@ function App(){
   const [showSettings,setShowSettings]=React.useState(false);
   const [hasUpdate,setHasUpdate]=React.useState(false);
   const [updateDismissed,setUpdateDismissed]=React.useState(false);
+  const [showAudio,setShowAudio]=React.useState(false);
+  const [audioActive,setAudioActive]=React.useState(null);
+  const [audioVolume,setAudioVolume]=React.useState(0.5);
+
+  function handleAudioSelect(mode){
+    if(mode){
+      ambient.start(mode);
+      ambient.setVolume(audioVolume);
+      setAudioActive(mode);
+    } else {
+      ambient.stop();
+      setAudioActive(null);
+    }
+    haptic("light");
+  }
+  function handleAudioVolume(v){
+    setAudioVolume(v);
+    ambient.setVolume(v);
+  }
+  // Stop audio cuando la app se cierre/oculta totalmente
+  React.useEffect(()=>{
+    return()=>ambient.stop();
+  },[]);
 
   // Load photos from IndexedDB
   React.useEffect(()=>{dbGetPhotos().then(p=>setPhotos(p||[]));},[]);
