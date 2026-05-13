@@ -319,29 +319,6 @@ function Ring({pct=0,size=60,stroke=4,color=P.text,track=P.cream,children}){
   </div>;
 }
 
-// ─── MOOD CHECK ──────────────────────────────────
-function MoodCheck({onDone}){
-  const [sel,setSel]=React.useState(null);
-  const moods=[{e:"😍",l:"Radiante"},{e:"🙂",l:"Bien"},{e:"😊",l:"Normal"},{e:"😌",l:"Sensible"},{e:"😟",l:"Irritada"}];
-  return<div style={{position:"absolute",inset:0,zIndex:60,background:"rgba(29,24,18,.5)",display:"flex",alignItems:"flex-end"}}>
-    <div style={{width:"100%",background:P.bg,borderRadius:"28px 28px 0 0",padding:"28px 20px 40px",animation:"slideUp .35s ease"}}>
-      <div style={{width:40,height:4,borderRadius:2,background:P.cream,margin:"0 auto 24px"}}/>
-      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:24,fontWeight:500,color:P.text,marginBottom:6,letterSpacing:"-.4px"}}>¿Cómo está tu piel hoy?</div>
-      <div style={{fontSize:13,color:P.muted,marginBottom:22}}>Esto alimenta tu diario automáticamente.</div>
-      <div style={{display:"flex",gap:8,marginBottom:24}}>
-        {moods.map(m=><button key={m.e} onClick={()=>setSel(m.e)} style={{flex:1,padding:"12px 4px",borderRadius:16,border:`2px solid ${sel===m.e?P.accent:P.border}`,background:sel===m.e?P.accentSoft:P.card,cursor:"pointer",transition:"all .2s",textAlign:"center"}}>
-          <div style={{fontSize:26}}>{m.e}</div>
-          <div style={{fontSize:10,color:P.muted,marginTop:4,fontWeight:600}}>{m.l}</div>
-        </button>)}
-      </div>
-      <div style={{display:"flex",gap:8}}>
-        <button onClick={()=>onDone(null)} style={{flex:1,height:50,borderRadius:16,border:`1px solid ${P.border}`,background:"transparent",color:P.muted,fontSize:14,fontWeight:500,cursor:"pointer"}}>Saltar</button>
-        <button onClick={()=>sel&&onDone(sel)} style={{flex:2,height:50,borderRadius:16,border:"none",background:sel?P.text:P.cream,color:sel?P.onDark:P.muted,fontSize:14,fontWeight:600,cursor:"pointer",transition:"all .2s"}}>Empezar rutina →</button>
-      </div>
-    </div>
-  </div>;
-}
-
 // ─── DAY PLAN BANNER ─────────────────────────────
 function DayPlanBanner({phase,onStartRoutine}){
   const h=new Date().getHours();
