@@ -533,12 +533,19 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient}
     {step.ingr&&step.ingr.length>0&&<>
       <div style={D}/>
       <div style={{padding:"12px 18px"}}>
-        <div style={LBL}>Lo que contiene</div>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+          <div style={{...LBL,marginBottom:0}}>Lo que contiene</div>
+          <span style={{fontSize:9,color:P.muted,opacity:.7,letterSpacing:.3,fontWeight:600}}>· toca para saber más</span>
+        </div>
         <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
-          {step.ingr.map((ig,i)=><div key={i} style={{padding:"4px 10px",borderRadius:20,background:P.cream,border:`1px solid ${P.border}`}}>
-            <span style={{fontSize:12,color:P.text,fontWeight:600}}>{ig.a}</span>
-            <span style={{fontSize:11,color:P.muted}}> · {ig.b}</span>
-          </div>)}
+          {step.ingr.map((ig,i)=>{
+            const known=findIngredient(ig.a);
+            return<button key={i} onClick={e=>{e.stopPropagation();if(known)onIngredient&&onIngredient(known);}} disabled={!known} style={{padding:"4px 10px",borderRadius:20,background:P.cream,border:`1px solid ${known?P.accent:P.border}`,cursor:known?"pointer":"default",textAlign:"left",fontFamily:"inherit"}}>
+              <span style={{fontSize:12,color:P.text,fontWeight:600}}>{ig.a}</span>
+              <span style={{fontSize:11,color:P.muted}}> · {ig.b}</span>
+              {known&&<span style={{fontSize:9,color:P.accent,marginLeft:4,fontWeight:700}}>ⓘ</span>}
+            </button>;
+          })}
         </div>
       </div>
     </>}
