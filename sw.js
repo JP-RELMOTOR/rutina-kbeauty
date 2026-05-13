@@ -18,7 +18,8 @@ self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(c => c.addAll(PRECACHE).catch(() => {}))
   );
-  self.skipWaiting();
+  // Don't skipWaiting() automatically — the main app posts SKIP_WAITING
+  // after the user taps the update banner so we never reload mid-routine.
 });
 
 self.addEventListener('activate', e => {
@@ -27,6 +28,10 @@ self.addEventListener('activate', e => {
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
+});
+
+self.addEventListener('message', e => {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', e => {
