@@ -811,6 +811,123 @@ function PhotoCapture({onClose,onSave}){
   </div>;
 }
 
+// ─── IMPORT PHOTOS (from iPhone Photos Library) ──
+function ImportPhotos({onClose,onSave}){
+  const inputRef=React.useRef();
+  const [files,setFiles]=React.useState([]); // [{preview, date, dateAuto, note}]
+  const [loading,setLoading]=React.useState(false);
+  const [saving,setSaving]=React.useState(false);
+
+  // Open native picker on mount
+  React.useEffect(()=>{
+    setTimeout(()=>inputRef.current?.click(),200);
+  },[]);
+
+  async function handlePick(e){
+    const list=Array.from(e.target.files||[]);
+    if(!list.length){onClose();return;}
+    setLoading(true);
+    const out=[];
+    for(const f of list){
+      const [exifDate,preview]=await Promise.all([readExifDate(f),compressImage(f)]);
+      if(!preview)continue;
+      const fallback=todayStr();
+      out.push({
+        preview,
+        date:exifDate||fallback,
+        dateAuto:!!exifDate,
+        note:"",
+      });
+    }
+    // Sort by date ascending (oldest first) for visual flow
+    out.sort((a,b)=>a.date.localeCompare(b.date));
+    setFiles(out);
+    setLoading(false);
+  }
+
+  function updateField(idx,field,value){
+    setFiles(prev=>prev.map((f,i)=>i===idx?{...f,[field]:value,...(field==="date"?{dateAuto:false}:{})}:f));
+  }
+  function removeOne(idx){
+    setFiles(prev=>prev.filter((_,i)=>i!==idx));
+  }
+  function setBulkDate(d){
+    setFiles(prev=>prev.map(f=>({...f,date:d,dateAuto:false})));
+  }
+
+  async function handleSave(){
+    if(!files.length)return;
+    setSaving(true);
+    for(const f of files){
+      const entry={
+        date:f.date,
+        time:"12:00",
+        dataUrl:f.preview,
+        feel:null,
+        feelLabel:null,
+        note:f.note||"",
+        imported:true,
+      };
+      await dbSavePhoto(entry);
+    }
+    setSaving(false);
+    onSave&&onSave(files.length);
+    onClose();
+  }
+
+  return<div style={{position:"absolute",inset:0,zIndex:90,background:P.bg,overflowY:"auto",animation:"fadeIn .3s ease",WebkitOverflowScrolling:"touch"}}>
+    <input ref={inputRef} type="file" accept="image/*" multiple onChange={handlePick} style={{display:"none"}}/>
+
+    <div style={{padding:"52px 16px 12px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,position:"sticky",top:0,background:P.bg,zIndex:2,borderBottom:files.length?`1px solid ${P.border}`:"none"}}>
+      <button onClick={onClose} style={{width:36,height:36,borderRadius:18,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Icon n="arrow" size={16} color={P.text} sw={2}/></button>
+      <div style={{flex:1,textAlign:"center"}}>
+        <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:20,fontWeight:500,color:P.text}}>Importar fotos</div>
+        {files.length>0&&<div style={{fontSize:11,color:P.muted,marginTop:1}}>{files.length} foto{files.length!==1?"s":""} · revisa fechas</div>}
+      </div>
+      <div style={{width:36}}/>
+    </div>
+
+    {loading&&<div style={{padding:"60px 20px",textAlign:"center"}}>
+      <div style={{fontSize:13,color:P.muted}}>Leyendo fechas de las fotos...</div>
+    </div>}
+
+    {!loading&&files.length===0&&<div style={{padding:"40px 20px",textAlign:"center"}}>
+      <div style={{fontSize:13,color:P.muted,marginBottom:14}}>Abriendo fototeca...</div>
+      <button onClick={()=>inputRef.current?.click()} style={{padding:"10px 16px",borderRadius:12,border:`1px solid ${P.border}`,background:P.card,cursor:"pointer",fontSize:13}}>Reintentar selección</button>
+    </div>}
+
+    {!loading&&files.length>0&&<>
+      <div style={{padding:"12px 16px",background:P.cream,fontSize:12,color:P.muted,lineHeight:1.5,borderBottom:`1px solid ${P.border}`}}>
+        💡 Las fechas con <span style={{color:P.green,fontWeight:700}}>AUTO</span> vienen del EXIF original de la foto. Las puedes cambiar si están mal.
+      </div>
+
+      <div style={{padding:"12px 16px"}}>
+        <button onClick={()=>{const d=prompt("Aplicar la misma fecha a TODAS (YYYY-MM-DD):",todayStr());if(d&&/^\d{4}-\d{2}-\d{2}$/.test(d))setBulkDate(d);}} style={{width:"100%",padding:"10px",borderRadius:12,border:`1px dashed ${P.border}`,background:"transparent",color:P.muted,fontSize:12,cursor:"pointer",marginBottom:8}}>Aplicar misma fecha a todas</button>
+      </div>
+
+      <div style={{padding:"0 16px 100px"}}>
+        {files.map((f,i)=><div key={i} style={{display:"flex",gap:12,padding:"12px",marginBottom:8,borderRadius:16,background:P.card,border:`1px solid ${P.border}`}}>
+          <div style={{width:72,height:72,borderRadius:12,overflow:"hidden",flexShrink:0,border:`1px solid ${P.border}`}}>
+            <img src={f.preview} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+              <input type="date" value={f.date} onChange={e=>updateField(i,"date",e.target.value)} style={{flex:1,padding:"6px 8px",borderRadius:8,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:13,fontFamily:"inherit"}}/>
+              {f.dateAuto&&<span style={{fontSize:8.5,padding:"2px 6px",borderRadius:5,background:P.greenSoft,color:P.green,fontWeight:700,letterSpacing:.3}}>AUTO</span>}
+              <button onClick={()=>removeOne(i)} aria-label="Quitar" style={{width:24,height:24,borderRadius:12,border:"none",background:P.cream,color:P.muted,cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+            </div>
+            <input type="text" value={f.note} onChange={e=>updateField(i,"note",e.target.value)} placeholder="Nota opcional..." style={{width:"100%",boxSizing:"border-box",padding:"6px 8px",borderRadius:8,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:12,fontFamily:"inherit"}}/>
+          </div>
+        </div>)}
+      </div>
+
+      <div style={{position:"fixed",left:0,right:0,bottom:0,padding:"12px 16px 28px",background:`linear-gradient(180deg,rgba(246,239,226,0),${P.bg} 30%)`,zIndex:3}}>
+        <button onClick={handleSave} disabled={saving||files.length===0} style={{width:"100%",height:54,borderRadius:18,border:"none",background:saving?P.muted:P.text,color:P.onDark,fontSize:15,fontWeight:600,cursor:saving?"default":"pointer"}}>{saving?"Guardando...":`Guardar ${files.length} foto${files.length!==1?"s":""} ✓`}</button>
+      </div>
+    </>}
+  </div>;
+}
+
 // ─── COMPLETE SHEET ──────────────────────────────
 function CompleteSheet({stats,onPhoto,onClose}){
   const mon=isMonday();
