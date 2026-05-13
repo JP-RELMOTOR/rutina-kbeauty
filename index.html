@@ -972,9 +972,33 @@ function App(){
   const [diary,setDiary]=React.useState(()=>ls("kb_diary",[]));
   const [photos,setPhotos]=React.useState([]);
   const [started,setStarted]=React.useState(false);
+  const [showSettings,setShowSettings]=React.useState(false);
+  const [hasUpdate,setHasUpdate]=React.useState(false);
+  const [updateDismissed,setUpdateDismissed]=React.useState(false);
 
   // Load photos from IndexedDB
   React.useEffect(()=>{dbGetPhotos().then(p=>setPhotos(p||[]));},[]);
+
+  // Listen for PWA update events from the SW registration
+  React.useEffect(()=>{
+    const h=()=>setHasUpdate(true);
+    window.addEventListener("pwa-update-available",h);
+    return()=>window.removeEventListener("pwa-update-available",h);
+  },[]);
+
+  function handleApplyUpdate(){
+    const w=window.__pwaWaitingWorker;
+    if(w&&w.postMessage){w.postMessage({type:"SKIP_WAITING"});}
+    else{window.location.reload();}
+  }
+  function handlePhaseChange(p){setPhase(p);lsSet("kb_phase",p);haptic("light");}
+  async function handleDataRestored(){
+    setHistory(ls("kb_history",[]));
+    setDiary(ls("kb_diary",[]));
+    setPhase(parseInt(ls("kb_phase","2"))||2);
+    const p=await dbGetPhotos();
+    setPhotos(p||[]);
+  }
 
   const routine=ROUTINES[mode]||ROUTINES.night;
   const streak=getStreak(history);
