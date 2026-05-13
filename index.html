@@ -340,8 +340,13 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName}){
   if(isActive)return<div style={{background:P.card,borderRadius:22,marginBottom:10,border:`1.5px solid ${P.accent}`,boxShadow:`0 8px 28px -8px ${P.shadow}`,animation:"stepIn .4s ease",overflow:"hidden"}}>
 
     {/* ── HEADER ── */}
-    <div style={{padding:"16px 18px 14px",display:"flex",alignItems:"flex-start",gap:12}}>
-      <div style={{width:34,height:34,borderRadius:17,background:P.accentSoft,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:14,fontWeight:700,color:P.accent}}>{idx+1}</div>
+    <div style={{padding:"16px 18px 14px",display:"flex",alignItems:"flex-start",gap:14}}>
+      <div style={{width:64,height:64,borderRadius:18,background:step.photo?P.cream:P.accentSoft,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:18,fontWeight:700,color:P.accent,overflow:"hidden",border:`1px solid ${P.border}`,position:"relative"}}>
+        {step.photo
+          ?<img src={step.photo} alt={step.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+          :<>{idx+1}</>}
+        <div style={{position:"absolute",bottom:-2,right:-2,width:22,height:22,borderRadius:11,background:P.accent,border:`2px solid ${P.card}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:P.onAccent}}>{idx+1}</div>
+      </div>
       <div style={{flex:1,minWidth:0}}>
         <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.accent,fontWeight:700,marginBottom:3}}>{step.cat}</div>
         <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:19,color:P.text,letterSpacing:"-.3px",lineHeight:1.2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{step.name}</div>
