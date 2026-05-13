@@ -1256,6 +1256,23 @@ function TabBar({tab,onTab}){
   </div>;
 }
 
+// ─── BACKUP REMINDER (día 1 y 15 de cada mes) ────
+function BackupReminder({onExport,onDismiss}){
+  return<div style={{margin:"0 16px 12px",padding:"13px 14px",borderRadius:18,background:P.accentSoft,border:`1.5px solid ${P.accent}`,animation:"stepIn .4s ease"}}>
+    <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:10}}>
+      <div style={{width:36,height:36,borderRadius:18,background:P.accent,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:18}}>💾</div>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:13,fontWeight:700,color:P.text,letterSpacing:"-.1px"}}>Día de respaldo</div>
+        <div style={{fontSize:11.5,color:P.muted,marginTop:3,lineHeight:1.45}}>Exporta tus datos cada 15 días. Protege tu diario, rutinas y fotos.</div>
+      </div>
+    </div>
+    <div style={{display:"flex",gap:8}}>
+      <button onClick={onDismiss} style={{flex:1,height:38,borderRadius:11,border:`1px solid ${P.border}`,background:"transparent",color:P.muted,fontSize:12.5,fontWeight:600,cursor:"pointer"}}>Más tarde</button>
+      <button onClick={onExport} style={{flex:2,height:38,borderRadius:11,border:"none",background:P.text,color:P.onDark,fontSize:12.5,fontWeight:700,cursor:"pointer",letterSpacing:.2}}>Exportar ahora</button>
+    </div>
+  </div>;
+}
+
 // ─── AMBIENT AUDIO (Web Audio API, generativo) ───
 // Genera 4 ambientes en tiempo real, 0 bytes de assets, infinito.
 class AmbientAudio {
