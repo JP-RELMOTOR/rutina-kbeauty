@@ -1059,7 +1059,7 @@ function App(){
 
   return<div style={{width:"100%",height:"100%",background:P.bg,position:"relative",overflow:"hidden"}}>
     <div style={{height:"100%",overflowY:"auto",paddingBottom:110,WebkitOverflowScrolling:"touch"}}>
-      {tab==="today"&&<TodayScreen mode={mode} setMode={handleSetMode} routine={routine} stepState={stepState} onTap={handleTap} onComplete={handleComplete} onSkip={handleSkip} completedCount={completedCount} completedMin={completedMin} isFinished={isFinished} onShowComplete={()=>setShowComplete(true)} streak={streak} phase={phase} doneSteps={doneSteps}/>}
+      {tab==="today"&&<TodayScreen mode={mode} setMode={handleSetMode} routine={routine} stepState={stepState} onTap={handleTap} onComplete={handleComplete} onSkip={handleSkip} completedCount={completedCount} completedMin={completedMin} isFinished={isFinished} onShowComplete={()=>setShowComplete(true)} streak={streak} phase={phase} doneSteps={doneSteps} onOpenSettings={()=>setShowSettings(true)}/>}
       {tab==="history"&&<HistoryScreen history={history} streak={streak} phase={phase}/>}
       {tab==="diary"&&<DiaryScreen diary={diary} photos={photos} onAddPhoto={()=>setShowCamera(true)}/>}
       {tab==="progress"&&<ProgressScreen history={history} streak={streak}/>}
