@@ -698,6 +698,7 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
 
 // ─── HISTORY SCREEN ──────────────────────────────
 function HistoryScreen({history,streak,phase}){
+  const freezeInfo=getFreezeInfo(history);
   const today=todayStr();
   const last14=[];
   for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);last14.push(d.toISOString().split("T")[0]);}
