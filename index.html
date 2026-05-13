@@ -22,6 +22,15 @@ textarea{font-family:'Inter',system-ui,sans-serif;}
 @keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 @keyframes stepIn{from{opacity:.5;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+
+  /* INGREDIENT CHIPS */
+  .ingr-section { margin: 10px 18px 0; }
+  .ingr-title { font-size: 10px; letter-spacing: 1.3px; text-transform: uppercase; color: rgba(254,252,247,.5); font-weight: 700; margin-bottom: 8px; }
+  .ingr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ingr-chip { padding: 5px 10px; border-radius: 20px; background: rgba(254,252,247,.1); border: 1px solid rgba(254,252,247,.2); }
+  .ingr-chip-name { font-size: 12px; color: rgba(254,252,247,.95); font-weight: 600; letter-spacing: -.1px; }
+  .ingr-chip-desc { font-size: 10px; color: rgba(254,252,247,.55); margin-top: 1px; }
+
 </style>
 </head>
 <body>
@@ -83,7 +92,7 @@ function isRetinalDay(phase){
   return phase===1?(d===1||d===4):(d===1||d===3||d===5);
 }
 function isMonday(){return getDOW()===1;}
-function getGreeting(){const h=new Date().getHours();return h<12?"Buenos días":"h<20"?h<20?"Buenas tardes":"Buenas noches":"Buenas noches";}
+function getGreeting(){const h=new Date().getHours();return h<12?"Buenos días":h<20?"Buenas tardes":"Buenas noches";}
 function getDayLabel(){
   const days=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
   return days[getDOW()];
@@ -122,101 +131,91 @@ function Icon({n,size=20,color="currentColor",sw=1.6,fill="none",style={}}){
 }
 
 // ─── ANIMATIONS ─────────────────────────────────
-const ANIM={
-  circular:`<svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="62" rx="36" ry="44" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/><circle cx="87" cy="53" r="3" fill="#d9c4aa"/><circle cx="113" cy="53" r="3" fill="#d9c4aa"/><path d="M90 74 Q100 81 110 74" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="100" cy="62" rx="54" ry="60" fill="none" stroke="#c89849" stroke-width="2.5" stroke-dasharray="15 9" opacity=".7"><animateTransform attributeName="transform" type="rotate" from="0 100 62" to="360 100 62" dur="2.5s" repeatCount="3"/></ellipse><polygon points="150,28 159,18 161,31" fill="#c89849" opacity=".7"><animateTransform attributeName="transform" type="rotate" from="0 100 62" to="360 100 62" dur="2.5s" repeatCount="3"/></polygon><text x="100" y="116" text-anchor="middle" font-size="9" fill="#bbb" font-family="Inter,sans-serif">Masajea en círculos · 60 seg</text></svg>`,
-  circular_oil:`<svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="62" rx="36" ry="44" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/><circle cx="87" cy="53" r="3" fill="#d9c4aa"/><circle cx="113" cy="53" r="3" fill="#d9c4aa"/><path d="M90 74 Q100 81 110 74" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="100" cy="62" rx="54" ry="60" fill="none" stroke="#9b59b6" stroke-width="2.5" stroke-dasharray="15 9" opacity=".7"><animateTransform attributeName="transform" type="rotate" from="0 100 62" to="360 100 62" dur="2.5s" repeatCount="3"/></ellipse><circle cx="170" cy="18" r="6" fill="#a8d8ea" opacity="0"><animate attributeName="opacity" values="0;0;1;0" dur="2.5s" repeatCount="3"/><animate attributeName="cy" values="5;22" dur="2.5s" repeatCount="3"/></circle><text x="100" y="116" text-anchor="middle" font-size="9" fill="#bbb" font-family="Inter,sans-serif">Cara seca · masajea · agrega agua</text></svg>`,
-  patting:`<svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="76" rx="34" ry="40" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/><circle cx="88" cy="67" r="3" fill="#d9c4aa"/><circle cx="112" cy="67" r="3" fill="#d9c4aa"/><path d="M91 87 Q100 93 109 87" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/><g><animateTransform attributeName="transform" type="translate" values="0,0;0,9;0,0" dur="1.6s" repeatCount="3" additive="sum"/><ellipse cx="72" cy="24" rx="13" ry="7" fill="#f5e6d3" stroke="#c8a882" stroke-width="1.2"/><rect x="63" y="24" width="4" height="13" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/><rect x="68" y="22" width="4" height="15" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/><rect x="73" y="22" width="4" height="15" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/><rect x="78" y="24" width="3.5" height="12" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/></g><g><animateTransform attributeName="transform" type="translate" values="0,0;0,9;0,0" dur="1.6s" repeatCount="3" additive="sum"/><ellipse cx="128" cy="24" rx="13" ry="7" fill="#f5e6d3" stroke="#c8a882" stroke-width="1.2"/><rect x="119" y="24" width="4" height="13" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/><rect x="124" y="22" width="4" height="15" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/><rect x="129" y="22" width="4" height="15" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/><rect x="134" y="24" width="3.5" height="12" rx="2" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/></g><circle cx="100" cy="76" r="0" fill="none" stroke="#c89849" stroke-width="1.5" opacity="0"><animate attributeName="r" values="0;28" begin=".8s" dur="1.6s" repeatCount="3"/><animate attributeName="opacity" values=".7;0" begin=".8s" dur="1.6s" repeatCount="3"/></circle><text x="100" y="116" text-anchor="middle" font-size="9" fill="#bbb" font-family="Inter,sans-serif">Palmotea suavemente · sin frotar</text></svg>`,
-  dropper:`<svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="90" rx="34" ry="28" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/><circle cx="89" cy="84" r="2.5" fill="#d9c4aa"/><circle cx="111" cy="84" r="2.5" fill="#d9c4aa"/><path d="M92 98 Q100 103 108 98" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/><rect x="91" y="5" width="18" height="28" rx="4" fill="#e8e0d8" stroke="#b8a898" stroke-width="1.2"/><ellipse cx="100" cy="5" rx="9" ry="5.5" fill="#d8d0c8" stroke="#b8a898" stroke-width="1"/><rect x="97.5" y="33" width="5" height="11" rx="2.5" fill="#b8a898"/><ellipse cx="100" cy="47" rx="4.5" ry="6.5" fill="#a8d4f8" opacity="0"><animate attributeName="cy" values="44;76" dur="1.2s" repeatCount="3"/><animate attributeName="opacity" values="0;1;1;0" dur="1.2s" repeatCount="3"/></ellipse><ellipse cx="100" cy="47" rx="3.5" ry="5.5" fill="#a8d4f8" opacity="0"><animate attributeName="cy" values="44;76" begin=".4s" dur="1.2s" repeatCount="3"/><animate attributeName="opacity" values="0;1;1;0" begin=".4s" dur="1.2s" repeatCount="3"/></ellipse><ellipse cx="100" cy="47" rx="3" ry="5" fill="#a8d4f8" opacity="0"><animate attributeName="cy" values="44;76" begin=".8s" dur="1.2s" repeatCount="3"/><animate attributeName="opacity" values="0;1;1;0" begin=".8s" dur="1.2s" repeatCount="3"/></ellipse><text x="100" y="116" text-anchor="middle" font-size="9" fill="#bbb" font-family="Inter,sans-serif">3-4 gotas · presiona suavemente</text></svg>`,
-  spreading:`<svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="65" rx="36" ry="44" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/><circle cx="87" cy="55" r="3" fill="#d9c4aa"/><circle cx="113" cy="55" r="3" fill="#d9c4aa"/><path d="M90 78 Q100 85 110 78" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/><line x1="100" y1="65" x2="66" y2="44" stroke="#c89849" stroke-width="2.5" stroke-linecap="round" opacity="0"><animate attributeName="opacity" values="0;.8;0" dur="2s" repeatCount="3"/><animate attributeName="x2" values="100;66" dur="2s" repeatCount="3"/><animate attributeName="y2" values="65;44" dur="2s" repeatCount="3"/></line><line x1="100" y1="65" x2="134" y2="44" stroke="#c89849" stroke-width="2.5" stroke-linecap="round" opacity="0"><animate attributeName="opacity" values="0;.8;0" dur="2s" repeatCount="3"/><animate attributeName="x2" values="100;134" dur="2s" repeatCount="3"/><animate attributeName="y2" values="65;44" dur="2s" repeatCount="3"/></line><line x1="100" y1="65" x2="73" y2="70" stroke="#c89849" stroke-width="2" stroke-linecap="round" opacity="0"><animate attributeName="opacity" values="0;0;.8;0" dur="2s" repeatCount="3"/></line><line x1="100" y1="65" x2="127" y2="70" stroke="#c89849" stroke-width="2" stroke-linecap="round" opacity="0"><animate attributeName="opacity" values="0;0;.8;0" dur="2s" repeatCount="3"/></line><text x="100" y="116" text-anchor="middle" font-size="9" fill="#bbb" font-family="Inter,sans-serif">Distribuye hacia arriba y afuera</text></svg>`,
-  spf:`<svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="67" rx="36" ry="44" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/><circle cx="87" cy="57" r="3" fill="#d9c4aa"/><circle cx="113" cy="57" r="3" fill="#d9c4aa"/><path d="M90 80 Q100 87 110 80" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-linecap="round"/><circle cx="20" cy="26" r="13" fill="#f7c948" opacity=".85"/><line x1="20" y1="7" x2="20" y2="2" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/><line x1="33" y1="13" x2="37" y2="9" stroke="#f7c948" stroke-width="2" stroke-linecap="round"/><line x1="39" y1="26" x2="44" y2="26" stroke="#f7c948" stroke-width="2" stroke-linecap="round"/><rect x="64" y="23" width="0" height="88" rx="2" fill="#f7c948" opacity=".3"><animate attributeName="width" values="0;72;72;0" dur="2.5s" repeatCount="3"/></rect><text x="100" y="116" text-anchor="middle" font-size="9" fill="#bbb" font-family="Inter,sans-serif">Capa uniforme · cara, cuello y orejas</text></svg>`,
-  retinal:`<svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="65" rx="36" ry="44" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/><ellipse cx="85" cy="55" rx="13" ry="8" fill="#ffdddd" stroke="#e07060" stroke-width="1.2" opacity="0"><animate attributeName="opacity" values="0;.85;.85;0" dur="2.5s" repeatCount="3"/></ellipse><ellipse cx="115" cy="55" rx="13" ry="8" fill="#ffdddd" stroke="#e07060" stroke-width="1.2" opacity="0"><animate attributeName="opacity" values="0;.85;.85;0" dur="2.5s" repeatCount="3"/></ellipse><ellipse cx="100" cy="79" rx="13" ry="5.5" fill="#ffdddd" stroke="#e07060" stroke-width="1.2" opacity="0"><animate attributeName="opacity" values="0;.85;.85;0" dur="2.5s" repeatCount="3"/></ellipse><text x="85" y="51" text-anchor="middle" font-size="7" fill="#e07060" font-weight="bold" font-family="Inter,sans-serif" opacity="0"><animate attributeName="opacity" values="0;0;1;1;0" dur="2.5s" repeatCount="3"/>evitar</text><text x="115" y="51" text-anchor="middle" font-size="7" fill="#e07060" font-weight="bold" font-family="Inter,sans-serif" opacity="0"><animate attributeName="opacity" values="0;0;1;1;0" dur="2.5s" repeatCount="3"/>evitar</text><ellipse cx="100" cy="65" rx="20" ry="24" fill="#d4edda" stroke="#4a7c59" stroke-width="1.2" opacity="0"><animate attributeName="opacity" values="0;0;0;.6;0" dur="2.5s" repeatCount="3"/></ellipse><text x="100" y="67" text-anchor="middle" font-size="8" fill="#2d6040" font-family="Inter,sans-serif" opacity="0"><animate attributeName="opacity" values="0;0;0;.9;0" dur="2.5s" repeatCount="3"/>aplicar aquí</text><text x="100" y="116" text-anchor="middle" font-size="9" fill="#bbb" font-family="Inter,sans-serif">Evita ojos · labios · nariz</text></svg>`,
-  eye:`<svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg"><path d="M36 52 Q100 18 164 52 Q100 86 36 52Z" fill="#fdf6ee" stroke="#d9c4aa" stroke-width="1.5"/><ellipse cx="100" cy="52" rx="15" ry="19" fill="#8bb4d4" stroke="#6a94b4" stroke-width="1"/><ellipse cx="100" cy="52" rx="8.5" ry="11" fill="#3d3d3d"/><circle cx="106" cy="47" r="2.8" fill="white"/><path d="M40 55 Q100 84 160 55" fill="none" stroke="#d9c4aa" stroke-width="1.5" stroke-dasharray="4 3"/><g><animateTransform attributeName="transform" type="translate" values="0,0;0,-8;0,0" dur="1.5s" repeatCount="3" additive="sum"/><rect x="89" y="92" width="22" height="9" rx="4.5" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/><rect x="95.5" y="83" width="9" height="13" rx="4" fill="#f5e6d3" stroke="#c8a882" stroke-width="1"/><text x="100" y="100" text-anchor="middle" font-size="6" fill="#c8a882" font-family="Inter,sans-serif">anular</text></g><circle cx="100" cy="74" r="0" fill="none" stroke="#c8a882" stroke-width="1.2" opacity="0"><animate attributeName="r" values="0;17" begin=".7s" dur="1.5s" repeatCount="3"/><animate attributeName="opacity" values=".6;0" begin=".7s" dur="1.5s" repeatCount="3"/></circle><text x="100" y="116" text-anchor="middle" font-size="9" fill="#bbb" font-family="Inter,sans-serif">Dedo anular · presión ultra suave</text></svg>`,
-};
 
 // ─── ROUTINES DATA ───────────────────────────────
 const ROUTINES={
   morning:{id:"morning",label:"Mañana",total:5,minutes:10,steps:[
-    {id:"m1",cat:"Limpieza",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:2,tone:"#e8b75c",animId:"circular",
+    {id:"m1",rinse:{do:true,temp:"tibia",note:"Enjuaga con agua tibia"},ingr:[{a:"Betaína Salicilato (BHA)",b:"exfolia suavemente"},{a:"Tea Tree Oil",b:"antibacteriano"},{a:"pH 5.5",b:"respeta la barrera"}],cat:"Limpieza",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:2,tone:"#e8b75c",animId:"circular",
      why:"pH bajo: limpia sin alterar la barrera. Quita el sebo nocturno y prepara la piel.",
      tip:"Tamaño de una moneda de $100. Masajea 60 seg en círculos, enjuaga con agua fría.",
      animo:"¡Arranca el día con todo, Mijal! Esta limpieza es tu reset — piel limpia, mente clara.",critical:true},
-    {id:"m2",cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",animId:"patting",
+    {id:"m2",rinse:{do:false},ingr:[{a:"Ginseng 70%",b:"antioxidante y antiedad"},{a:"Fermentos",b:"potencian absorción"},{a:"Adenosina",b:"reduce arrugas finas"}],cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",animId:"patting",
      why:"Ginseng + antioxidantes. Rehidrata y actúa como primer para que los sérums penetren mejor.",
      tip:"Vierte el centro de la palma. Da 5 palmaditas suaves hasta absorber.",
      animo:"Este es el secreto del glass skin. El ginseng está preparando tu piel para absorber todo lo que viene."},
-    {id:"m3",cat:"Sérum",name:"Dark Spot Correcting Glow Serum",brand:"Axis-Y",min:1.5,tone:"#d6a47a",animId:"dropper",star:true,
+    {id:"m3",rinse:{do:false},ingr:[{a:"Niacinamida 5%",b:"aclara manchas y poros"},{a:"Squalane",b:"hidratación ligera"},{a:"Sea Buckthorn",b:"antioxidante potente"}],cat:"Sérum",name:"Dark Spot Correcting Glow Serum",brand:"Axis-Y",min:1.5,tone:"#d6a47a",animId:"dropper",star:true,
      why:"Niacinamida 5% + Squalane: aclara manchas, minimiza poros y unifica el tono.",
      tip:"3-4 gotas del gotero. Distribuye presionando suavemente.",
      animo:"La niacinamida trabaja despacio pero seguro. Cada gota está reduciendo esas manchas. ¡Constancia es la clave!"},
-    {id:"m4",cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",animId:"spreading",
+    {id:"m4",rinse:{do:false},ingr:[{a:"Ácido Hialurónico",b:"retiene humedad profunda"},{a:"Panthenol (B5)",b:"repara y suaviza"},{a:"Ceramida NP",b:"fortalece la barrera"}],cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",animId:"spreading",
      why:"Sella todo lo anterior. Crea un colchón de hidratación antes del SPF.",
      tip:"Tamaño de un garbanzo. Aplica en 5 puntos y distribuye hacia arriba.",
      animo:"Casi llegamos. Esta crema sella todo tu trabajo de esta mañana. Distribúyela con cariño hacia arriba."},
-    {id:"m5",cat:"Protector solar",name:"Centella Hyalu-Cica Sun Serum SPF50+",brand:"Skin1004",min:1,tone:"#f0c674",animId:"spf",critical:true,
+    {id:"m5",rinse:{do:false},ingr:[{a:"SPF50+ PA++++",b:"bloquea UVA y UVB"},{a:"Centella Asiática",b:"calma y protege"},{a:"Ácido Hialurónico",b:"hidrata mientras protege"}],cat:"Protector solar",name:"Centella Hyalu-Cica Sun Serum SPF50+",brand:"Skin1004",min:1,tone:"#f0c674",animId:"spf",critical:true,
      why:"SPF50+ PA++++. SIN esto el sérum aclarante no funciona — genera manchas en vez de reducirlas.",
      tip:"Media cucharadita para cara + cuello + orejas. Espera 15 min antes de salir al sol.",
      animo:"¡El paso más importante del día! Sin SPF, la niacinamida puede generar más manchas. Siempre, sin excepción. 🌞"},
   ]},
   night:{id:"night",label:"Noche",total:7,minutes:17,steps:[
-    {id:"n1",cat:"Doble limpieza · Aceite",name:"Clean It Zero Cleansing Balm",brand:"Banila Co",min:2,tone:"#e8b75c",animId:"circular_oil",
+    {id:"n1",rinse:{do:true,temp:"tibia",note:"Emulsifica con agua, enjuaga bien"},ingr:[{a:"Acerola Berry",b:"Vitamina C natural"},{a:"Vitamina E",b:"antioxidante"},{a:"Aceite de éster natural",b:"limpieza suave"}],cat:"Doble limpieza · Aceite",name:"Clean It Zero Cleansing Balm",brand:"Banila Co",min:2,tone:"#e8b75c",animId:"circular_oil",
      why:"Disuelve SPF, sebo y maquillaje a base de aceite. El agua sola no puede hacer esto.",
      tip:"Cara SECA, tamaño de una avellana. 60 seg masaje, agrega agua para emulsificar.",
      animo:"Bienvenida la noche, Mijal. Este balm va a disolver todo el SPF del día. ¡Es momento de relajarse!"},
-    {id:"n2",cat:"Doble limpieza · Agua",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:1.5,tone:"#c89b5e",animId:"circular",
+    {id:"n2",rinse:{do:true,temp:"tibia",note:"Enjuaga con agua tibia"},ingr:[{a:"Betaína Salicilato (BHA)",b:"limpieza profunda pH bajo"},{a:"Tea Tree Oil",b:"antibacteriano"},{a:"pH 5.5",b:"sin alterar la barrera"}],cat:"Doble limpieza · Agua",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:1.5,tone:"#c89b5e",animId:"circular",
      why:"Elimina los residuos del balm. Deja la piel realmente limpia.",
      tip:"Mismo tamaño que en la mañana: moneda de $100.",
      animo:"Segunda pasada para dejar el lienzo perfecto. Tu rutina nocturna empieza bien cuando la base está impecable."},
-    {id:"n3",cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",animId:"patting",
+    {id:"n3",rinse:{do:false},ingr:[{a:"Ginseng 70%",b:"antioxidante y antiedad"},{a:"Fermentos",b:"potencian absorción"},{a:"Adenosina",b:"reduce arrugas finas"}],cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",animId:"patting",
      why:"Rehidrata y equilibra el pH post-limpieza. Abre el camino para los activos.",
      tip:"Centro de la palma. Palmotea suavemente.",
      animo:"El ginseng rehidrata y abre los canales. Cada palmadita es un mensaje de amor a tu piel."},
-    {id:"n4",cat:"Essence reparadora",name:"Snail Repair Intensive Essence",brand:"Mizon",min:1.5,tone:"#d6a47a",animId:"patting",
+    {id:"n4",rinse:{do:false},ingr:[{a:"Mucín de Caracol",b:"repara y regenera"},{a:"Adenosina",b:"antiedad"},{a:"Alantoína",b:"calma la piel"}],cat:"Essence reparadora",name:"Snail Repair Intensive Essence",brand:"Mizon",min:1.5,tone:"#d6a47a",animId:"patting",
      why:"Mucín de caracol: repara micro-daños y regenera la barrera cutánea.",
      tip:"Tamaño de una avellana. Palmotea suavemente sobre toda la cara.",
      animo:"El caracol lleva siglos reparando pieles. Este mucín está rellenando micro-daños mientras lo aplicas."},
-    {id:"n5",cat:"Ampoule",name:"Madagascar Centella Ampoule",brand:"Skin1004",min:1.5,tone:"#a8b8c8",animId:"dropper",
+    {id:"n5",rinse:{do:false},ingr:[{a:"Centella Asiática Madagascar",b:"calma y repara"},{a:"Glicerina",b:"hidratante"}],cat:"Ampoule",name:"Madagascar Centella Ampoule",brand:"Skin1004",min:1.5,tone:"#a8b8c8",animId:"dropper",
      why:"Centella de Madagascar: calma inflamación y fortalece la barrera cutánea.",
      tip:"3-4 gotas. Distribuye presionando suavemente.",
      animo:"La centella calma todo. Esta noche tu piel va a repararse profundo mientras duermes."},
-    {id:"n6",cat:"Sérum reparador",name:"Revive Serum: Ginseng + Snail Mucin",brand:"Beauty of Joseon",min:2,tone:"#d6c2a0",animId:"dropper",
+    {id:"n6",rinse:{do:false},ingr:[{a:"Ginseng Panax 63%",b:"antioxidante y antiedad"},{a:"Mucín de Caracol 3%",b:"reparador e hidratante"},{a:"Niacinamida",b:"luminosidad"}],cat:"Sérum reparador",name:"Revive Serum: Ginseng + Snail Mucin",brand:"Beauty of Joseon",min:2,tone:"#d6c2a0",animId:"dropper",
      why:"Ginseng + snail mucin: repara y regenera toda la noche sin interferencias.",
      tip:"3-4 gotas del gotero. Palmotea suavemente.",
      animo:"El ginseng + mucín trabajan toda la noche sin competencia. Esta es tu noche de reparación profunda. ¡Descansa bien!"},
-    {id:"n7",cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",animId:"spreading",
+    {id:"n7",rinse:{do:false},ingr:[{a:"Ácido Hialurónico",b:"retiene humedad profunda"},{a:"Panthenol (B5)",b:"repara y suaviza"},{a:"Ceramida NP",b:"fortalece la barrera"}],cat:"Hidratante",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",animId:"spreading",
      why:"Sella todos los activos. Mantiene la hidratación durante las 7-8 horas de sueño.",
      tip:"Tamaño de un garbanzo. Sella todo y permite que los activos trabajen profundo.",
      animo:"¡Lo lograste! Esta crema va a mantener todo lo que aplicaste durante toda la noche. ¡Dulces sueños!"},
   ]},
   nightRetinal:{id:"nightRetinal",label:"Noche · Retinal",total:8,minutes:28,steps:[
-    {id:"r1",cat:"Doble limpieza · Aceite",name:"Clean It Zero Cleansing Balm",brand:"Banila Co",min:2,tone:"#e8b75c",animId:"circular_oil",
+    {id:"r1",rinse:{do:true,temp:"tibia",note:"Emulsifica con agua, enjuaga bien"},ingr:[{a:"Acerola Berry",b:"Vitamina C natural"},{a:"Vitamina E",b:"antioxidante"},{a:"Aceite de éster natural",b:"limpieza suave"}],cat:"Doble limpieza · Aceite",name:"Clean It Zero Cleansing Balm",brand:"Banila Co",min:2,tone:"#e8b75c",animId:"circular_oil",
      why:"Disuelve SPF, sebo y maquillaje a base de aceite. El retinal necesita piel perfectamente limpia.",
      tip:"Cara SECA, tamaño de una avellana. 60 seg masaje, agrega agua para emulsificar.",
      animo:"Noche de retinal, la más poderosa. La base perfecta hace que todo funcione mejor. ¡Vamos con todo!"},
-    {id:"r2",cat:"Doble limpieza · Agua",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:1.5,tone:"#c89b5e",animId:"circular",
+    {id:"r2",rinse:{do:true,temp:"tibia",note:"Enjuaga con agua tibia"},ingr:[{a:"Betaína Salicilato (BHA)",b:"limpieza profunda pH bajo"},{a:"Tea Tree Oil",b:"antibacteriano"},{a:"pH 5.5",b:"sin alterar la barrera"}],cat:"Doble limpieza · Agua",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:1.5,tone:"#c89b5e",animId:"circular",
      why:"Elimina residuos del balm. El retinal necesita piel completamente limpia para trabajar.",
      tip:"Mismo tamaño que siempre: moneda de $100.",
      animo:"Segunda limpieza para tener el lienzo perfecto. El retinal necesita piel impecable para penetrar bien."},
-    {id:"r3",cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",animId:"patting",
+    {id:"r3",rinse:{do:false},ingr:[{a:"Ginseng 70%",b:"antioxidante y antiedad"},{a:"Fermentos",b:"potencian absorción"},{a:"Adenosina",b:"reduce arrugas finas"}],cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",animId:"patting",
      why:"Rehidrata y equilibra el pH. Esta hidratación inicial reduce la irritación del retinal.",
      tip:"Centro de la palma. Palmotea suavemente.",
      animo:"El ginseng prepara y protege. Esta hidratación hace que el retinal sea más tolerable."},
-    {id:"r4",cat:"Essence reparadora",name:"Snail Repair Intensive Essence",brand:"Mizon",min:1.5,tone:"#d6a47a",animId:"patting",
+    {id:"r4",rinse:{do:false},ingr:[{a:"Mucín de Caracol",b:"repara y genera base hidratante"},{a:"Adenosina",b:"antiedad"},{a:"Alantoína",b:"calma la piel"}],cat:"Essence reparadora",name:"Snail Repair Intensive Essence",brand:"Mizon",min:1.5,tone:"#d6a47a",animId:"patting",
      why:"Crea una base hidratante que ayuda a la piel a tolerar mejor el retinal.",
      tip:"Tamaño de una avellana. Palmotea suavemente.",
      animo:"El caracol está construyendo tu armadura. Esta capa hidratante hace que el retinal sea más tolerable."},
-    {id:"r5",cat:"Ampoule calmante",name:"Madagascar Centella Ampoule",brand:"Skin1004",min:1.5,tone:"#a8b8c8",animId:"dropper",
+    {id:"r5",rinse:{do:false},ingr:[{a:"Centella Asiática Madagascar",b:"calma antes del retinal"},{a:"Glicerina",b:"hidratante"}],cat:"Ampoule calmante",name:"Madagascar Centella Ampoule",brand:"Skin1004",min:1.5,tone:"#a8b8c8",animId:"dropper",
      why:"Centella calma la inflamación y fortalece la barrera antes del retinal.",
      tip:"3-4 gotas. Después de esto ESPERA 10-15 minutos antes del retinal.",
      animo:"Centella asiática al rescate. Después de aplicarla, ¡cepíllate los dientes en esos 10-15 min! 🦷"},
-    {id:"r6",cat:"Retinal facial 🔴",name:"Seoul 1988 Serum — Retinal 2%",brand:"K-Secret",min:1,tone:"#c04030",animId:"retinal",star:true,
+    {id:"r6",rinse:{do:false},ingr:[{a:"Retinal Liposoma 2%",b:"más potente que el retinol"},{a:"Ginseng Negro 58%",b:"antioxidante profundo"},{a:"Niacinamida",b:"luminosidad y poros"},{a:"Bakuchiol",b:"potencia el retinal"}],cat:"Retinal facial 🔴",name:"Seoul 1988 Serum — Retinal 2%",brand:"K-Secret",min:1,tone:"#c04030",animId:"retinal",star:true,
      why:"Retinal 2%: estimula colágeno, reduce arrugas finas, unifica el tono. El activo anti-edad más potente.",
      tip:"1 SOLA gota para toda la cara. Evita ojos (1 cm), bordes de labios y nariz.",
      animo:"¡El activo estrella! Una gota está estimulando colágeno ahora mismo. Resultados visibles en 4-8 semanas. ¡Vale la pena!"},
-    {id:"r7",cat:"Contorno de ojos",name:"Revive Eye Serum: Ginseng + Retinal",brand:"Beauty of Joseon",min:2,tone:"#e0c8b0",animId:"eye",
+    {id:"r7",rinse:{do:false},ingr:[{a:"Retinal Liposoma 2%",b:"suaviza líneas finas del ojo"},{a:"Ginseng Panax 10%",b:"hidrata y protege"},{a:"Niacinamida",b:"ilumina ojeras"},{a:"Ceramida NP",b:"barrera del contorno"}],cat:"Contorno de ojos",name:"Revive Eye Serum: Ginseng + Retinal",brand:"Beauty of Joseon",min:2,tone:"#e0c8b0",animId:"eye",
      why:"Retinal suave para la zona más delicada. Reduce ojeras y líneas finas.",
      tip:"UN grano de arroz para AMBOS ojos. Solo con el dedo anular, presión ultra suave.",
      animo:"La zona del ojo es la primera en mostrar juventud. Un grano de arroz es todo lo que necesitas."},
-    {id:"r8",cat:"Hidratante selladora",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",animId:"spreading",
+    {id:"r8",rinse:{do:false},ingr:[{a:"Ácido Hialurónico",b:"retiene humedad 7-8 horas"},{a:"Panthenol (B5)",b:"buffer del retinal"},{a:"Ceramida NP",b:"fortalece la barrera"}],cat:"Hidratante selladora",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",animId:"spreading",
      why:"Técnica buffer: sella el retinal y reduce irritación sin cancelar su eficacia.",
      tip:"Tamaño de un garbanzo. Capa generosa sobre todo el retinal.",
      animo:"¡Perfecta noche de retinal! Esta crema sella el activo y reduce la irritación. ¡Dulces sueños, Mijal!"},
@@ -281,12 +280,13 @@ function DayPlanBanner({phase,onStartRoutine}){
 }
 
 // ─── STEP CARD ───────────────────────────────────
-function StepCard({step,idx,state,onTap,onComplete,onSkip}){
+function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName}){
+  if(nextName) step={...step,_next:nextName};
   const isActive=state==="active",isDone=state==="done";
   const totalSec=Math.round(step.min*60);
   const [secLeft,setSecLeft]=React.useState(totalSec);
   const [running,setRunning]=React.useState(false);
-  React.useEffect(()=>{if(isActive){setSecLeft(totalSec);setRunning(true);}else setRunning(false);},[isActive,totalSec]);
+  React.useEffect(()=>{if(isActive){setSecLeft(totalSec);setRunning(false);}else setRunning(false);},[isActive,totalSec]);
   React.useEffect(()=>{if(!running||secLeft<=0)return;const id=setInterval(()=>setSecLeft(s=>Math.max(0,s-1)),1000);return()=>clearInterval(id);},[running,secLeft]);
   const pct=isActive?1-secLeft/totalSec:0;
   const mm=String(Math.floor(secLeft/60)).padStart(2,"0"),ss=String(secLeft%60).padStart(2,"0");
@@ -300,39 +300,91 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip}){
     <div style={{fontSize:11,color:P.green,fontWeight:600}}>✓ {step.min}m</div>
   </div>;
 
-  if(isActive)return<div style={{background:P.card,borderRadius:22,marginBottom:10,border:`2px solid ${P.accent}`,boxShadow:`0 8px 28px -8px ${P.shadow}`,animation:"stepIn .4s ease",overflow:"hidden"}}>
-    <div style={{padding:"16px 18px 0",display:"flex",alignItems:"flex-start",gap:12}}>
+  const D = {height:1,background:P.border,margin:"0 18px"};
+  const LBL = {fontSize:9,letterSpacing:1.4,textTransform:"uppercase",fontWeight:700,color:P.muted,marginBottom:6};
+
+  if(isActive)return<div style={{background:P.card,borderRadius:22,marginBottom:10,border:`1.5px solid ${P.accent}`,boxShadow:`0 8px 28px -8px ${P.shadow}`,animation:"stepIn .4s ease",overflow:"hidden"}}>
+
+    {/* ── HEADER ── */}
+    <div style={{padding:"16px 18px 14px",display:"flex",alignItems:"flex-start",gap:12}}>
       <div style={{width:34,height:34,borderRadius:17,background:P.accentSoft,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:14,fontWeight:700,color:P.accent}}>{idx+1}</div>
-      <div style={{flex:1}}>
+      <div style={{flex:1,minWidth:0}}>
         <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.accent,fontWeight:700,marginBottom:3}}>{step.cat}</div>
-        <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:19,color:P.text,letterSpacing:"-.3px",lineHeight:1.2}}>{step.name}</div>
+        <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:19,color:P.text,letterSpacing:"-.3px",lineHeight:1.2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{step.name}</div>
         <div style={{fontSize:12,color:P.muted,marginTop:2}}>{step.brand}</div>
       </div>
     </div>
-    {step.animId&&ANIM[step.animId]&&<div style={{margin:"12px 18px 0",background:P.cream,borderRadius:14,padding:"8px",display:"flex",justifyContent:"center"}} dangerouslySetInnerHTML={{__html:ANIM[step.animId]}}/>}
-    <div style={{display:"flex",alignItems:"center",gap:14,padding:"12px 18px 0"}}>
-      <Ring pct={pct} size={62} stroke={4} color={P.accent} track={P.cream}>
+
+    {/* ── INGREDIENTES ── */}
+    {step.ingr&&step.ingr.length>0&&<>
+      <div style={D}/>
+      <div style={{padding:"12px 18px"}}>
+        <div style={LBL}>Lo que contiene</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+          {step.ingr.map((ig,i)=><div key={i} style={{padding:"4px 10px",borderRadius:20,background:P.cream,border:`1px solid ${P.border}`}}>
+            <span style={{fontSize:12,color:P.text,fontWeight:600}}>{ig.a}</span>
+            <span style={{fontSize:11,color:P.muted}}> · {ig.b}</span>
+          </div>)}
+        </div>
+      </div>
+    </>}
+
+    {/* ── TIMER ── */}
+    <div style={D}/>
+    <div style={{padding:"12px 18px",display:"flex",alignItems:"center",gap:14}}>
+      <Ring pct={pct} size={58} stroke={4} color={running?P.accent:P.muted} track={P.cream}>
         <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:13,fontWeight:600,color:P.text,letterSpacing:"-.5px"}}>{mm}:{ss}</div>
       </Ring>
-      <button onClick={e=>{e.stopPropagation();setRunning(r=>!r);}} style={{width:38,height:38,borderRadius:19,border:`1px solid ${P.border}`,background:P.cream,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:P.text}}>
-        <Icon n={running?"pause":"play"} size={13} fill={P.text} color={P.text}/>
+      <button onClick={e=>{e.stopPropagation();setRunning(r=>!r);}} style={{width:44,height:44,borderRadius:22,border:"none",background:running?P.text:P.accentSoft,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .2s"}}>
+        <Icon n={running?"pause":"play"} size={15} fill={running?P.onDark:P.accent} color={running?P.onDark:P.accent}/>
       </button>
-      <div style={{flex:1,fontSize:11,color:P.muted,letterSpacing:.3}}>Toca pausa si<br/>necesitas un momento</div>
+      <div style={{flex:1,fontSize:12,color:P.muted,lineHeight:1.4}}>{running?"Corriendo...":"Toca ▶ cuando estés lista"}</div>
     </div>
-    {/* INSTRUCCIONES - el elemento más destacado */}
-    <div style={{margin:"14px 18px 0",padding:"14px 16px",borderRadius:16,background:P.text,border:"none"}}>
-      <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:"rgba(254,252,247,.5)",fontWeight:700,marginBottom:6}}>Cómo hacerlo</div>
-      <div style={{fontSize:15,color:P.onDark,lineHeight:1.55,fontWeight:500}}>{step.tip}</div>
+
+    {/* ── CÓMO APLICAR ── */}
+    <div style={D}/>
+    <div style={{padding:"14px 18px"}}>
+      <div style={LBL}>Cómo aplicar</div>
+      <div style={{fontSize:15,color:P.text,lineHeight:1.6,fontWeight:500}}>{step.tip}</div>
+      {step.rinse&&step.rinse.do&&<div style={{display:"flex",alignItems:"center",gap:8,marginTop:10,padding:"8px 12px",borderRadius:12,background:"#e8f3f9",border:"1px solid #b8d8ea"}}>
+        <span style={{fontSize:16}}>💧</span>
+        <span style={{fontSize:13,color:"#2a6080",fontWeight:600}}>{step.rinse.note}</span>
+      </div>}
+      {step.rinse&&!step.rinse.do&&<div style={{display:"flex",alignItems:"center",gap:8,marginTop:10,padding:"6px 12px",borderRadius:10,background:P.cream}}>
+        <span style={{fontSize:13}}>🚫</span>
+        <span style={{fontSize:12,color:P.muted}}>No enjuagar</span>
+      </div>}
     </div>
-    <div style={{margin:"10px 18px 0",padding:"12px 14px",borderRadius:14,background:P.cream}}>
-      <div style={{fontSize:10,color:P.muted,letterSpacing:1.2,textTransform:"uppercase",fontWeight:600,marginBottom:4}}>Por qué</div>
-      <div style={{fontSize:13,color:P.text,lineHeight:1.5}}>{step.why}</div>
+
+    {/* ── POR QUÉ ── */}
+    <div style={D}/>
+    <div style={{padding:"12px 18px"}}>
+      <div style={LBL}>Por qué</div>
+      <div style={{fontSize:13,color:P.muted,lineHeight:1.55}}>{step.why}</div>
     </div>
-    {step.animo&&<div style={{margin:"10px 18px 0",padding:"12px 14px",borderRadius:14,background:P.accentSoft,border:`1px solid ${P.accent}30`}}>
-      <div style={{fontSize:10,color:P.accent,fontWeight:700,letterSpacing:.3,textTransform:"uppercase",marginBottom:3}}>💪 Motivación</div>
-      <div style={{fontSize:13,color:P.text,lineHeight:1.5}}>{step.animo}</div>
-    </div>}
-    <div style={{display:"flex",gap:8,padding:"14px 18px"}}>
+
+    {/* ── MOTIVACIÓN ── */}
+    {step.animo&&<>
+      <div style={D}/>
+      <div style={{padding:"10px 18px 14px",display:"flex",gap:8,alignItems:"flex-start"}}>
+        <span style={{fontSize:14,flexShrink:0,marginTop:1}}>💪</span>
+        <div style={{fontSize:13,color:P.accent,lineHeight:1.5,fontStyle:"italic"}}>{step.animo}</div>
+      </div>
+    </>}
+
+    {/* ── PRÓXIMO PASO ── */}
+    {step._next&&<>
+      <div style={D}/>
+      <div style={{padding:"10px 18px",display:"flex",alignItems:"center",gap:8,opacity:.6}}>
+        <span style={{fontSize:11,color:P.muted,fontWeight:600,letterSpacing:.3,textTransform:"uppercase"}}>Próximo</span>
+        <span style={{fontSize:11,color:P.muted}}>→</span>
+        <span style={{fontSize:12,color:P.text,fontWeight:500,flex:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{step._next}</span>
+      </div>
+    </>}
+
+    {/* ── BOTONES ── */}
+    <div style={D}/>
+    <div style={{display:"flex",gap:8,padding:"12px 18px 16px"}}>
       <button onClick={e=>{e.stopPropagation();onSkip();}} style={{flex:1,height:48,borderRadius:14,background:"transparent",border:`1px solid ${P.border}`,color:P.muted,fontSize:14,fontWeight:500,cursor:"pointer"}}>Saltar</button>
       <button onClick={e=>{e.stopPropagation();onComplete();}} style={{flex:2,height:48,borderRadius:14,background:P.text,border:"none",color:P.onDark,fontSize:15,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
         <Icon n="check" size={16} color={P.onDark} sw={2.5}/>Listo
@@ -490,9 +542,8 @@ function CompleteSheet({stats,onPhoto,onClose}){
 }
 
 // ─── TODAY SCREEN ────────────────────────────────
-function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,completedCount,completedMin,isFinished,onShowComplete,streak,phase}){
-  const h=new Date().getHours();
-  const greeting=h<12?"Buenos días":"h<18"?h<18?"Buenas tardes":"Buenas noches":"Buenas noches";
+function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,completedCount,completedMin,isFinished,onShowComplete,streak,phase,doneSteps}){
+  const greeting=getGreeting();
   return<div>
     <div style={{padding:"56px 20px 10px"}}>
       <div style={{fontSize:12,color:P.muted,letterSpacing:.3,marginBottom:2}}>{greeting}, Mijal</div>
@@ -509,8 +560,19 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
         <div style={{height:"100%",width:`${(completedCount/routine.total)*100}%`,background:P.accent,transition:"width .5s ease",borderRadius:2.5}}/>
       </div>
     </div>
+    {/* Step dots */}
+    <div style={{display:"flex",gap:5,justifyContent:"center",padding:"0 16px 10px"}}>
+      {routine.steps.map((s,i)=>{
+        const done=doneSteps.has(s.id);
+        const active=i===routine.steps.findIndex((_,ii)=>!doneSteps.has(routine.steps[ii].id));
+        return<div key={s.id} style={{width:done?18:active?18:8,height:8,borderRadius:4,background:done?P.green:active?P.accent:P.cream,border:`1px solid ${done?P.green:active?P.accent:P.border}`,transition:"all .3s ease"}}/>;
+      })}
+    </div>
     <div style={{padding:"0 16px"}}>
-      {routine.steps.map((s,i)=><StepCard key={s.id} step={s} idx={i} state={stepState(s,i)} onTap={()=>onTap(i)} onComplete={()=>onComplete(s,i)} onSkip={()=>onSkip(s,i)}/>)}
+      {routine.steps.map((s,i)=>{
+        const nextReal=routine.steps.slice(i+1).find(st=>!doneSteps.has(st.id));
+        return<StepCard key={s.id} step={s} idx={i} state={stepState(s,i)} onTap={()=>onTap(i)} onComplete={()=>onComplete(s,i)} onSkip={()=>onSkip(s,i)} nextName={nextReal?nextReal.name:null}/>;
+      })}
     </div>
     {isFinished&&<div style={{padding:"8px 16px"}}>
       <button onClick={onShowComplete} style={{width:"100%",height:54,borderRadius:18,border:"none",background:P.accent,color:P.onAccent,fontSize:15,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
@@ -810,7 +872,7 @@ function App(){
 
   return<div style={{width:"100%",height:"100%",background:P.bg,position:"relative",overflow:"hidden"}}>
     <div style={{height:"100%",overflowY:"auto",paddingBottom:110,WebkitOverflowScrolling:"touch"}}>
-      {tab==="today"&&<TodayScreen mode={mode} setMode={handleSetMode} routine={routine} stepState={stepState} onTap={handleTap} onComplete={handleComplete} onSkip={handleSkip} completedCount={completedCount} completedMin={completedMin} isFinished={isFinished} onShowComplete={()=>setShowComplete(true)} streak={streak} phase={phase}/>}
+      {tab==="today"&&<TodayScreen mode={mode} setMode={handleSetMode} routine={routine} stepState={stepState} onTap={handleTap} onComplete={handleComplete} onSkip={handleSkip} completedCount={completedCount} completedMin={completedMin} isFinished={isFinished} onShowComplete={()=>setShowComplete(true)} streak={streak} phase={phase} doneSteps={doneSteps}/>}
       {tab==="history"&&<HistoryScreen history={history} streak={streak} phase={phase}/>}
       {tab==="diary"&&<DiaryScreen diary={diary} photos={photos} onAddPhoto={()=>setShowCamera(true)}/>}
       {tab==="progress"&&<ProgressScreen history={history} streak={streak}/>}
