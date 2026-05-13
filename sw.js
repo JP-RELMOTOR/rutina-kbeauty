@@ -4,7 +4,7 @@
 //   - External libs (React, Babel, fonts): CACHE-FIRST (don't change often, save bandwidth)
 // This means every time the app opens with network, the user gets the latest index.html from GitHub.
 
-const CACHE = 'kbeauty-v2';
+const CACHE = 'kbeauty-v3';
 const PRECACHE = [
   '/rutina-kbeauty/',
   '/rutina-kbeauty/index.html',
