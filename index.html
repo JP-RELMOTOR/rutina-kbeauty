@@ -252,6 +252,59 @@ const ROUTINES={
   ]},
 };
 
+// ─── DAILY TIPS DATA ─────────────────────────────
+// 35 curated tips. Categories: técnica · ingrediente · mito · piel · ritual · producto
+const TIPS=[
+  {c:"técnica",t:"Aplica los sérums de menor a mayor densidad: agua → gel → emulsión → crema → aceite. Si lo haces al revés, los más finos no penetran."},
+  {c:"técnica",t:"60 segundos masajeando el cleanser. Casi nadie llega tan lejos — pero ahí está la diferencia entre piel limpia y piel REALMENTE limpia."},
+  {c:"técnica",t:"Palmotea, no frotes. La presión suave activa absorción sin estirar la piel ni romper colágeno."},
+  {c:"técnica",t:"Aplica todo hacia arriba. La gravedad ya hace su trabajo de bajada — tú compensa con cada gesto."},
+  {c:"técnica",t:"Espera 30-60 seg entre productos. Si los aplicas todos seguidos, no penetran — se mezclan en la superficie y se anulan."},
+  {c:"técnica",t:"Cuello y escote también necesitan tu rutina. La piel ahí envejece 30% más rápido que la cara."},
+  {c:"técnica",t:"Si te sobra producto, distribúyelo en tus manos. Tienen menos atención y se ven en cada foto."},
+  {c:"técnica",t:"El SPF no se 're-activa' con agua o sudor. Re-aplica cada 2 horas si estás expuesta al sol."},
+
+  {c:"ingrediente",t:"La niacinamida puede usarse AM Y PM. NO tiene fotosensibilidad como la vitamina C o el retinal."},
+  {c:"ingrediente",t:"El ácido hialurónico necesita humedad para funcionar. Aplícalo sobre piel ligeramente húmeda — si no, te puede deshidratar más."},
+  {c:"ingrediente",t:"El snail mucin NO es 'baba viva'. Es un filtrado purificado — en marcas serias (Mizon, BoJ) no hay sufrimiento animal."},
+  {c:"ingrediente",t:"Centella asiática (CICA) calma cualquier piel — no falla, no irrita. Es el ingrediente más seguro del K-beauty."},
+  {c:"ingrediente",t:"El retinal es 11× más potente que el retinol con menos irritación. Lo que tienes con K-Secret es de lo mejor del mercado."},
+  {c:"ingrediente",t:"BHA (ácido salicílico) penetra el sebo y limpia poros. AHA (glicólico) exfolia la superficie. Distintos trabajos."},
+  {c:"ingrediente",t:"Ginseng tiene 70+ compuestos activos. Por eso aparece en tantos productos K-beauty: antioxidante natural muy potente."},
+  {c:"ingrediente",t:"Vitamina C + niacinamida juntas SÍ funcionan. El mito de que se cancelan está desmentido desde 2014."},
+
+  {c:"mito",t:"Los poros NO se 'abren ni cierran'. Su tamaño es genético. La limpieza solo los hace verse más pequeños temporalmente."},
+  {c:"mito",t:"Lavarse la cara más veces ≠ piel más limpia. 2× al día es lo correcto. Más reseca y daña la barrera."},
+  {c:"mito",t:"El agua caliente NO 'abre poros'. Solo deshidrata y dilata vasos sanguíneos. Usa tibia o fría."},
+  {c:"mito",t:"Cremas 'tightening' no contraen la piel a largo plazo. Es efecto temporal — la firmeza real viene de retinal y SPF."},
+  {c:"mito",t:"No 'sentir' un producto NO significa que no funcione. La piel saludable casi no debe sentir nada. Eso es buena señal."},
+  {c:"mito",t:"Las pieles grasas TAMBIÉN necesitan hidratante. Sin hidratación, generan más sebo para compensar — efecto rebote."},
+
+  {c:"piel",t:"La piel se renueva cada 28 días a los 20, cada 40-60 días a los 40+. Por eso la constancia gana sobre la intensidad."},
+  {c:"piel",t:"El cortisol (estrés) aumenta la producción de sebo. Dormir mal = brotes. Tu rutina nocturna también es higiene mental."},
+  {c:"piel",t:"Si sientes ardor, piel tirante o rojez constante: PAUSA todos los activos por 1-2 semanas. Solo hidrata. Tu barrera está rota."},
+  {c:"piel",t:"La piel está más receptiva a tratamientos en la noche. Por eso el retinal va PM y el SPF va AM."},
+  {c:"piel",t:"Beber 2L de agua al día NO 'hidrata' la piel directamente — pero sin agua, todo lo demás funciona peor."},
+
+  {c:"ritual",t:"'Glass skin' coreano no es maquillaje. Es hidratación + uniformidad + barrera intacta. Tu rutina apunta exactamente a eso."},
+  {c:"ritual",t:"Las coreanas se aplican esencia con palmaditas, nunca la frotan. Patting > rubbing — siempre, en todos los pasos."},
+  {c:"ritual",t:"El 7-skin method (aplicar tónico 7 veces) NO siempre es mejor. Para piel deshidratada sí, para piel grasa puede saturar."},
+  {c:"ritual",t:"Doble limpieza es EL secreto de la noche: aceite primero (disuelve SPF/sebo), agua después (limpia residuos). En ese orden."},
+  {c:"ritual",t:"El 'skip-care' coreano (rutina mínima) es para piel ya equilibrada. Cuando tu piel mejore, podrás simplificar."},
+
+  {c:"producto",t:"Tu COSRX cleanser tiene BHA — limpia más profundo que un cleanser regular. Por eso no necesitas exfoliantes extra."},
+  {c:"producto",t:"El sérum Axis-Y muestra resultados en 4-8 semanas. Si después de 2 meses no notas cambios, sube a niacinamida 10%."},
+  {c:"producto",t:"El SPF Skin1004 es 'invisible' — no deja velo blanco. Por eso es seguro para cuello y escote."},
+  {c:"producto",t:"El Banila Co Clean It Zero solo necesita el tamaño de una avellana. Más cantidad es desperdicio puro."},
+  {c:"producto",t:"El retinal Seoul 1988 combina Bakuchiol que potencia el activo y reduce irritación. Combo perfecto para empezar."},
+];
+function getTipOfTheDay(){
+  // Deterministic: same day → same tip. Rotates daily.
+  const d=new Date();
+  const seed=Math.floor(d.getTime()/(1000*60*60*24));
+  return TIPS[seed%TIPS.length];
+}
+
 // ─── RING ────────────────────────────────────────
 function Ring({pct=0,size=60,stroke=4,color=P.text,track=P.cream,children}){
   const r=(size-stroke)/2,c=2*Math.PI*r;
