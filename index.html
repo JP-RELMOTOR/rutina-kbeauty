@@ -914,6 +914,149 @@ function TabBar({tab,onTab}){
   </div>;
 }
 
+// ─── AMBIENT AUDIO (Web Audio API, generativo) ───
+// Genera 4 ambientes en tiempo real, 0 bytes de assets, infinito.
+class AmbientAudio {
+  constructor(){this.ctx=null;this.nodes=[];this.master=null;this.intervals=[];this.mode=null;}
+  _ensureCtx(){
+    if(!this.ctx){
+      const AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC)return false;
+      this.ctx=new AC();
+      this.master=this.ctx.createGain();
+      this.master.gain.value=0.35;
+      this.master.connect(this.ctx.destination);
+    }
+    if(this.ctx.state==="suspended")this.ctx.resume();
+    return true;
+  }
+  _noise(type){
+    const sr=this.ctx.sampleRate;const len=sr*4;
+    const buf=this.ctx.createBuffer(1,len,sr);
+    const d=buf.getChannelData(0);
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for(let i=0;i<len;i++){
+      const w=Math.random()*2-1;
+      if(type==="pink"){
+        b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;
+        b2=0.96900*b2+w*0.1538520;b3=0.86650*b3+w*0.3104856;
+        b4=0.55000*b4+w*0.5329522;b5=-0.7616*b5-w*0.0168980;
+        d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;
+        b6=w*0.115926;
+      } else d[i]=w;
+    }
+    const src=this.ctx.createBufferSource();
+    src.buffer=buf;src.loop=true;
+    return src;
+  }
+  start(mode){
+    if(!this._ensureCtx())return false;
+    this.stop();
+    this.mode=mode;
+    if(mode==="olas")this._waves();
+    else if(mode==="lluvia")this._rain();
+    else if(mode==="crepitar")this._fire();
+    else if(mode==="drones")this._drones();
+    return true;
+  }
+  stop(){
+    this.intervals.forEach(clearInterval);this.intervals=[];
+    this.nodes.forEach(n=>{try{n.stop&&n.stop();n.disconnect&&n.disconnect();}catch(_){}});
+    this.nodes=[];this.mode=null;
+  }
+  setVolume(v){if(this.master)this.master.gain.value=Math.max(0,Math.min(1,v))*0.5;}
+  _waves(){
+    const noise=this._noise("pink");
+    const f=this.ctx.createBiquadFilter();f.type="lowpass";f.frequency.value=380;f.Q.value=0.4;
+    const lfo=this.ctx.createOscillator();lfo.frequency.value=0.07;
+    const lfoG=this.ctx.createGain();lfoG.gain.value=180;
+    lfo.connect(lfoG);lfoG.connect(f.frequency);
+    const amp=this.ctx.createGain();amp.gain.value=0.6;
+    const ampLfo=this.ctx.createOscillator();ampLfo.frequency.value=0.05;
+    const ampLfoG=this.ctx.createGain();ampLfoG.gain.value=0.25;
+    ampLfo.connect(ampLfoG);ampLfoG.connect(amp.gain);
+    noise.connect(f);f.connect(amp);amp.connect(this.master);
+    noise.start();lfo.start();ampLfo.start();
+    this.nodes.push(noise,f,lfo,lfoG,amp,ampLfo,ampLfoG);
+  }
+  _rain(){
+    const noise=this._noise("white");
+    const f=this.ctx.createBiquadFilter();f.type="bandpass";f.frequency.value=2800;f.Q.value=0.4;
+    const amp=this.ctx.createGain();amp.gain.value=0.4;
+    noise.connect(f);f.connect(amp);amp.connect(this.master);
+    noise.start();
+    this.nodes.push(noise,f,amp);
+  }
+  _fire(){
+    const noise=this._noise("pink");
+    const f=this.ctx.createBiquadFilter();f.type="lowpass";f.frequency.value=900;
+    const env=this.ctx.createGain();env.gain.value=0.3;
+    noise.connect(f);f.connect(env);env.connect(this.master);
+    noise.start();
+    this.nodes.push(noise,f,env);
+    const tick=()=>{
+      if(!this.ctx||this.mode!=="crepitar")return;
+      const now=this.ctx.currentTime;
+      env.gain.cancelScheduledValues(now);
+      env.gain.setValueAtTime(0.3,now);
+      env.gain.linearRampToValueAtTime(1.2+Math.random()*1.5,now+0.01);
+      env.gain.exponentialRampToValueAtTime(0.3,now+0.08+Math.random()*0.15);
+    };
+    const id=setInterval(tick,180+Math.random()*420);
+    this.intervals.push(id);
+  }
+  _drones(){
+    // Acorde calmado: C2, G2, Eb3, Bb3 (Cm9 voicing parcial, ambient pad)
+    const freqs=[65.41,98.00,155.56,233.08];
+    freqs.forEach((fr,i)=>{
+      const o=this.ctx.createOscillator();o.type=i<2?"sine":"triangle";o.frequency.value=fr;
+      const g=this.ctx.createGain();g.gain.value=0.08;
+      const lfo=this.ctx.createOscillator();lfo.frequency.value=0.08+i*0.04;
+      const lfoG=this.ctx.createGain();lfoG.gain.value=3;
+      lfo.connect(lfoG);lfoG.connect(o.detune);
+      o.connect(g);g.connect(this.master);
+      o.start();lfo.start();
+      this.nodes.push(o,g,lfo,lfoG);
+    });
+  }
+}
+const ambient=new AmbientAudio();
+
+// ─── AUDIO PANEL ─────────────────────────────────
+function AudioPanel({active,volume,onSelect,onVolume,onClose}){
+  const sounds=[
+    {id:"olas",label:"Olas",emoji:"🌊",desc:"Marea suave"},
+    {id:"lluvia",label:"Lluvia",emoji:"🌧️",desc:"Lluvia tranquila"},
+    {id:"crepitar",label:"Crepitar",emoji:"🔥",desc:"Fuego de chimenea"},
+    {id:"drones",label:"Drones",emoji:"🎐",desc:"Acorde ambient"},
+  ];
+  return<div style={{position:"absolute",inset:0,zIndex:75,background:"rgba(29,24,18,.4)",display:"flex",alignItems:"flex-end"}} onClick={onClose}>
+    <div onClick={e=>e.stopPropagation()} style={{width:"100%",background:P.bg,borderRadius:"28px 28px 0 0",padding:"18px 18px 32px",animation:"slideUp .35s ease"}}>
+      <div style={{width:40,height:4,borderRadius:2,background:P.cream,margin:"0 auto 18px"}}/>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+        <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:24,fontWeight:500,color:P.text,letterSpacing:"-.4px"}}>Música ambient</div>
+        <button onClick={onClose} style={{width:34,height:34,borderRadius:17,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Icon n="close" size={14} color={P.text} sw={2}/></button>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:18}}>
+        {sounds.map(s=>{
+          const a=active===s.id;
+          return<button key={s.id} onClick={()=>onSelect(a?null:s.id)} style={{padding:"16px 12px",borderRadius:18,border:`1.5px solid ${a?P.accent:P.border}`,background:a?P.accentSoft:P.card,cursor:"pointer",transition:"all .2s",textAlign:"left"}}>
+            <div style={{fontSize:30,marginBottom:6}}>{s.emoji}</div>
+            <div style={{fontSize:14,fontWeight:700,color:a?P.accent:P.text}}>{s.label}</div>
+            <div style={{fontSize:11,color:P.muted,marginTop:1}}>{s.desc}</div>
+            {a&&<div style={{fontSize:10,color:P.accent,marginTop:6,fontWeight:600,letterSpacing:.3}}>● REPRODUCIENDO</div>}
+          </button>;
+        })}
+      </div>
+      {active&&<div style={{marginBottom:8,padding:"12px 14px",borderRadius:14,background:P.card,border:`1px solid ${P.border}`}}>
+        <div style={{fontSize:11,color:P.muted,marginBottom:8,letterSpacing:.3,textTransform:"uppercase",fontWeight:700}}>Volumen</div>
+        <input type="range" min="0" max="100" value={Math.round(volume*100)} onChange={e=>onVolume(parseInt(e.target.value)/100)} style={{width:"100%",accentColor:P.accent}}/>
+      </div>}
+      <div style={{fontSize:11,color:P.muted,textAlign:"center",marginTop:6,lineHeight:1.5}}>Generado en vivo · sin descarga · ideal para concentrarte en tu rutina</div>
+    </div>
+  </div>;
+}
+
 // ─── DAILY TIP CARD ──────────────────────────────
 function DailyTip(){
   const tip=React.useMemo(()=>getTipOfTheDay(),[]);
