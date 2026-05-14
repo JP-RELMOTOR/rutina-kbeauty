@@ -1591,13 +1591,15 @@ function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataR
 // ─── APP ─────────────────────────────────────────
 function App(){
   const [tab,setTab]=React.useState("today");
+  const _restored=loadRoutineProgress(); // hoy mismo, mismo mode
   const [mode,setMode]=React.useState(()=>{
+    if(_restored)return _restored.mode;
     const h=new Date().getHours();
     return h>=18||h<6?"night":"morning";
   });
   const [phase,setPhase]=React.useState(()=>parseInt(ls("kb_phase","2")));
   const [activeIdx,setActiveIdx]=React.useState(null);
-  const [doneSteps,setDoneSteps]=React.useState(new Set());
+  const [doneSteps,setDoneSteps]=React.useState(()=>_restored?new Set(_restored.doneSteps):new Set());
   const [showComplete,setShowComplete]=React.useState(false);
   const [showCamera,setShowCamera]=React.useState(false);
   const [history,setHistory]=React.useState(()=>ls("kb_history",[]));
