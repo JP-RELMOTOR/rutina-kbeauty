@@ -2438,6 +2438,8 @@ function App(){
   const [showProfileModal,setShowProfileModal]=React.useState(false);
   const [theme,setThemeState]=React.useState(()=>ls("kb_theme","auto"));
   const [accent,setAccentState]=React.useState(()=>ls("kb_accent","gold"));
+  const [voiceEnabled,setVoiceEnabled]=React.useState(()=>ls("kb_voice",false));
+  function handleVoiceChange(v){setVoiceEnabled(v);lsSet("kb_voice",v);if(!v)stopSpeaking();haptic("light");}
   function handleAccentChange(a){
     setAccentState(a);
     lsSet("kb_accent",a);
