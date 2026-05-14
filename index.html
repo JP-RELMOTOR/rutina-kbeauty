@@ -118,6 +118,22 @@ function useThemeReactive(){
   React.useEffect(()=>{_themeBumpers.add(bump);return()=>_themeBumpers.delete(bump);},[]);
 }
 
+// Voice cues — Web Speech API (gratis, on-device)
+function speakText(text){
+  try{
+    if(!window.speechSynthesis||!text)return;
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="es-MX";u.rate=0.92;u.pitch=1.0;u.volume=0.85;
+    // Voz femenina si está disponible
+    const voices=window.speechSynthesis.getVoices();
+    const esFemale=voices.find(v=>v.lang.startsWith("es")&&/female|mujer|paulina|monica/i.test(v.name));
+    if(esFemale)u.voice=esFemale;
+    window.speechSynthesis.speak(u);
+  }catch(_){}
+}
+function stopSpeaking(){try{window.speechSynthesis?.cancel();}catch(_){}}
+
 // ─── INDEXEDDB (PHOTOS) ─────────────────────────
 let _db=null;
 async function getDB(){
