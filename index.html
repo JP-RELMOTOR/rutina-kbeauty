@@ -3064,6 +3064,7 @@ function App(){
     {activeProduct&&<ProductDetailSheet product={activeProduct} onClose={()=>setActiveProduct(null)} onOpenIngredient={setActiveIngredient}/>}
     {showImport&&<ImportPhotos onClose={()=>setShowImport(false)} onSave={handleImportDone}/>}
     {showRecap&&recapStats&&<WeeklyRecapSheet stats={recapStats} onClose={handleCloseRecap}/>}
+    {showYearWrapped&&yearStats&&<YearWrappedSheet stats={yearStats} onClose={handleCloseYearWrapped} profileName={profileName}/>}
     {showJourney&&<SkinJourneySheet photos={photos} onClose={()=>setShowJourney(false)} onOpenPhoto={setViewerPhoto}/>}
     {viewerPhoto&&<PhotoViewer photo={viewerPhoto} onClose={()=>setViewerPhoto(null)} onDelete={handlePhotoDeleted} allPhotos={photos}/>}
     {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose} profileName={profileName}/>}
