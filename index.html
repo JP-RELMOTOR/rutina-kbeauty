@@ -2500,7 +2500,8 @@ function App(){
     {showRecap&&recapStats&&<WeeklyRecapSheet stats={recapStats} onClose={handleCloseRecap}/>}
     {showJourney&&<SkinJourneySheet photos={photos} onClose={()=>setShowJourney(false)} onOpenPhoto={setViewerPhoto}/>}
     {viewerPhoto&&<PhotoViewer photo={viewerPhoto} onClose={()=>setViewerPhoto(null)} onDelete={handlePhotoDeleted}/>}
-    {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose}/>}
+    {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose} profileName={profileName}/>}
+    {!profile&&<ProfileSetupModal onPick={handleProfilePick}/>}
     {showCamera&&<PhotoCapture onClose={()=>setShowCamera(false)} onSave={handlePhotoSave}/>}
   </div>;
 }
