@@ -508,7 +508,8 @@ function getUniqueProducts(){
 // ─── INGREDIENT SHEET ────────────────────────────
 function IngredientSheet({ingredient,onClose}){
   if(!ingredient)return null;
-  return<div style={{position:"absolute",inset:0,zIndex:78,background:"rgba(29,24,18,.5)",display:"flex",alignItems:"flex-end"}} onClick={onClose}>
+  // z-index 88 para quedar siempre encima de ProductDetailSheet (78) y SettingsSheet (75)
+  return<div style={{position:"absolute",inset:0,zIndex:88,background:"rgba(29,24,18,.5)",display:"flex",alignItems:"flex-end"}} onClick={onClose}>
     <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxHeight:"88%",overflowY:"auto",background:P.bg,borderRadius:"28px 28px 0 0",padding:"18px 20px 36px",animation:"slideUp .35s ease",WebkitOverflowScrolling:"touch"}}>
       <div style={{width:40,height:4,borderRadius:2,background:P.cream,margin:"0 auto 18px"}}/>
       <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:6,gap:12}}>
