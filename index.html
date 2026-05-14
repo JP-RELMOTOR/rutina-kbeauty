@@ -1588,7 +1588,7 @@ function BackupReminder({onExport,onDismiss}){
 // ─── AMBIENT AUDIO (Web Audio API, generativo) ───
 // Genera 4 ambientes en tiempo real, 0 bytes de assets, infinito.
 class AmbientAudio {
-  constructor(){this.ctx=null;this.nodes=[];this.master=null;this.intervals=[];this.mode=null;}
+  constructor(){this.ctx=null;this.nodes=[];this.master=null;this.intervals=[];this.timers=[];this.mode=null;}
   _ensureCtx(){
     if(!this.ctx){
       const AC=window.AudioContext||window.webkitAudioContext;
@@ -1596,6 +1596,17 @@ class AmbientAudio {
       this.ctx=new AC();
       this.master=this.ctx.createGain();
       this.master.gain.value=0.35;
+      // Reverb-like feedback delay para sonidos más musicales (no agresivo)
+      this.delay=this.ctx.createDelay(2);
+      this.delay.delayTime.value=0.32;
+      this.delayFb=this.ctx.createGain();
+      this.delayFb.gain.value=0.28;
+      this.delayWet=this.ctx.createGain();
+      this.delayWet.gain.value=0.35;
+      this.delay.connect(this.delayFb);
+      this.delayFb.connect(this.delay);
+      this.delay.connect(this.delayWet);
+      this.delayWet.connect(this.master);
       this.master.connect(this.ctx.destination);
     }
     if(this.ctx.state==="suspended")this.ctx.resume();
@@ -1625,17 +1636,20 @@ class AmbientAudio {
     this.stop();
     this.mode=mode;
     if(mode==="olas")this._waves();
-    else if(mode==="lluvia")this._rain();
-    else if(mode==="crepitar")this._fire();
-    else if(mode==="drones")this._drones();
+    else if(mode==="piano")this._piano();
+    else if(mode==="musicBox")this._musicBox();
+    else if(mode==="pad")this._pad();
     return true;
   }
   stop(){
     this.intervals.forEach(clearInterval);this.intervals=[];
+    this.timers.forEach(clearTimeout);this.timers=[];
     this.nodes.forEach(n=>{try{n.stop&&n.stop();n.disconnect&&n.disconnect();}catch(_){}});
     this.nodes=[];this.mode=null;
   }
   setVolume(v){if(this.master)this.master.gain.value=Math.max(0,Math.min(1,v))*0.5;}
+
+  // OLAS — sin cambios, la única que le gustaba
   _waves(){
     const noise=this._noise("pink");
     const f=this.ctx.createBiquadFilter();f.type="lowpass";f.frequency.value=380;f.Q.value=0.4;
@@ -1650,45 +1664,154 @@ class AmbientAudio {
     noise.start();lfo.start();ampLfo.start();
     this.nodes.push(noise,f,lfo,lfoG,amp,ampLfo,ampLfoG);
   }
-  _rain(){
-    const noise=this._noise("white");
-    const f=this.ctx.createBiquadFilter();f.type="bandpass";f.frequency.value=2800;f.Q.value=0.4;
-    const amp=this.ctx.createGain();amp.gain.value=0.4;
-    noise.connect(f);f.connect(amp);amp.connect(this.master);
-    noise.start();
-    this.nodes.push(noise,f,amp);
+
+  // Helper: nota con envolvente piano-like (attack rápido, decay largo)
+  _softNote(freq,duration,gain,type){
+    const now=this.ctx.currentTime;
+    const env=this.ctx.createGain();
+    env.gain.setValueAtTime(0,now);
+    env.gain.linearRampToValueAtTime(gain,now+0.015);
+    env.gain.exponentialRampToValueAtTime(0.001,now+duration);
+    const osc=this.ctx.createOscillator();
+    osc.type=type||"triangle";
+    osc.frequency.value=freq;
+    // Armónico sutil para riqueza tímbrica
+    const env2=this.ctx.createGain();
+    env2.gain.setValueAtTime(0,now);
+    env2.gain.linearRampToValueAtTime(gain*0.3,now+0.03);
+    env2.gain.exponentialRampToValueAtTime(0.001,now+duration*0.6);
+    const osc2=this.ctx.createOscillator();
+    osc2.type="sine";
+    osc2.frequency.value=freq*2;
+    osc.connect(env);osc2.connect(env2);
+    env.connect(this.master);env2.connect(this.master);
+    // Send a reverb (delay)
+    if(this.delay){env.connect(this.delay);env2.connect(this.delay);}
+    osc.start(now);osc.stop(now+duration+0.1);
+    osc2.start(now);osc2.stop(now+duration*0.6+0.1);
   }
-  _fire(){
-    const noise=this._noise("pink");
-    const f=this.ctx.createBiquadFilter();f.type="lowpass";f.frequency.value=900;
-    const env=this.ctx.createGain();env.gain.value=0.3;
-    noise.connect(f);f.connect(env);env.connect(this.master);
-    noise.start();
-    this.nodes.push(noise,f,env);
+
+  // PIANO suave — notas aleatorias en escala pentatónica C
+  _piano(){
+    const notes=[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25,783.99];
     const tick=()=>{
-      if(!this.ctx||this.mode!=="crepitar")return;
-      const now=this.ctx.currentTime;
-      env.gain.cancelScheduledValues(now);
-      env.gain.setValueAtTime(0.3,now);
-      env.gain.linearRampToValueAtTime(1.2+Math.random()*1.5,now+0.01);
-      env.gain.exponentialRampToValueAtTime(0.3,now+0.08+Math.random()*0.15);
+      if(this.mode!=="piano")return;
+      // 50% probabilidad de tocar nota en cada tick
+      if(Math.random()<0.55){
+        const n=notes[Math.floor(Math.random()*notes.length)];
+        this._softNote(n,3+Math.random()*2.5,0.16,"triangle");
+        // 25% chance de nota armónica casi simultánea
+        if(Math.random()<0.25){
+          const t=setTimeout(()=>{
+            if(this.mode!=="piano")return;
+            const h=notes[Math.floor(Math.random()*notes.length)];
+            this._softNote(h,3+Math.random()*2,0.12,"triangle");
+          },180+Math.random()*320);
+          this.timers.push(t);
+        }
+      }
     };
-    const id=setInterval(tick,180+Math.random()*420);
+    // Primera nota inmediata
+    const first=setTimeout(()=>{
+      if(this.mode!=="piano")return;
+      this._softNote(notes[Math.floor(Math.random()*notes.length)],4,0.18,"triangle");
+    },50);
+    this.timers.push(first);
+    // Tempo: una decisión cada 1.4s
+    const id=setInterval(tick,1400);
     this.intervals.push(id);
   }
-  _drones(){
-    // Acorde calmado: C2, G2, Eb3, Bb3 (Cm9 voicing parcial, ambient pad)
-    const freqs=[65.41,98.00,155.56,233.08];
-    freqs.forEach((fr,i)=>{
-      const o=this.ctx.createOscillator();o.type=i<2?"sine":"triangle";o.frequency.value=fr;
-      const g=this.ctx.createGain();g.gain.value=0.08;
-      const lfo=this.ctx.createOscillator();lfo.frequency.value=0.08+i*0.04;
-      const lfoG=this.ctx.createGain();lfoG.gain.value=3;
-      lfo.connect(lfoG);lfoG.connect(o.detune);
-      o.connect(g);g.connect(this.master);
-      o.start();lfo.start();
-      this.nodes.push(o,g,lfo,lfoG);
-    });
+
+  // CAJA MUSICAL — melodía lullaby en Do mayor, timbre tipo campana
+  _musicBox(){
+    // [freq, duration_seg] — frase de 16 compases en C
+    const melody=[
+      [523.25,0.9],[659.25,0.9],[783.99,0.9],[1046.50,1.6],
+      [783.99,0.9],[659.25,0.9],[587.33,1.6],
+      [659.25,0.9],[783.99,0.9],[587.33,0.9],[523.25,1.6],
+      [440.00,0.9],[523.25,0.9],[587.33,0.9],[659.25,1.6],
+      [587.33,0.9],[523.25,0.9],[493.88,0.9],[523.25,2.5],
+      [0,2.0], // pausa antes de loop
+    ];
+    let i=0;
+    const playStep=()=>{
+      if(this.mode!=="musicBox")return;
+      const [freq,dur]=melody[i%melody.length];
+      if(freq>0){
+        // Bell-like: sine fundamental + 2da armónica
+        const now=this.ctx.currentTime;
+        const env=this.ctx.createGain();
+        env.gain.setValueAtTime(0,now);
+        env.gain.linearRampToValueAtTime(0.20,now+0.008);
+        env.gain.exponentialRampToValueAtTime(0.001,now+dur*1.4);
+        const osc=this.ctx.createOscillator();
+        osc.type="sine";osc.frequency.value=freq;
+        const env2=this.ctx.createGain();
+        env2.gain.setValueAtTime(0,now);
+        env2.gain.linearRampToValueAtTime(0.06,now+0.015);
+        env2.gain.exponentialRampToValueAtTime(0.001,now+dur*0.8);
+        const osc2=this.ctx.createOscillator();
+        osc2.type="sine";osc2.frequency.value=freq*3;
+        osc.connect(env);osc2.connect(env2);
+        env.connect(this.master);env2.connect(this.master);
+        if(this.delay){env.connect(this.delay);}
+        osc.start(now);osc.stop(now+dur*1.4+0.1);
+        osc2.start(now);osc2.stop(now+dur*0.8+0.1);
+      }
+      i++;
+      const t=setTimeout(playStep,dur*1000);
+      this.timers.push(t);
+    };
+    playStep();
+  }
+
+  // PAD cinemático — progresión I-vi-IV-V con movimiento (acordes lentos)
+  _pad(){
+    // C → Am → F → G (cada acorde dura 10s)
+    const chords=[
+      [130.81,196.00,261.63,329.63], // C
+      [110.00,164.81,220.00,329.63], // Am
+      [87.31,174.61,261.63,349.23],  // F
+      [98.00,196.00,246.94,392.00],  // G
+    ];
+    let chordIdx=0;
+    let active=[];
+    const changeChord=()=>{
+      if(this.mode!=="pad")return;
+      const now=this.ctx.currentTime;
+      // Fade out anterior
+      active.forEach(({env,osc,lfo})=>{
+        try{
+          env.gain.cancelScheduledValues(now);
+          env.gain.setValueAtTime(env.gain.value,now);
+          env.gain.linearRampToValueAtTime(0,now+3);
+          osc.stop(now+3.2);lfo.stop(now+3.2);
+        }catch(_){}
+      });
+      active=[];
+      // Fade in nuevo
+      const chord=chords[chordIdx];
+      chord.forEach((fr,i)=>{
+        const env=this.ctx.createGain();
+        env.gain.setValueAtTime(0,now);
+        env.gain.linearRampToValueAtTime(0.07+i*0.01,now+3.5);
+        const osc=this.ctx.createOscillator();
+        osc.type=i<2?"sine":"triangle";
+        osc.frequency.value=fr;
+        const lfo=this.ctx.createOscillator();
+        lfo.frequency.value=0.07+i*0.04;
+        const lfoG=this.ctx.createGain();lfoG.gain.value=2.5;
+        lfo.connect(lfoG);lfoG.connect(osc.detune);
+        osc.connect(env);env.connect(this.master);
+        osc.start(now);lfo.start(now);
+        active.push({env,osc,lfo});
+        this.nodes.push(osc,lfo,lfoG,env);
+      });
+      chordIdx=(chordIdx+1)%chords.length;
+      const t=setTimeout(changeChord,10000);
+      this.timers.push(t);
+    };
+    changeChord();
   }
 }
 const ambient=new AmbientAudio();
