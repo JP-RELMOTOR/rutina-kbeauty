@@ -1683,7 +1683,8 @@ function App(){
   const completedMin=routine.steps.filter(s=>doneSteps.has(s.id)).reduce((a,s)=>a+s.min,0);
   const isFinished=completedCount===routine.steps.length&&routine.steps.length>0;
 
-  function handleSetMode(m){setMode(m);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);}
+  function handleSetMode(m){setMode(m);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();}
+  React.useEffect(()=>{saveRoutineProgress(mode,doneSteps);},[mode,doneSteps]);
   React.useEffect(()=>{setDoneSteps(new Set());setActiveIdx(null);setStarted(false);},[mode]);
 
   function stepState(s,i){return doneSteps.has(s.id)?"done":i===activeIdx?"active":"pending";}
