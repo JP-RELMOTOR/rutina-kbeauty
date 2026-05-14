@@ -1859,6 +1859,7 @@ function App(){
   const [backupReminderOpen,setBackupReminderOpen]=React.useState(()=>shouldShowBackupReminder());
   const [expressMode,setExpressMode]=React.useState(()=>ls("kb_express_mode",false));
   const [showRecap,setShowRecap]=React.useState(false);
+  const [showJourney,setShowJourney]=React.useState(false);
   React.useEffect(()=>{
     if(shouldShowWeeklyRecap(history)){
       const t=setTimeout(()=>setShowRecap(true),600);
