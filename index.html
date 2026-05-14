@@ -952,7 +952,7 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,
 
     {/* ── HEADER ── */}
     <div style={{padding:"16px 18px 14px",display:"flex",alignItems:"flex-start",gap:14}}>
-      <div style={{width:64,height:64,borderRadius:18,background:step.photo?P.cream:P.accentSoft,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:18,fontWeight:700,color:P.accent,overflow:"hidden",border:`1px solid ${P.border}`,position:"relative"}}>
+      <div onClick={photoClick} style={{width:64,height:64,borderRadius:18,background:step.photo?P.cream:P.accentSoft,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:18,fontWeight:700,color:P.accent,overflow:"hidden",border:`1px solid ${P.border}`,position:"relative",cursor:step.photo?"pointer":"default"}}>
         {step.photo
           ?<img src={step.photo} alt={step.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
           :<>{idx+1}</>}
