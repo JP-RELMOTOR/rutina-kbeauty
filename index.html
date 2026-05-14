@@ -62,6 +62,21 @@ const P_DARK={
 };
 let P=P_LIGHT;
 const _themeBumpers=new Set();
+// Inicializar P ANTES del primer render para evitar flash claro→oscuro
+(function(){
+  try{
+    let stored=localStorage.getItem("kb_theme");
+    stored=stored?JSON.parse(stored):"auto";
+    const isDark=stored==="dark"||(stored==="auto"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+    if(isDark){
+      P=P_DARK;
+      document.documentElement.style.setProperty("--app-bg",P.bg);
+      document.documentElement.style.setProperty("--app-text",P.text);
+      const meta=document.querySelector('meta[name="theme-color"]');
+      if(meta)meta.setAttribute("content",P.bg);
+    }
+  }catch(_){}
+})();
 function _systemPrefersDark(){
   try{return window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(_){return false;}
 }
