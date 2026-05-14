@@ -77,9 +77,14 @@ function applyAccent(accentKey,intoDark){
 }
 let P=P_LIGHT;
 const _themeBumpers=new Set();
-// Inicializar P ANTES del primer render para evitar flash claro→oscuro
+// Inicializar P + accent ANTES del primer render para evitar flash
 (function(){
   try{
+    // Accent guardado
+    let storedAccent=localStorage.getItem("kb_accent");
+    storedAccent=storedAccent?JSON.parse(storedAccent):"gold";
+    applyAccent(storedAccent);
+    // Tema guardado
     let stored=localStorage.getItem("kb_theme");
     stored=stored?JSON.parse(stored):"auto";
     const isDark=stored==="dark"||(stored==="auto"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);
