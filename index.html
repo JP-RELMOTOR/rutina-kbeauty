@@ -2322,10 +2322,44 @@ function App(){
   function handleComplete(s,i){
     haptic("medium");
     const next=new Set(doneSteps);next.add(s.id);setDoneSteps(next);
+    // Si el paso requiere espera antes del próximo, abre el WaitGate
+    if(s.wait&&s.wait>0){
+      setActiveIdx(null);
+      setWaitingAfterIdx(i);
+      setWaitTotal(s.wait*60);
+      setWaitSecs(s.wait*60);
+      setWaitRunning(true);
+      setWaitHint(s.waitHint||"");
+      setWaitWhy(s.waitWhy||"");
+      return;
+    }
     const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!next.has(st.id));
     if(nextIdx===-1){setActiveIdx(null);setTimeout(()=>setShowComplete(true),350);}
     else setActiveIdx(nextIdx);
   }
+  function advancePastWait(){
+    const i=waitingAfterIdx;
+    setWaitingAfterIdx(null);setWaitSecs(0);setWaitTotal(0);
+    const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!doneSteps.has(st.id));
+    if(nextIdx===-1){setTimeout(()=>setShowComplete(true),350);}
+    else setActiveIdx(nextIdx);
+  }
+  function handleSkipWait(){haptic("light");advancePastWait();}
+  function handleToggleWait(){haptic("light");setWaitRunning(r=>!r);}
+  // Countdown effect
+  React.useEffect(()=>{
+    if(waitingAfterIdx===null||!waitRunning||waitSecs<=0)return;
+    const id=setInterval(()=>setWaitSecs(s=>Math.max(0,s-1)),1000);
+    return()=>clearInterval(id);
+  },[waitingAfterIdx,waitRunning]);
+  React.useEffect(()=>{
+    if(waitingAfterIdx!==null&&waitSecs===0&&waitTotal>0){
+      haptic("medium");
+      advancePastWait();
+    }
+  },[waitSecs,waitingAfterIdx,waitTotal]);
+  // Si cambia de modo o reset, limpia wait
+  React.useEffect(()=>{setWaitingAfterIdx(null);setWaitSecs(0);},[mode]);
 
   function handleSkip(s,i){
     const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!doneSteps.has(st.id));
