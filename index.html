@@ -204,6 +204,17 @@ function getDayLabel(){
   return days[getDOW()];
 }
 function todayStr(){return new Date().toISOString().split("T")[0];}
+// Persist routine progress so Mijal can pause and resume without losing steps.
+function saveRoutineProgress(mode,doneSet){
+  if(!doneSet||doneSet.size===0){localStorage.removeItem("kb_routine_progress");return;}
+  lsSet("kb_routine_progress",{date:todayStr(),mode,doneSteps:[...doneSet]});
+}
+function loadRoutineProgress(){
+  const p=ls("kb_routine_progress",null);
+  if(!p||p.date!==todayStr())return null;
+  return p;
+}
+function clearRoutineProgress(){localStorage.removeItem("kb_routine_progress");}
 // Backup reminder cada 2 semanas (día 1 y día 15 de cada mes). Persistido para no repetirse el mismo día.
 function shouldShowBackupReminder(){
   const today=todayStr();
