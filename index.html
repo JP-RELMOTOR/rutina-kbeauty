@@ -2345,6 +2345,17 @@ function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataR
           })}
         </div>
         <div style={{fontSize:10.5,color:P.muted,marginTop:8,lineHeight:1.4}}>Auto sigue el modo de tu iPhone (Pantalla y brillo).</div>
+        <div style={{marginTop:12,paddingTop:12,borderTop:`1px solid ${P.border}`}}>
+          <div style={{fontSize:10,letterSpacing:1,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:8}}>Color de acento</div>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+            {Object.entries(ACCENT_PRESETS).map(([key,p])=>{
+              const a=accent===key;
+              return<button key={key} onClick={()=>onAccentChange&&onAccentChange(key)} aria-label={p.name} style={{width:36,height:36,borderRadius:18,border:`2px solid ${a?P.text:"transparent"}`,background:p.accent,cursor:"pointer",padding:0,position:"relative"}}>
+                {a&&<span style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",color:"white",fontSize:14,fontWeight:700,textShadow:"0 1px 2px rgba(0,0,0,.3)"}}>✓</span>}
+              </button>;
+            })}
+          </div>
+        </div>
       </div>
 
       {/* PHASE */}
