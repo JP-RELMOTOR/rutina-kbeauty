@@ -933,7 +933,7 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,
   const mm=String(Math.floor(secLeft/60)).padStart(2,"0"),ss=String(secLeft%60).padStart(2,"0");
 
   if(isDone)return<div style={{background:P.card,borderRadius:20,marginBottom:8,border:`1px solid ${P.border}`,padding:"12px 16px",opacity:.5,display:"flex",alignItems:"center",gap:12}} onClick={onTap}>
-    <div style={{width:36,height:36,borderRadius:18,background:step.photo?P.cream:P.green,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,overflow:"hidden",position:"relative"}}>
+    <div onClick={photoClick} style={{width:36,height:36,borderRadius:18,background:step.photo?P.cream:P.green,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,overflow:"hidden",position:"relative",cursor:step.photo?"pointer":"default"}}>
       {step.photo
         ?<><img src={step.photo} alt="" style={{width:"100%",height:"100%",objectFit:"cover",filter:"grayscale(.3)"}}/><div style={{position:"absolute",bottom:-2,right:-2,width:18,height:18,borderRadius:9,background:P.green,border:`2px solid ${P.card}`,display:"flex",alignItems:"center",justifyContent:"center"}}><Icon n="check" size={10} color={P.onDark} sw={3}/></div></>
         :<Icon n="check" size={16} color={P.onDark} sw={2.5}/>}
