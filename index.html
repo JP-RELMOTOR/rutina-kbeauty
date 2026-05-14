@@ -2669,8 +2669,25 @@ function App(){
   function stepState(s,i){return doneSteps.has(s.id)?"done":i===activeIdx?"active":"pending";}
 
   function handleTap(i){
+    // Si es el primer paso y no ha empezado, muestra la intención antes
+    if(!started&&i===0&&!doneSteps.has(routine.steps[0].id)){
+      setPendingFirstIdx(i);
+      setShowIntention(true);
+      return;
+    }
     if(!started)setStarted(true);
     setActiveIdx(i);
+  }
+  function handleIntentionDone(intentionText){
+    if(intentionText){
+      const list=ls("kb_intentions",[]);
+      list.push({date:todayStr(),text:intentionText,profileId:profile?.id||"unknown"});
+      lsSet("kb_intentions",list);
+    }
+    setShowIntention(false);
+    setStarted(true);
+    setActiveIdx(pendingFirstIdx??0);
+    setPendingFirstIdx(null);
   }
 
   function handleComplete(s,i){
