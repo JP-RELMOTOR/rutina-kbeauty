@@ -2345,6 +2345,24 @@ function App(){
   const [tab,setTab]=React.useState("today");
   const [profile,setProfile]=React.useState(()=>getProfile());
   const [showProfileModal,setShowProfileModal]=React.useState(false);
+  const [theme,setThemeState]=React.useState(()=>ls("kb_theme","auto"));
+  useThemeReactive(); // se re-renderea cuando applyTheme dispara
+  // Aplicar tema al inicio + escuchar cambios del sistema
+  React.useEffect(()=>{
+    applyTheme(theme);
+    if(theme==="auto"){
+      const mql=window.matchMedia("(prefers-color-scheme: dark)");
+      const handler=()=>applyTheme("auto");
+      mql.addEventListener?mql.addEventListener("change",handler):mql.addListener(handler);
+      return()=>mql.removeEventListener?mql.removeEventListener("change",handler):mql.removeListener(handler);
+    }
+  },[theme]);
+  function handleThemeChange(t){
+    setThemeState(t);
+    lsSet("kb_theme",t);
+    applyTheme(t);
+    haptic("light");
+  }
   const profileName=profile?.name||"";
   const profileSex=profile?.sex||null;
   function handleProfilePick(p){
