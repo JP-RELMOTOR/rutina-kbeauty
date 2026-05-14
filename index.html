@@ -1331,7 +1331,7 @@ function ProgressScreen({history,streak}){
 
 // ─── TAB BAR ─────────────────────────────────────
 function TabBar({tab,onTab}){
-  const items=[{id:"today",l:"Hoy",n:"drop"},{id:"history",l:"Historial",n:"calendar"},{id:"diary",l:"Diario",n:"book"},{id:"progress",l:"Progreso",n:"chart"}];
+  const items=[{id:"today",l:"Hoy",n:"drop"},{id:"history",l:"Historial",n:"calendar"},{id:"diary",l:"Diario",n:"book"},{id:"progress",l:"Progreso",n:"chart"},{id:"info",l:"Info",n:"info"}];
   return<div style={{position:"absolute",left:12,right:12,bottom:24,zIndex:30,borderRadius:26,background:P.card,border:`1px solid ${P.border}`,boxShadow:`0 10px 28px -8px ${P.shadow}`,display:"flex",padding:5}}>
     {items.map(it=>{const a=tab===it.id;return<button key={it.id} onClick={()=>onTab(it.id)} style={{flex:1,height:52,borderRadius:21,border:"none",background:a?P.text:"transparent",color:a?P.onDark:P.muted,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,cursor:"pointer",transition:"all .25s"}}>
       <Icon n={it.n} size={18} color={a?P.onDark:P.muted}/>
