@@ -705,6 +705,7 @@ function IngredientSheet({ingredient,onClose}){
 function ProductDetailSheet({product,onClose,onOpenIngredient}){
   if(!product)return null;
   const routineEmoji={morning:"☀️",night:"🌙",nightRetinal:"🌙🔴"};
+  const info=getProductInfo(product);
   return<div style={{position:"absolute",inset:0,zIndex:78,background:P.bg,overflowY:"auto",animation:"slideUp .35s ease",WebkitOverflowScrolling:"touch"}}>
     <div style={{padding:"52px 16px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,background:P.bg,zIndex:2,borderBottom:`1px solid ${P.border}`}}>
       <button onClick={onClose} style={{width:36,height:36,borderRadius:18,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Icon n="arrow" size={16} color={P.text} sw={2}/></button>
