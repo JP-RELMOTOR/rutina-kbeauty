@@ -942,9 +942,12 @@ function ProfileSetupModal({onPick,onCancel}){
   }
 
   return<div style={{position:"absolute",inset:0,zIndex:99,background:P.bg,display:"flex",flexDirection:"column",animation:"fadeIn .3s ease",overflowY:"auto",WebkitOverflowScrolling:"touch"}}>
-    <div style={{padding:"60px 24px 20px",textAlign:"center"}}>
+    {onCancel&&<div style={{padding:"52px 16px 0"}}>
+      <button onClick={onCancel} aria-label="Cancelar" style={{width:36,height:36,borderRadius:18,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Icon n="close" size={16} color={P.text} sw={2}/></button>
+    </div>}
+    <div style={{padding:onCancel?"20px 24px 20px":"60px 24px 20px",textAlign:"center"}}>
       <div style={{fontSize:42,marginBottom:14}}>🌅</div>
-      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:30,color:P.text,letterSpacing:"-.6px",lineHeight:1.1}}>Bienvenida a tu rutina</div>
+      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:30,color:P.text,letterSpacing:"-.6px",lineHeight:1.1}}>{onCancel?"Cambiar de perfil":"Bienvenida a tu rutina"}</div>
       <div style={{fontSize:14,color:P.muted,marginTop:8,lineHeight:1.4,maxWidth:280,margin:"8px auto 0"}}>Selecciona tu perfil para personalizar tips, frecuencia del retinal y mensajes.</div>
     </div>
 
