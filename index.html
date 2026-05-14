@@ -219,17 +219,22 @@ function _computeStreakInfo(hist){
   const dates=new Set(hist.map(s=>s.date));
   const today=todayStr();
   const currentMonth=today.slice(0,7);
+  if(dates.size===0)return {streak:0,usedThisMonth:0,freezesLeft:MAX_FREEZES_PER_MONTH};
+  // El streak no puede ir más atrás que la primera actividad registrada.
+  const earliest=[...dates].sort()[0];
   let streak=0,check=today,consecGaps=0;
   const freezesByMonth={};
   for(let i=0;i<400;i++){
+    if(check<earliest)break;
     if(dates.has(check)){streak++;consecGaps=0;}
     else if(check===today){consecGaps=0;}
     else{
       consecGaps++;
       if(consecGaps>1)break;
       const m=check.slice(0,7);
-      freezesByMonth[m]=(freezesByMonth[m]||0)+1;
-      if(freezesByMonth[m]>MAX_FREEZES_PER_MONTH)break;
+      const used=freezesByMonth[m]||0;
+      if(used>=MAX_FREEZES_PER_MONTH)break;
+      freezesByMonth[m]=used+1;
       streak++;
     }
     const dt=new Date(check+"T12:00:00");dt.setDate(dt.getDate()-1);
