@@ -16,7 +16,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body,#root{height:100%;overflow:hidden;background:#f6efe2;font-family:'Inter',system-ui,sans-serif;color:#1d1812;-webkit-font-smoothing:antialiased;}
+:root{--app-bg:#f6efe2;--app-text:#1d1812;}
+@media (prefers-color-scheme: dark){:root{--app-bg:#1a1612;--app-text:#f3ead4;}}
+html,body,#root{height:100%;overflow:hidden;background:var(--app-bg);font-family:'Inter',system-ui,sans-serif;color:var(--app-text);-webkit-font-smoothing:antialiased;transition:background-color .25s ease, color .25s ease;}
 #root{position:fixed;inset:0;}
 ::-webkit-scrollbar{display:none;}
 textarea{font-family:'Inter',system-ui,sans-serif;}
