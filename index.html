@@ -2135,8 +2135,8 @@ function BackupReminder({onExport,onDismiss}){
 }
 
 // ─── DAILY TIP CARD ──────────────────────────────
-function DailyTip(){
-  const tip=React.useMemo(()=>getTipOfTheDay(),[]);
+function DailyTip({profileSex}){
+  const tip=React.useMemo(()=>getTipOfTheDay(profileSex),[profileSex]);
   const [open,setOpen]=React.useState(false);
   const catColors={
     "técnica":{bg:"#e9f1ee",fg:"#2c6048"},
