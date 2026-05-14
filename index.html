@@ -297,6 +297,23 @@ function getDayLabel(){
 }
 function todayStr(){return new Date().toISOString().split("T")[0];}
 
+// Cycle tracking (opt-in, solo perfil ♀)
+function getCycleInfo(){
+  const data=ls("kb_cycle",null);
+  if(!data||!data.enabled||!data.lastPeriod)return null;
+  const cycleLen=data.cycleLength||28;
+  const start=new Date(data.lastPeriod+"T12:00:00");
+  const today=new Date();
+  const daysSince=Math.floor((today-start)/(86400000));
+  const dayInCycle=((daysSince%cycleLen)+cycleLen)%cycleLen+1;
+  let phase,phaseEmoji,phaseTip;
+  if(dayInCycle<=5){phase="Menstrual";phaseEmoji="🌑";phaseTip="Piel más sensible · evita exfoliantes fuertes y retinal";}
+  else if(dayInCycle<=13){phase="Folicular";phaseEmoji="🌒";phaseTip="Piel más receptiva · ideal para introducir activos nuevos";}
+  else if(dayInCycle<=15){phase="Ovulatoria";phaseEmoji="🌕";phaseTip="Piel luminosa · momento más radiante del ciclo";}
+  else{phase="Lútea";phaseEmoji="🌘";phaseTip="Piel propensa a brotes · cuidados extra con limpieza y BHA";}
+  return {dayInCycle,phase,phaseEmoji,phaseTip,cycleLen};
+}
+
 // Skin Level Evolution — basado en días únicos de actividad
 const SKIN_LEVELS=[
   {threshold:0,id:"aprendiz",label:"Aprendiz",emoji:"🌱",desc:"Empezando tu camino"},
