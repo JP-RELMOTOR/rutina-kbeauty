@@ -922,7 +922,7 @@ function Ring({pct=0,size=60,stroke=4,color=P.text,track=P.cream,children}){
 }
 
 // ─── PROFILE SETUP MODAL ─────────────────────────
-function ProfileSetupModal({onPick}){
+function ProfileSetupModal({onPick,onCancel}){
   const [custom,setCustom]=React.useState(false);
   const [name,setName]=React.useState("");
   const [age,setAge]=React.useState("");
