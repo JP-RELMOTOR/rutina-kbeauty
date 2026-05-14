@@ -1527,10 +1527,15 @@ function CompleteSheet({stats,onPhoto,onClose,profileName}){
 }
 
 // ─── TODAY SCREEN ────────────────────────────────
-function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,completedCount,completedMin,isFinished,onShowComplete,streak,phase,doneSteps,onOpenSettings,onIngredient,onOpenProduct,backupReminderOpen,onBackupExport,onBackupDismiss,expressMode,onExpressChange,waitingAfterIdx,waitTotal,waitSecs,waitRunning,waitHint,waitWhy,onToggleWait,onSkipWait,profileName,profileSex}){
+function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,completedCount,completedMin,isFinished,onShowComplete,streak,phase,doneSteps,onOpenSettings,onIngredient,onOpenProduct,backupReminderOpen,onBackupExport,onBackupDismiss,expressMode,onExpressChange,waitingAfterIdx,waitTotal,waitSecs,waitRunning,waitHint,waitWhy,onToggleWait,onSkipWait,profileName,profileSex,profile,onSwitchProfile}){
   const greeting=getGreeting();
   return<div>
     <div style={{padding:"56px 20px 10px",position:"relative"}}>
+      {profile&&<button onClick={onSwitchProfile} style={{display:"flex",alignItems:"center",gap:6,padding:"4px 10px 4px 6px",borderRadius:14,border:`1px solid ${P.border}`,background:P.card,cursor:"pointer",marginBottom:8,fontFamily:"inherit"}}>
+        <span style={{fontSize:14}}>{profile.emoji||"✨"}</span>
+        <span style={{fontSize:11,fontWeight:700,color:P.text,letterSpacing:.2}}>{profile.name}</span>
+        <span style={{fontSize:9,color:P.muted,letterSpacing:.5,textTransform:"uppercase",fontWeight:700,marginLeft:2}}>· cambiar</span>
+      </button>}
       <div style={{fontSize:12,color:P.muted,letterSpacing:.3,marginBottom:2}}>{greeting}{profileName?", "+profileName:""}</div>
       <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:30,fontWeight:500,color:P.text,letterSpacing:"-.6px",lineHeight:1.05,marginBottom:16}}>Tu rutina de hoy</div>
       <button onClick={onOpenSettings} aria-label="Ajustes" style={{position:"absolute",top:54,right:18,width:38,height:38,borderRadius:19,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
