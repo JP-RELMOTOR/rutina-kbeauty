@@ -83,6 +83,15 @@ async function dbGetPhotos(){
     req.onerror=()=>res([]);
   });
 }
+async function dbDeletePhoto(id){
+  const db=await getDB(); if(!db||id==null) return false;
+  return new Promise(res=>{
+    const tx=db.transaction("photos","readwrite");
+    tx.objectStore("photos").delete(id);
+    tx.oncomplete=()=>res(true);
+    tx.onerror=()=>res(false);
+  });
+}
 async function dbClearPhotos(){
   const db=await getDB(); if(!db) return;
   return new Promise(res=>{
