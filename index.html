@@ -2577,6 +2577,41 @@ function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataR
         <div style={{fontSize:10.5,color:P.muted,lineHeight:1.4,marginTop:4}}>Útil cuando tienes las manos llenas de producto. Voz suave del sistema.</div>
       </div>
 
+      {/* CYCLE TRACKING — solo perfil femenino */}
+      {profile?.sex==="f"&&(()=>{
+        const stored=ls("kb_cycle",{enabled:false,lastPeriod:"",cycleLength:28});
+        const [cy,setCy]=React.useState(stored);
+        function update(patch){const next={...cy,...patch};setCy(next);lsSet("kb_cycle",next);}
+        const info=cy.enabled&&cy.lastPeriod?getCycleInfo():null;
+        return<div style={{marginBottom:14,padding:14,borderRadius:18,background:P.card,border:`1px solid ${P.border}`}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:cy.enabled?10:0}}>
+            <div>
+              <div style={{fontSize:11,letterSpacing:1.3,textTransform:"uppercase",color:P.muted,fontWeight:700}}>🌙 Ciclo menstrual</div>
+              <div style={{fontSize:12,color:P.text,marginTop:6,fontWeight:500}}>Adapta consejos según fase hormonal</div>
+            </div>
+            <button onClick={()=>update({enabled:!cy.enabled})} style={{width:54,height:30,borderRadius:15,border:"none",background:cy.enabled?P.accent:P.cream,position:"relative",cursor:"pointer",transition:"all .2s",flexShrink:0}}>
+              <div style={{position:"absolute",top:3,left:cy.enabled?27:3,width:24,height:24,borderRadius:12,background:P.card,transition:"left .2s",boxShadow:"0 1px 3px rgba(0,0,0,.15)"}}/>
+            </button>
+          </div>
+          {cy.enabled&&<>
+            <div style={{marginTop:8}}>
+              <div style={{fontSize:10,letterSpacing:1,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:5}}>Inicio último período</div>
+              <input type="date" value={cy.lastPeriod||""} onChange={e=>update({lastPeriod:e.target.value})} style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:10,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:13,fontFamily:"inherit",marginBottom:8}}/>
+              <div style={{fontSize:10,letterSpacing:1,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:5}}>Duración promedio del ciclo</div>
+              <input type="number" value={cy.cycleLength||28} onChange={e=>update({cycleLength:parseInt(e.target.value)||28})} min="20" max="40" style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:10,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:13,fontFamily:"inherit"}}/>
+            </div>
+            {info&&<div style={{marginTop:12,padding:12,borderRadius:14,background:P.cream,display:"flex",gap:10,alignItems:"flex-start"}}>
+              <div style={{fontSize:24}}>{info.phaseEmoji}</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:13,fontWeight:700,color:P.text}}>Fase {info.phase} · Día {info.dayInCycle}</div>
+                <div style={{fontSize:11,color:P.muted,marginTop:3,lineHeight:1.4}}>{info.phaseTip}</div>
+              </div>
+            </div>}
+          </>}
+          {!cy.enabled&&<div style={{fontSize:10.5,color:P.muted,marginTop:8,lineHeight:1.4}}>Opcional. Activa para que la app sugiera adaptar la rutina según fase hormonal (menstrual, folicular, ovulatoria, lútea).</div>}
+        </div>;
+      })()}
+
       {/* PLAYLISTS */}
       <div style={{marginBottom:14,padding:14,borderRadius:18,background:P.card,border:`1px solid ${P.border}`}}>
         <div style={{fontSize:11,letterSpacing:1.3,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:10}}>🎵 Música para tu rutina</div>
