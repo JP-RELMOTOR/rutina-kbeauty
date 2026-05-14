@@ -296,7 +296,7 @@ const ROUTINES={
     {id:"m1",photo:"products/cosrx-low-ph-cleanser.jpg",rinse:{do:true,temp:"tibia",note:"Enjuaga con agua tibia"},ingr:[{a:"Betaína Salicilato (BHA)",b:"exfolia suavemente"},{a:"Tea Tree Oil",b:"antibacteriano"},{a:"pH 5.5",b:"respeta la barrera"}],cat:"Limpieza",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:2,tone:"#e8b75c",animId:"circular",essential:true,
      why:"pH bajo: limpia sin alterar la barrera. Quita el sebo nocturno y prepara la piel.",
      tip:"Una almendra entera (~2 cm) en palmas HÚMEDAS — hace espuma primero ahí, no directo en la cara. Masajea con yemas en círculos de adentro hacia afuera: nariz → mejillas → frente → mentón. Insiste en zona T (más sebo). 60 seg completos: la mayoría no llega. Enjuaga con agua tibia, seca dando palmaditas con toallita — nunca frotando.",
-     animo:"¡Arranca el día con todo, Mijal! Esta limpieza es tu reset — piel limpia, mente clara.",critical:true},
+     animo:"¡Arranca el día con todo, {name}! Esta limpieza es tu reset — piel limpia, mente clara.",critical:true},
     {id:"m2",photo:"products/beauty-of-joseon-ginseng-essence.jpg",rinse:{do:false},ingr:[{a:"Ginseng 70%",b:"antioxidante y antiedad"},{a:"Fermentos",b:"potencian absorción"},{a:"Adenosina",b:"reduce arrugas finas"}],cat:"Tónico · Essence",name:"Ginseng Essence Water",brand:"Beauty of Joseon",min:1.5,tone:"#c89b5e",animId:"patting",
      why:"Ginseng + antioxidantes. Rehidrata y actúa como primer para que los sérums penetren mejor.",
      tip:"3-4 gotas al centro de la palma — nunca uses algodón, desperdicia el 50%. Une las dos palmas, prensa contra la cara como compresa. Después palmaditas suaves de ADENTRO hacia AFUERA siguiendo los músculos: mejilla → sien, mentón → mandíbula. 5-7 palmaditas por zona. Espera 30 seg antes del próximo.",
@@ -318,7 +318,7 @@ const ROUTINES={
     {id:"n1",essential:true,photo:"products/banila-co-clean-it-zero.jpg",rinse:{do:true,temp:"tibia",note:"Emulsifica con agua, enjuaga bien"},ingr:[{a:"Acerola Berry",b:"Vitamina C natural"},{a:"Vitamina E",b:"antioxidante"},{a:"Aceite de éster natural",b:"limpieza suave"}],cat:"Doble limpieza · Aceite",name:"Clean It Zero Cleansing Balm",brand:"Banila Co",min:2,tone:"#e8b75c",animId:"circular_oil",
      why:"Disuelve SPF, sebo y maquillaje a base de aceite. El agua sola no puede hacer esto.",
      tip:"Cara Y manos SECAS — clave para que el balm disuelva grasa, no se diluya. Avellana de balm en palma, derrite con calor corporal 3 seg. Masaje circular con YEMAS (no palmas): frente → sienes → mejillas → mandíbula → cuello. 60 seg reales. Agrega 3-4 gotas de agua, sigue masajeando — se vuelve blanco lechoso (emulsificó). Enjuaga abundante sin residuo.",
-     animo:"Bienvenida la noche, Mijal. Este balm va a disolver todo el SPF del día. ¡Es momento de relajarse!"},
+     animo:"Buenas noches, {name}. Este balm va a disolver todo el SPF del día. Es momento de relajarse."},
     {id:"n2",essential:true,photo:"products/cosrx-low-ph-cleanser.jpg",rinse:{do:true,temp:"tibia",note:"Enjuaga con agua tibia"},ingr:[{a:"Betaína Salicilato (BHA)",b:"limpieza profunda pH bajo"},{a:"Tea Tree Oil",b:"antibacteriano"},{a:"pH 5.5",b:"sin alterar la barrera"}],cat:"Doble limpieza · Agua",name:"Low pH Good Morning Gel Cleanser",brand:"COSRX",min:1.5,tone:"#c89b5e",animId:"circular",
      why:"Elimina los residuos del balm. Deja la piel realmente limpia.",
      tip:"Una almendra entera (~2 cm), palmas húmedas, espuma primero. Masaje circular con yemas 45-60 seg, adentro hacia afuera. El balm ya quitó el sebo y SPF — ahora solo limpias residuos finos. Enjuague abundante con agua tibia. Pat dry.",
@@ -376,7 +376,7 @@ const ROUTINES={
     {id:"r8",essential:true,photo:"products/cosrx-hyaluronic-cream.jpg",rinse:{do:false},ingr:[{a:"Ácido Hialurónico",b:"retiene humedad 7-8 horas"},{a:"Panthenol (B5)",b:"buffer del retinal"},{a:"Ceramida NP",b:"fortalece la barrera"}],cat:"Hidratante selladora",name:"Hyaluronic Acid Intensive Cream",brand:"COSRX",min:2,tone:"#bcd2c0",animId:"spreading",
      why:"Técnica buffer: sella el retinal y reduce irritación sin cancelar su eficacia.",
      tip:"Capa GENEROSA (más que otras noches): garbanzo y medio. Calienta entre palmas, 5 puntos sobre la cara, distribución suave hacia afuera y arriba. ESPECIAL cuidado donde aplicaste retinal — esta crema es el buffer que sella el retinal y reduce la irritación sin cancelar su efecto. La capa generosa es intencional.",
-     animo:"¡Perfecta noche de retinal! Esta crema sella el activo y reduce la irritación. ¡Dulces sueños, Mijal!"},
+     animo:"¡Perfecta noche de retinal! Esta crema sella el activo y reduce la irritación. ¡Dulces sueños, {name}!"},
   ]},
 };
 
@@ -877,12 +877,34 @@ const TIPS=[
   {c:"producto",t:"El SPF Skin1004 es 'invisible' — no deja velo blanco. Por eso es seguro para cuello y escote."},
   {c:"producto",t:"El Banila Co Clean It Zero solo necesita el tamaño de una avellana. Más cantidad es desperdicio puro."},
   {c:"producto",t:"El retinal Seoul 1988 combina Bakuchiol que potencia el activo y reduce irritación. Combo perfecto para empezar."},
+  {c:"producto",sex:"m",t:"El día después de afeitarte, evita exfoliantes y retinal — tu piel ya está micro-irritada y se sensibiliza el doble."},
+  {c:"técnica",sex:"m",t:"Cuello y manos también necesitan SPF. La piel masculina ahí envejece sin que te des cuenta — son las primeras zonas que delatan la edad."},
+  {c:"ritual",sex:"m",t:"El BHA del COSRX cleanser previene foliculitis post-afeitado mejor que cualquier after-shave tradicional. Aplícalo después de afeitar."},
+  {c:"piel",sex:"m",t:"La piel masculina es 25% más gruesa que la femenina y tolera mejor el retinal. Puedes ir 3-4 veces/sem en vez de 2-3."},
 ];
-function getTipOfTheDay(){
-  // Deterministic: same day → same tip. Rotates daily.
+function getTipOfTheDay(profileSex){
+  // Filtra tips por sexo del perfil (tips sin sex aplican a ambos)
+  const eligible=TIPS.filter(t=>!t.sex||t.sex===profileSex);
   const d=new Date();
   const seed=Math.floor(d.getTime()/(1000*60*60*24));
-  return TIPS[seed%TIPS.length];
+  return eligible[seed%eligible.length];
+}
+
+// ─── PROFILE ─────────────────────────────────────
+const PROFILE_PRESETS=[
+  {id:"mijal",name:"Mijal",sex:"f",age:null,defaultPhase:1,emoji:"🌸",desc:"Mujer · piel mixta · fase 1 (suave) del retinal"},
+  {id:"jp",name:"Juan Pablo",sex:"m",age:40,defaultPhase:2,emoji:"🌿",desc:"Hombre 40 · piel grasa · fase 2 (3×/sem) del retinal"},
+];
+function getProfile(){return ls("kb_profile",null);}
+function setupProfile(preset){
+  lsSet("kb_profile",preset);
+  if(preset.defaultPhase&&localStorage.getItem("kb_phase")===null){
+    lsSet("kb_phase",preset.defaultPhase);
+  }
+}
+function interpolateName(text,profileName){
+  if(!text)return "";
+  return text.replaceAll("{name}",profileName||"");
 }
 
 // ─── RING ────────────────────────────────────────
