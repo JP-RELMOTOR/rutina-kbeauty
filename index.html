@@ -1004,6 +1004,33 @@ function Ring({pct=0,size=60,stroke=4,color=P.text,track=P.cream,children}){
   </div>;
 }
 
+// ─── INTENTION MODAL ─────────────────────────────
+function IntentionModal({onDone,profileName}){
+  const [text,setText]=React.useState("");
+  const prompts=[
+    "¿Qué quieres dejar atrás hoy?",
+    "¿Qué quieres traer a tu día?",
+    "¿Cómo te quieres sentir hoy?",
+    "Una palabra para tu mañana",
+  ];
+  const prompt=React.useMemo(()=>prompts[Math.floor(Math.random()*prompts.length)],[]);
+  return<div style={{position:"absolute",inset:0,zIndex:60,background:"rgba(29,24,18,.6)",display:"flex",alignItems:"flex-end",animation:"fadeIn .3s ease"}}>
+    <div style={{width:"100%",background:P.bg,borderRadius:"28px 28px 0 0",padding:"28px 22px 36px",animation:"slideUp .35s ease"}}>
+      <div style={{width:40,height:4,borderRadius:2,background:P.cream,margin:"0 auto 20px"}}/>
+      <div style={{textAlign:"center",marginBottom:20}}>
+        <div style={{fontSize:32,marginBottom:10}}>🌿</div>
+        <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:24,color:P.text,letterSpacing:"-.4px",lineHeight:1.15,marginBottom:6}}>{prompt}</div>
+        <div style={{fontSize:12,color:P.muted,lineHeight:1.4}}>Una pausa antes de cuidarte. Puedes saltar.</div>
+      </div>
+      <input type="text" value={text} onChange={e=>setText(e.target.value)} placeholder="Una palabra · una frase · lo que sientas" autoFocus style={{width:"100%",boxSizing:"border-box",padding:"14px 16px",borderRadius:14,border:`1.5px solid ${P.border}`,background:P.card,color:P.text,fontSize:15,outline:"none",fontFamily:"inherit",marginBottom:12,textAlign:"center"}}/>
+      <div style={{display:"flex",gap:8}}>
+        <button onClick={()=>onDone(null)} style={{flex:1,height:48,borderRadius:14,border:`1px solid ${P.border}`,background:"transparent",color:P.muted,fontSize:14,fontWeight:500,cursor:"pointer"}}>Saltar</button>
+        <button onClick={()=>onDone(text.trim()||null)} style={{flex:2,height:48,borderRadius:14,border:"none",background:P.text,color:P.onDark,fontSize:14,fontWeight:600,cursor:"pointer"}}>Empezar rutina →</button>
+      </div>
+    </div>
+  </div>;
+}
+
 // ─── PROFILE SETUP MODAL ─────────────────────────
 function ProfileSetupModal({onPick,onCancel}){
   const [custom,setCustom]=React.useState(false);
