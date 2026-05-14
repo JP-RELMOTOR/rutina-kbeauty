@@ -2291,6 +2291,17 @@ function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataR
 // ─── APP ─────────────────────────────────────────
 function App(){
   const [tab,setTab]=React.useState("today");
+  const [profile,setProfile]=React.useState(()=>getProfile());
+  const profileName=profile?.name||"";
+  const profileSex=profile?.sex||null;
+  function handleProfilePick(p){
+    setupProfile(p);
+    setProfile(p);
+    if(p.defaultPhase&&localStorage.getItem("kb_phase")===String(p.defaultPhase)){
+      setPhase&&setPhase(p.defaultPhase);
+    }
+    haptic("medium");
+  }
   const _restored=loadRoutineProgress(); // hoy mismo, mismo mode
   const [mode,setMode]=React.useState(()=>{
     if(_restored)return _restored.mode;
