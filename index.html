@@ -998,7 +998,7 @@ function CompleteSheet({stats,onPhoto,onClose}){
         :<button onClick={onPhoto} style={{width:"100%",height:46,borderRadius:14,border:`1px solid ${P.border}`,background:P.card,color:P.muted,fontSize:13,fontWeight:500,cursor:"pointer",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
           <Icon n="camera" size={16} color={P.muted}/>Tomar foto de progreso (opcional)
         </button>}
-      <button onClick={()=>onClose(mood)} style={{width:"100%",height:50,borderRadius:16,border:"none",background:P.text,color:P.onDark,fontSize:15,fontWeight:600,cursor:"pointer"}}>Terminar ✓</button>
+      <button onClick={()=>onClose(mood,note)} style={{width:"100%",height:50,borderRadius:16,border:"none",background:P.text,color:P.onDark,fontSize:15,fontWeight:600,cursor:"pointer"}}>Terminar ✓</button>
     </div>
   </div>;
 }
