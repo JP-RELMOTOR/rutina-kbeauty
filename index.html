@@ -1692,7 +1692,13 @@ function App(){
     setPhotos(p||[]);
   }
 
-  const routine=ROUTINES[mode]||ROUTINES.night;
+  const baseRoutine=ROUTINES[mode]||ROUTINES.night;
+  const routine=React.useMemo(()=>{
+    if(!expressMode)return baseRoutine;
+    const filtered=baseRoutine.steps.filter(s=>s.essential);
+    const totalMin=filtered.reduce((a,s)=>a+s.min,0);
+    return {...baseRoutine,steps:filtered,total:filtered.length,minutes:Math.round(totalMin),label:baseRoutine.label+" · Express ⚡"};
+  },[baseRoutine,expressMode]);
   const streak=getStreak(history);
   const completedCount=routine.steps.filter(s=>doneSteps.has(s.id)).length;
   const completedMin=routine.steps.filter(s=>doneSteps.has(s.id)).reduce((a,s)=>a+s.min,0);
