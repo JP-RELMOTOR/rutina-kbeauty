@@ -1626,7 +1626,25 @@ function CompleteSheet({stats,onPhoto,onClose,profileName}){
   const mon=isMonday();
   const [mood,setMood]=React.useState(null);
   const [note,setNote]=React.useState("");
+  const [sleep,setSleep]=React.useState(0); // 0=skip, 1-5=valor
+  const [stress,setStress]=React.useState(0);
+  const [water,setWater]=React.useState(0);
   const moods=[{e:"😍",l:"Radiante"},{e:"🙂",l:"Bien"},{e:"😊",l:"Normal"},{e:"😌",l:"Sensible"},{e:"😟",l:"Irritada"}];
+  const Slider=({label,value,onChange,emoji,low,high})=><div style={{marginBottom:10}}>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:5}}>
+      <div style={{display:"flex",alignItems:"center",gap:6}}>
+        <span style={{fontSize:14}}>{emoji}</span>
+        <span style={{fontSize:11,fontWeight:700,color:P.text,letterSpacing:.2}}>{label}</span>
+      </div>
+      <div style={{fontSize:10,color:P.muted}}>{value?`${value}/5`:"saltar"}</div>
+    </div>
+    <div style={{display:"flex",gap:4}}>
+      {[1,2,3,4,5].map(n=><button key={n} onClick={()=>onChange(value===n?0:n)} style={{flex:1,height:24,borderRadius:6,border:"none",background:value>=n?P.accent:P.cream,cursor:"pointer"}}/>)}
+    </div>
+    <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:P.muted,marginTop:3,letterSpacing:.3}}>
+      <span>{low}</span><span>{high}</span>
+    </div>
+  </div>;
   return<div style={{position:"absolute",inset:0,zIndex:80,background:P.bg,display:"flex",flexDirection:"column",overflowY:"auto",animation:"fadeIn .4s ease",WebkitOverflowScrolling:"touch"}}>
     <div style={{flex:"0 0 auto",display:"flex",flexDirection:"column",alignItems:"center",padding:"56px 24px 18px",textAlign:"center"}}>
       <div style={{width:80,height:80,borderRadius:40,background:`radial-gradient(circle at 30% 30%,${P.accentSoft},${P.accent})`,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:18,boxShadow:`0 16px 40px -10px ${P.accent}80`,animation:"pulse 2s ease-in-out infinite"}}>
