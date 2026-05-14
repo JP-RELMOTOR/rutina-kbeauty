@@ -474,6 +474,37 @@ function findIngredient(name){
   return INGREDIENTS.find(i=>low.includes(i.key))||null;
 }
 
+// Aggrega productos únicos desde las 3 rutinas (mismo producto puede aparecer en varias)
+function getUniqueProducts(){
+  const seen=new Map();
+  Object.values(ROUTINES).forEach(r=>{
+    r.steps.forEach(step=>{
+      const key=`${step.brand}|${step.name}`;
+      if(!seen.has(key)){
+        seen.set(key,{
+          name:step.name,
+          brand:step.brand,
+          photo:step.photo,
+          cat:step.cat,
+          ingr:step.ingr,
+          appearances:[],
+        });
+      }
+      seen.get(key).appearances.push({
+        routineId:r.id,
+        routineLabel:r.label,
+        cat:step.cat,
+        why:step.why,
+        tip:step.tip,
+        min:step.min,
+        critical:!!step.critical,
+        star:!!step.star,
+      });
+    });
+  });
+  return [...seen.values()];
+}
+
 // ─── INGREDIENT SHEET ────────────────────────────
 function IngredientSheet({ingredient,onClose}){
   if(!ingredient)return null;
