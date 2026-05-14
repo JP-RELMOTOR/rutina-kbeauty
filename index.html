@@ -1628,6 +1628,8 @@ function App(){
   const [activeIngredient,setActiveIngredient]=React.useState(null);
   const [showImport,setShowImport]=React.useState(false);
   const [backupReminderOpen,setBackupReminderOpen]=React.useState(()=>shouldShowBackupReminder());
+  const [expressMode,setExpressMode]=React.useState(()=>ls("kb_express_mode",false));
+  function handleExpressChange(v){setExpressMode(v);lsSet("kb_express_mode",v);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();haptic("light");}
 
   async function handleBackupExport(){
     try{await exportAllData();}catch(_){}
