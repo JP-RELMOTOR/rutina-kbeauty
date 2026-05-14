@@ -1001,8 +1001,9 @@ function DayPlanBanner({phase,onStartRoutine}){
 }
 
 // ─── STEP CARD ───────────────────────────────────
-function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,onOpenProduct}){
+function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,onOpenProduct,profileName}){
   const photoClick=e=>{if(!step.photo||!onOpenProduct)return;e.stopPropagation();onOpenProduct(step);};
+  const animoText=interpolateName(step.animo,profileName);
   if(nextName) step={...step,_next:nextName};
   const isActive=state==="active",isDone=state==="done";
   const totalSec=Math.round(step.min*60);
