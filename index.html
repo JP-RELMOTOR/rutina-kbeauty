@@ -854,6 +854,48 @@ function PhotoCapture({onClose,onSave}){
   </div>;
 }
 
+// ─── PHOTO VIEWER (lightbox + metadata + delete) ──
+function PhotoViewer({photo,onClose,onDelete}){
+  if(!photo)return null;
+  const [deleting,setDeleting]=React.useState(false);
+  const moodLabels={"😍":"Radiante","🙂":"Bien","😊":"Normal","😌":"Sensible","😟":"Irritada"};
+  async function handleDelete(){
+    if(!confirm("¿Eliminar esta foto? No se puede deshacer."))return;
+    setDeleting(true);
+    await dbDeletePhoto(photo.id);
+    onDelete&&onDelete(photo.id);
+    setDeleting(false);
+    onClose();
+  }
+  return<div style={{position:"absolute",inset:0,zIndex:95,background:"#0d0a07",display:"flex",flexDirection:"column",animation:"fadeIn .25s ease"}}>
+    <div style={{padding:"52px 16px 14px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <button onClick={onClose} aria-label="Cerrar" style={{width:38,height:38,borderRadius:19,border:"none",background:"rgba(255,255,255,.14)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+        <Icon n="close" size={16} color="white" sw={2}/>
+      </button>
+      <div style={{color:"rgba(255,255,255,.85)",fontSize:13,fontFamily:"'JetBrains Mono',monospace",letterSpacing:.5,textAlign:"center",flex:1,margin:"0 12px"}}>{photo.date||"sin fecha"}</div>
+      <button onClick={handleDelete} disabled={deleting} aria-label="Eliminar" style={{width:38,height:38,borderRadius:19,border:"none",background:deleting?"rgba(255,255,255,.1)":"rgba(192,64,48,.85)",display:"flex",alignItems:"center",justifyContent:"center",cursor:deleting?"default":"pointer"}}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6"/></svg>
+      </button>
+    </div>
+    <div onClick={onClose} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 12px",overflow:"hidden",cursor:"pointer"}}>
+      <img src={photo.dataUrl} alt="" onClick={e=>e.stopPropagation()} style={{maxWidth:"100%",maxHeight:"100%",borderRadius:14,objectFit:"contain",cursor:"default"}}/>
+    </div>
+    <div style={{padding:"16px 20px 32px",background:"linear-gradient(180deg,rgba(13,10,7,0),rgba(13,10,7,.92) 30%)"}}>
+      {(photo.feel||photo.note)&&<div style={{padding:"14px 16px",borderRadius:18,background:"rgba(255,255,255,.08)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
+        {photo.feel&&<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:photo.note?8:0}}>
+          <div style={{fontSize:30}}>{photo.feel}</div>
+          <div>
+            <div style={{fontSize:10,letterSpacing:1.2,textTransform:"uppercase",color:"rgba(255,255,255,.5)",fontWeight:700}}>Mood</div>
+            <div style={{fontSize:14,color:"white",fontWeight:600,marginTop:1}}>{moodLabels[photo.feel]||photo.feel}</div>
+          </div>
+        </div>}
+        {photo.note&&<div style={{fontSize:13,color:"rgba(255,255,255,.9)",lineHeight:1.5,fontStyle:photo.feel?"italic":"normal"}}>{photo.note}</div>}
+      </div>}
+      {!photo.feel&&!photo.note&&<div style={{fontSize:12,color:"rgba(255,255,255,.4)",textAlign:"center"}}>Sin mood ni nota guardados</div>}
+    </div>
+  </div>;
+}
+
 // ─── IMPORT PHOTOS (from iPhone Photos Library) ──
 function ImportPhotos({onClose,onSave}){
   const inputRef=React.useRef();
