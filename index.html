@@ -2396,11 +2396,14 @@ function App(){
   const profileName=profile?.name||"";
   const profileSex=profile?.sex||null;
   function handleProfilePick(p){
-    const firstTime=localStorage.getItem("kb_phase")===null;
     setupProfile(p);
     setProfile(p);
     setShowProfileModal(false);
-    if(p.defaultPhase&&firstTime)setPhase(p.defaultPhase);
+    // Aplica defaultPhase en cada selección de perfil (incluso si cambiaste)
+    if(p.defaultPhase){
+      setPhase(p.defaultPhase);
+      lsSet("kb_phase",p.defaultPhase);
+    }
     haptic("medium");
   }
   function handleOpenProfileSwitcher(){setShowProfileModal(true);}
