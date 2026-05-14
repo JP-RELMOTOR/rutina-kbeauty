@@ -2292,7 +2292,7 @@ function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataR
 
       {/* ABOUT */}
       <div style={{padding:"14px 4px",fontSize:11,color:P.muted,lineHeight:1.6,textAlign:"center"}}>
-        K-Beauty · Mijal<br/>
+        K-Beauty{profile?.name?` · ${profile.name}`:""}<br/>
         Hecho con amor 💕 · v1.1<br/>
         <a href="https://github.com/JP-RELMOTOR/rutina-kbeauty" target="_blank" rel="noopener" style={{color:P.muted,textDecoration:"underline"}}>código en GitHub</a>
       </div>
