@@ -2234,6 +2234,153 @@ function SkinJourneySheet({photos,onClose,onOpenPhoto}){
   </div>;
 }
 
+// ─── YEAR WRAPPED (31 dic / 1 ene) ────────────────
+function shouldShowYearWrapped(history){
+  const today=new Date();
+  const m=today.getMonth(),d=today.getDate();
+  // Show on Dec 31 or Jan 1-7 (first week of new year)
+  const isEndOfYear=(m===11&&d===31);
+  const isNewYear=(m===0&&d<=7);
+  if(!isEndOfYear&&!isNewYear)return false;
+  const yearKey=isNewYear?today.getFullYear()-1:today.getFullYear();
+  const last=ls("kb_year_wrapped_shown","");
+  if(last===String(yearKey))return false;
+  // Solo si tiene al menos 30 rutinas ese año
+  const yearStr=String(yearKey);
+  const count=history.filter(h=>h.date?.startsWith(yearStr)).length;
+  return count>=30;
+}
+function markYearWrappedShown(year){lsSet("kb_year_wrapped_shown",String(year));}
+
+function computeYearStats(history,diary,photos,year){
+  const yearStr=String(year);
+  const yearHist=history.filter(h=>h.date?.startsWith(yearStr));
+  const yearDiary=diary.filter(d=>d.date?.startsWith(yearStr));
+  const yearPhotos=photos.filter(p=>p.date?.startsWith(yearStr));
+  const uniqueDays=new Set(yearHist.map(s=>s.date)).size;
+  const totalMin=yearHist.length*8; // estimación ~8 min promedio
+  const am=yearHist.filter(s=>s.routine==="morning").length;
+  const retNights=yearHist.filter(s=>s.routine==="pm_retinal").length;
+  // Mood predominante del año
+  const moodCount={};
+  yearDiary.forEach(d=>{if(d.feel)moodCount[d.feel]=(moodCount[d.feel]||0)+1;});
+  const topMood=Object.entries(moodCount).sort((a,b)=>b[1]-a[1])[0];
+  // Mes más activo
+  const byMonth={};
+  yearHist.forEach(h=>{const m=h.date.slice(0,7);byMonth[m]=(byMonth[m]||0)+1;});
+  const bestMonth=Object.entries(byMonth).sort((a,b)=>b[1]-a[1])[0];
+  const monthNames=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  return {
+    year,
+    totalSessions:yearHist.length,
+    uniqueDays,
+    totalMin,
+    am,retNights,
+    photos:yearPhotos.length,
+    diaryEntries:yearDiary.length,
+    topMood:topMood?topMood[0]:null,
+    topMoodCount:topMood?topMood[1]:0,
+    bestMonth:bestMonth?monthNames[parseInt(bestMonth[0].slice(5,7))-1]:null,
+    bestMonthCount:bestMonth?bestMonth[1]:0,
+    firstPhoto:yearPhotos.length?[...yearPhotos].sort((a,b)=>a.date.localeCompare(b.date))[0]:null,
+    lastPhoto:yearPhotos.length?[...yearPhotos].sort((a,b)=>b.date.localeCompare(a.date))[0]:null,
+  };
+}
+
+function YearWrappedSheet({stats,onClose,profileName}){
+  if(!stats)return null;
+  const moodLabels={"😍":"Radiante","🙂":"Bien","😊":"Normal","😌":"Sensible","😟":"Irritada"};
+  return<div style={{position:"absolute",inset:0,zIndex:96,background:P.bg,overflowY:"auto",animation:"fadeIn .5s ease",WebkitOverflowScrolling:"touch"}}>
+    <div style={{padding:"56px 24px 20px",textAlign:"center"}}>
+      <div style={{fontSize:48,marginBottom:14}}>🌟</div>
+      <div style={{fontSize:11,letterSpacing:1.5,textTransform:"uppercase",color:P.accent,fontWeight:700,marginBottom:6}}>Tu año en K-Beauty</div>
+      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:48,color:P.text,letterSpacing:"-1px",lineHeight:1,fontWeight:500}}>{stats.year}</div>
+      {profileName&&<div style={{fontSize:14,color:P.muted,marginTop:10,fontStyle:"italic"}}>Para ti, {profileName} 💕</div>}
+    </div>
+
+    <div style={{padding:"4px 16px"}}>
+      {/* Big number */}
+      <div style={{padding:"28px 22px",borderRadius:26,background:P.text,color:P.onDark,textAlign:"center",marginBottom:14,position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",right:-40,top:-50,width:180,height:180,borderRadius:90,background:P.accent,filter:"blur(60px)",opacity:.7}}/>
+        <div style={{position:"relative",zIndex:1}}>
+          <div style={{fontSize:10,letterSpacing:1.5,opacity:.65,textTransform:"uppercase",fontWeight:600}}>Rutinas completadas</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:84,fontWeight:500,lineHeight:1,letterSpacing:-2,marginTop:6}}>{stats.totalSessions}</div>
+          <div style={{fontSize:13,opacity:.7,marginTop:10}}>{stats.uniqueDays} días cuidándote este año</div>
+        </div>
+      </div>
+
+      {/* Grid de stats */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:14}}>
+        <div style={{padding:14,borderRadius:18,background:P.card,border:`1px solid ${P.border}`,textAlign:"center"}}>
+          <div style={{fontSize:22,marginBottom:4}}>🌅</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:28,fontWeight:500,color:P.text,lineHeight:1}}>{stats.am}</div>
+          <div style={{fontSize:10,color:P.muted,marginTop:4,letterSpacing:.4,textTransform:"uppercase"}}>Mañanas</div>
+        </div>
+        <div style={{padding:14,borderRadius:18,background:P.card,border:`1px solid ${P.retinal}`,textAlign:"center"}}>
+          <div style={{fontSize:22,marginBottom:4}}>🔴</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:28,fontWeight:500,color:P.text,lineHeight:1}}>{stats.retNights}</div>
+          <div style={{fontSize:10,color:P.muted,marginTop:4,letterSpacing:.4,textTransform:"uppercase"}}>Noches retinal</div>
+        </div>
+        <div style={{padding:14,borderRadius:18,background:P.card,border:`1px solid ${P.border}`,textAlign:"center"}}>
+          <div style={{fontSize:22,marginBottom:4}}>📸</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:28,fontWeight:500,color:P.text,lineHeight:1}}>{stats.photos}</div>
+          <div style={{fontSize:10,color:P.muted,marginTop:4,letterSpacing:.4,textTransform:"uppercase"}}>Fotos del año</div>
+        </div>
+        <div style={{padding:14,borderRadius:18,background:P.card,border:`1px solid ${P.border}`,textAlign:"center"}}>
+          <div style={{fontSize:22,marginBottom:4}}>📝</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:28,fontWeight:500,color:P.text,lineHeight:1}}>{stats.diaryEntries}</div>
+          <div style={{fontSize:10,color:P.muted,marginTop:4,letterSpacing:.4,textTransform:"uppercase"}}>Diario</div>
+        </div>
+      </div>
+
+      {stats.bestMonth&&<div style={{padding:14,borderRadius:18,background:P.accentSoft,border:`1px solid ${P.accent}`,marginBottom:10,display:"flex",alignItems:"center",gap:12}}>
+        <div style={{fontSize:32}}>🏆</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.accent,fontWeight:700}}>Tu mejor mes</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:20,color:P.text,marginTop:2}}>{stats.bestMonth}</div>
+          <div style={{fontSize:11,color:P.muted,marginTop:1}}>{stats.bestMonthCount} rutinas ese mes</div>
+        </div>
+      </div>}
+
+      {stats.topMood&&<div style={{padding:14,borderRadius:18,background:P.card,border:`1px solid ${P.border}`,marginBottom:10,display:"flex",alignItems:"center",gap:12}}>
+        <div style={{fontSize:42}}>{stats.topMood}</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.muted,fontWeight:700}}>Tu piel el {stats.year}</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:20,color:P.text,marginTop:2}}>{moodLabels[stats.topMood]||stats.topMood}</div>
+          <div style={{fontSize:11,color:P.muted,marginTop:1}}>{stats.topMoodCount} veces este año</div>
+        </div>
+      </div>}
+
+      {stats.firstPhoto&&stats.lastPhoto&&stats.firstPhoto.id!==stats.lastPhoto.id&&<div style={{padding:14,borderRadius:18,background:P.card,border:`1px solid ${P.border}`,marginBottom:14}}>
+        <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:10,textAlign:"center"}}>Tu evolución</div>
+        <div style={{display:"flex",gap:8}}>
+          <div style={{flex:1}}>
+            <div style={{aspectRatio:"3/4",borderRadius:14,overflow:"hidden",border:`1px solid ${P.border}`}}>
+              <img src={stats.firstPhoto.dataUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+            </div>
+            <div style={{fontSize:9,color:P.muted,marginTop:6,fontFamily:"'JetBrains Mono',monospace",textAlign:"center"}}>{stats.firstPhoto.date}</div>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{aspectRatio:"3/4",borderRadius:14,overflow:"hidden",border:`1.5px solid ${P.accent}`}}>
+              <img src={stats.lastPhoto.dataUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+            </div>
+            <div style={{fontSize:9,color:P.accent,marginTop:6,fontFamily:"'JetBrains Mono',monospace",textAlign:"center",fontWeight:700}}>{stats.lastPhoto.date}</div>
+          </div>
+        </div>
+      </div>}
+
+      <div style={{padding:"24px 18px",borderRadius:20,background:P.cream,border:`1px solid ${P.border}`,textAlign:"center",marginBottom:18}}>
+        <div style={{fontSize:32,marginBottom:10}}>💕</div>
+        <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:22,color:P.text,lineHeight:1.25,letterSpacing:"-.3px"}}>
+          {stats.uniqueDays>=300?"Un año entero contigo. Gracias por la constancia.":stats.uniqueDays>=200?"Más de 200 días cuidándote. Eso es amor propio.":stats.uniqueDays>=100?"Más de 100 días en tu ritual. Estás formando un hábito real.":"Cada día cuenta. Sigamos."}
+        </div>
+      </div>
+
+      <button onClick={onClose} style={{width:"100%",height:54,borderRadius:18,border:"none",background:P.text,color:P.onDark,fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:32}}>Continuar a {stats.year+1} →</button>
+    </div>
+  </div>;
+}
+
 // ─── WEEKLY RECAP (domingo estilo Wrapped) ───────
 function computeWeekStats(history,diary,routines){
   const today=new Date();
