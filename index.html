@@ -1820,9 +1820,9 @@ const ambient=new AmbientAudio();
 function AudioPanel({active,volume,onSelect,onVolume,onClose}){
   const sounds=[
     {id:"olas",label:"Olas",emoji:"🌊",desc:"Marea suave"},
-    {id:"lluvia",label:"Lluvia",emoji:"🌧️",desc:"Lluvia tranquila"},
-    {id:"crepitar",label:"Crepitar",emoji:"🔥",desc:"Fuego de chimenea"},
-    {id:"drones",label:"Drones",emoji:"🎐",desc:"Acorde ambient"},
+    {id:"piano",label:"Piano suave",emoji:"🎹",desc:"Notas aleatorias en Do"},
+    {id:"musicBox",label:"Caja musical",emoji:"🎵",desc:"Melodía lullaby"},
+    {id:"pad",label:"Pad cinemático",emoji:"🌌",desc:"Acordes flotantes"},
   ];
   return<div style={{position:"absolute",inset:0,zIndex:75,background:"rgba(29,24,18,.4)",display:"flex",alignItems:"flex-end"}} onClick={onClose}>
     <div onClick={e=>e.stopPropagation()} style={{width:"100%",background:P.bg,borderRadius:"28px 28px 0 0",padding:"18px 18px 32px",animation:"slideUp .35s ease"}}>
