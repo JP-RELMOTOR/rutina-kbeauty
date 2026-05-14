@@ -1406,14 +1406,14 @@ function SkinJourneySheet({photos,onClose,onOpenPhoto}){
         {comparisons.map((c,i)=><div key={i} style={{marginBottom:14,padding:14,borderRadius:20,background:P.card,border:`1px solid ${P.border}`}}>
           <div style={{fontSize:12,color:P.muted,marginBottom:10,fontWeight:600,letterSpacing:.3}}>{c.label}</div>
           <div style={{display:"flex",gap:8}}>
-            {[c.a,c.b].map((p,j)=><div key={j} style={{flex:1}}>
+            {[c.a,c.b].map((p,j)=><button key={j} onClick={()=>onOpenPhoto&&onOpenPhoto(p)} style={{flex:1,padding:0,border:"none",background:"none",cursor:"pointer",textAlign:"left"}}>
               <div style={{aspectRatio:"3/4",borderRadius:14,overflow:"hidden",border:`1px solid ${P.border}`,position:"relative"}}>
-                <img src={p.dataUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                <img src={p.dataUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
                 {j===1&&<div style={{position:"absolute",top:6,right:6,padding:"2px 8px",borderRadius:6,background:P.accent,color:P.onAccent,fontSize:9,fontWeight:700,letterSpacing:.3}}>AHORA</div>}
               </div>
               <div style={{fontSize:10,color:P.muted,marginTop:6,fontFamily:"'JetBrains Mono',monospace",textAlign:"center"}}>{p.date}</div>
               {p.feel&&<div style={{fontSize:14,textAlign:"center",marginTop:2}}>{p.feel}</div>}
-            </div>)}
+            </button>)}
           </div>
         </div>)}
       </div>}
