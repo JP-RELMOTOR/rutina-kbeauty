@@ -1180,7 +1180,10 @@ function DiaryScreen({diary,photos,onAddPhoto,onImportPhotos,onOpenJourney}){
     <div style={{marginBottom:14}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px 10px"}}>
         <div style={{fontSize:14,fontWeight:600,color:P.text}}>Fotos de progreso</div>
-        {isMonday()&&<div style={{fontSize:11,color:P.green,fontWeight:600,background:P.greenSoft,padding:"3px 10px",borderRadius:8}}>📸 Día de foto</div>}
+        <div style={{display:"flex",gap:6,alignItems:"center"}}>
+          {isMonday()&&<div style={{fontSize:11,color:P.green,fontWeight:600,background:P.greenSoft,padding:"3px 10px",borderRadius:8}}>📸 Día de foto</div>}
+          {photos.length>=2&&<button onClick={onOpenJourney} style={{fontSize:11,color:P.accent,fontWeight:700,background:P.accentSoft,padding:"4px 10px",borderRadius:8,border:`1px solid ${P.accent}`,cursor:"pointer",letterSpacing:.3}}>✨ Ver evolución</button>}
+        </div>
       </div>
       <div style={{display:"flex",gap:8,overflowX:"auto",padding:"0 16px 4px",WebkitOverflowScrolling:"touch"}}>
         <button onClick={onAddPhoto} style={{width:76,height:96,borderRadius:14,border:`1.5px dashed ${P.border}`,background:P.cream,flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:5,color:P.muted,cursor:"pointer"}}>
