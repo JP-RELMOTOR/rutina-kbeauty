@@ -2226,6 +2226,12 @@ function App(){
   const [updateDismissed,setUpdateDismissed]=React.useState(false);
   const [activeIngredient,setActiveIngredient]=React.useState(null);
   const [activeProduct,setActiveProduct]=React.useState(null);
+  const [waitingAfterIdx,setWaitingAfterIdx]=React.useState(null);
+  const [waitSecs,setWaitSecs]=React.useState(0);
+  const [waitTotal,setWaitTotal]=React.useState(0);
+  const [waitRunning,setWaitRunning]=React.useState(true);
+  const [waitHint,setWaitHint]=React.useState("");
+  const [waitWhy,setWaitWhy]=React.useState("");
   const [showImport,setShowImport]=React.useState(false);
   const [backupReminderOpen,setBackupReminderOpen]=React.useState(()=>shouldShowBackupReminder());
   const [expressMode,setExpressMode]=React.useState(()=>ls("kb_express_mode",false));
