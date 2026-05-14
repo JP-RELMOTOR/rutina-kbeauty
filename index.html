@@ -2684,7 +2684,7 @@ function App(){
     </div>
     <TabBar tab={tab} onTab={setTab}/>
     {hasUpdate&&!updateDismissed&&<UpdateBanner onApply={handleApplyUpdate} onDismiss={()=>setUpdateDismissed(true)}/>}
-    {showSettings&&<SettingsSheet onClose={()=>setShowSettings(false)} history={history} diary={diary} photos={photos} phase={phase} onPhaseChange={handlePhaseChange} onDataRestored={handleDataRestored} profile={profile} onChangeProfile={handleOpenProfileSwitcher} theme={theme} onThemeChange={handleThemeChange} accent={accent} onAccentChange={handleAccentChange}/>}
+    {showSettings&&<SettingsSheet onClose={()=>setShowSettings(false)} history={history} diary={diary} photos={photos} phase={phase} onPhaseChange={handlePhaseChange} onDataRestored={handleDataRestored} profile={profile} onChangeProfile={handleOpenProfileSwitcher} theme={theme} onThemeChange={handleThemeChange} accent={accent} onAccentChange={handleAccentChange} voiceEnabled={voiceEnabled} onVoiceChange={handleVoiceChange}/>}
     {activeIngredient&&<IngredientSheet ingredient={activeIngredient} onClose={()=>setActiveIngredient(null)}/>}
     {activeProduct&&<ProductDetailSheet product={activeProduct} onClose={()=>setActiveProduct(null)} onOpenIngredient={setActiveIngredient}/>}
     {showImport&&<ImportPhotos onClose={()=>setShowImport(false)} onSave={handleImportDone}/>}
