@@ -1407,10 +1407,18 @@ function PhotoCapture({onClose,onSave}){
 }
 
 // ─── PHOTO VIEWER (lightbox + metadata + delete) ──
-function PhotoViewer({photo,onClose,onDelete}){
+function PhotoViewer({photo,onClose,onDelete,allPhotos}){
   if(!photo)return null;
   const [deleting,setDeleting]=React.useState(false);
+  const [zoomed,setZoomed]=React.useState(false);
+  const [compareIdx,setCompareIdx]=React.useState(null); // foto comparativa
   const moodLabels={"😍":"Radiante","🙂":"Bien","😊":"Normal","😌":"Sensible","😟":"Irritada"};
+  const sortedAll=React.useMemo(()=>allPhotos?[...allPhotos].sort((a,b)=>(a.date||"").localeCompare(b.date||"")):[],[allPhotos]);
+  const compareSuggestions=React.useMemo(()=>{
+    if(!sortedAll.length||sortedAll.length<2)return [];
+    return sortedAll.filter(p=>p.id!==photo.id).slice(0,8);
+  },[sortedAll,photo]);
+  const comparePhoto=compareIdx!=null?compareSuggestions[compareIdx]:null;
   async function handleDelete(){
     if(!confirm("¿Eliminar esta foto? No se puede deshacer."))return;
     setDeleting(true);
