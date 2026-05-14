@@ -735,6 +735,16 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient}
   </div>;
 }
 
+// ─── EXPRESS TOGGLE ──────────────────────────────
+function ExpressToggle({express,onChange}){
+  return<div style={{padding:"6px 16px 0"}}>
+    <button onClick={()=>onChange(!express)} style={{width:"100%",padding:"8px 12px",borderRadius:12,border:`1px solid ${express?P.accent:P.border}`,background:express?P.accentSoft:"transparent",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all .2s"}}>
+      <span style={{fontSize:14}}>{express?"⚡":"○"}</span>
+      <span style={{fontSize:12,fontWeight:600,color:express?P.accent:P.muted,letterSpacing:.2}}>{express?"Modo express activo · pasos esenciales":"Activar modo express (rápido)"}</span>
+    </button>
+  </div>;
+}
+
 // ─── MODE TOGGLE ─────────────────────────────────
 function ModeToggle({mode,onChange}){
   const isNight=mode==="night"||mode==="nightRetinal";
