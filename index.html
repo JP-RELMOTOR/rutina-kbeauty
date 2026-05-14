@@ -1855,6 +1855,24 @@ function HistoryScreen({history,streak,phase}){
         </div>
       </div>
     </div>
+
+    {/* SKIN LEVEL */}
+    <div style={{margin:"0 16px 14px",padding:18,borderRadius:22,background:P.card,border:`1.5px solid ${P.accent}`}}>
+      <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:skinLevel.next?12:0}}>
+        <div style={{width:54,height:54,borderRadius:27,background:P.accentSoft,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,flexShrink:0}}>{skinLevel.emoji}</div>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:10,letterSpacing:1.2,textTransform:"uppercase",color:P.accent,fontWeight:700}}>Tu nivel</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:22,color:P.text,letterSpacing:"-.3px",lineHeight:1.1,marginTop:2}}>{skinLevel.label}</div>
+          <div style={{fontSize:11,color:P.muted,marginTop:2}}>{skinLevel.desc} · {skinLevel.daysActive} días activos</div>
+        </div>
+      </div>
+      {skinLevel.next&&<>
+        <div style={{height:6,borderRadius:3,background:P.cream,overflow:"hidden",marginBottom:6}}>
+          <div style={{height:"100%",width:`${Math.max(0,Math.min(100,skinLevel.progress*100))}%`,background:P.accent,transition:"width .5s ease"}}/>
+        </div>
+        <div style={{fontSize:11,color:P.muted,textAlign:"center"}}>{skinLevel.daysToNext} día{skinLevel.daysToNext!==1?"s":""} para subir a <strong style={{color:P.text}}>{skinLevel.next.emoji} {skinLevel.next.label}</strong></div>
+      </>}
+    </div>
     <div style={{margin:"0 16px 14px",padding:"16px",borderRadius:22,background:P.card,border:`1px solid ${P.border}`}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
         <div style={{fontSize:14,fontWeight:600,color:P.text}}>Últimas 2 semanas</div>
