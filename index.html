@@ -2282,7 +2282,7 @@ async function importAllData(file){
 }
 
 // ─── SETTINGS SHEET ──────────────────────────────
-function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataRestored,profile,onChangeProfile,theme,onThemeChange}){
+function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataRestored,profile,onChangeProfile,theme,onThemeChange,accent,onAccentChange}){
   const fileRef=React.useRef();
   const [stor,setStor]=React.useState({used:0,quota:0});
   const [importing,setImporting]=React.useState(false);
