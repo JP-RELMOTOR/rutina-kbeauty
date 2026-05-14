@@ -2775,6 +2775,7 @@ function App(){
     {viewerPhoto&&<PhotoViewer photo={viewerPhoto} onClose={()=>setViewerPhoto(null)} onDelete={handlePhotoDeleted} allPhotos={photos}/>}
     {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose} profileName={profileName}/>}
     {(!profile||showProfileModal)&&<ProfileSetupModal onPick={handleProfilePick} onCancel={profile?()=>setShowProfileModal(false):null}/>}
+    {showIntention&&<IntentionModal onDone={handleIntentionDone} profileName={profileName}/>}
     {showCamera&&<PhotoCapture onClose={()=>setShowCamera(false)} onSave={handlePhotoSave}/>}
   </div>;
 }
