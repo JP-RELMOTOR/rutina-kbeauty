@@ -2072,6 +2072,7 @@ function App(){
       {tab==="history"&&<HistoryScreen history={history} streak={streak} phase={phase}/>}
       {tab==="diary"&&<DiaryScreen diary={diary} photos={photos} onAddPhoto={()=>setShowCamera(true)} onImportPhotos={()=>setShowImport(true)} onOpenJourney={()=>setShowJourney(true)} onOpenPhoto={setViewerPhoto}/>}
       {tab==="progress"&&<ProgressScreen history={history} streak={streak}/>}
+      {tab==="info"&&<InfoScreen onOpenProduct={setActiveProduct} onOpenIngredient={setActiveIngredient}/>}
     </div>
     <TabBar tab={tab} onTab={setTab}/>
     {hasUpdate&&!updateDismissed&&<UpdateBanner onApply={handleApplyUpdate} onDismiss={()=>setUpdateDismissed(true)}/>}
