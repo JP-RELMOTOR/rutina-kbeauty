@@ -1478,7 +1478,7 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
       {routine.steps.map((s,i)=>{
         const nextReal=routine.steps.slice(i+1).find(st=>!doneSteps.has(st.id));
         return<React.Fragment key={s.id}>
-          <StepCard step={s} idx={i} state={stepState(s,i)} onTap={()=>onTap(i)} onComplete={()=>onComplete(s,i)} onSkip={()=>onSkip(s,i)} nextName={nextReal?nextReal.name:null} onIngredient={onIngredient}/>
+          <StepCard step={s} idx={i} state={stepState(s,i)} onTap={()=>onTap(i)} onComplete={()=>onComplete(s,i)} onSkip={()=>onSkip(s,i)} nextName={nextReal?nextReal.name:null} onIngredient={onIngredient} onOpenProduct={onOpenProduct}/>
           {waitingAfterIdx===i&&<WaitGate totalSec={waitTotal} secsLeft={waitSecs} running={waitRunning} onToggle={onToggleWait} onSkip={onSkipWait} hint={waitHint} why={waitWhy} nextName={nextReal?nextReal.name:null}/>}
         </React.Fragment>;
       })}
