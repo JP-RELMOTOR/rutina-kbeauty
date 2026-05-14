@@ -1709,14 +1709,14 @@ function App(){
     setActiveIdx(nextIdx===-1?null:nextIdx);
   }
 
-  function handleCompleteClose(mood){
+  function handleCompleteClose(mood,note){
     const rKey=mode==="morning"?"morning":mode==="nightRetinal"?"pm_retinal":"pm_normal";
     const today=todayStr();
     const session={date:today,time:new Date().toTimeString().slice(0,5),routine:rKey,steps:completedCount};
     const newH=[...history,session];
     setHistory(newH);lsSet("kb_history",newH);
-    if(mood){
-      const entry={date:today,time:session.time,routine:rKey,feel:mood,note:""};
+    if(mood||note){
+      const entry={date:today,time:session.time,routine:rKey,feel:mood||null,note:note||""};
       const newD=[...diary,entry];setDiary(newD);lsSet("kb_diary",newD);
     }
     setShowComplete(false);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();
