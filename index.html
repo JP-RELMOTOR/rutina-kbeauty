@@ -296,6 +296,34 @@ function getDayLabel(){
   return days[getDOW()];
 }
 function todayStr(){return new Date().toISOString().split("T")[0];}
+
+// Skin Level Evolution — basado en días únicos de actividad
+const SKIN_LEVELS=[
+  {threshold:0,id:"aprendiz",label:"Aprendiz",emoji:"🌱",desc:"Empezando tu camino"},
+  {threshold:14,id:"constante",label:"Constante",emoji:"🌸",desc:"Dos semanas seguidas"},
+  {threshold:30,id:"devota",label:"Devota",emoji:"🌿",desc:"Un mes de cuidarte"},
+  {threshold:90,id:"experta",label:"Experta",emoji:"✨",desc:"Tres meses de constancia"},
+  {threshold:180,id:"sabia",label:"Sabia",emoji:"🌙",desc:"Medio año de ritual"},
+  {threshold:365,id:"maestra",label:"Maestra",emoji:"👑",desc:"Un año entero contigo"},
+];
+function getSkinLevel(history){
+  const uniqueDays=new Set(history.map(s=>s.date)).size;
+  let current=SKIN_LEVELS[0];
+  let next=null;
+  for(let i=0;i<SKIN_LEVELS.length;i++){
+    if(uniqueDays>=SKIN_LEVELS[i].threshold){
+      current=SKIN_LEVELS[i];
+      next=SKIN_LEVELS[i+1]||null;
+    }else{next=SKIN_LEVELS[i];break;}
+  }
+  return {
+    ...current,
+    daysActive:uniqueDays,
+    next:next,
+    daysToNext:next?next.threshold-uniqueDays:0,
+    progress:next?(uniqueDays-current.threshold)/(next.threshold-current.threshold):1,
+  };
+}
 // Persist routine progress so Mijal can pause and resume without losing steps.
 function saveRoutineProgress(mode,doneSet){
   if(!doneSet||doneSet.size===0){localStorage.removeItem("kb_routine_progress");return;}
