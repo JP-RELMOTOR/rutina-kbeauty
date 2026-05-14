@@ -42,7 +42,7 @@ textarea{font-family:'Inter',system-ui,sans-serif;}
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
 <script type="text/babel" data-presets="env,react">
 // ─── PALETTE ────────────────────────────────────
-const P={
+const P_LIGHT={
   bg:"#f6efe2",card:"#fefcf7",cream:"#f1ead9",
   text:"#1d1812",muted:"#9c9282",accent:"#c89849",
   accentSoft:"#f3e3bf",border:"rgba(29,24,18,0.08)",
@@ -50,6 +50,36 @@ const P={
   retinal:"#c04030",retinalSoft:"#fdecea",
   green:"#4a7c59",greenSoft:"#e8f3eb",
 };
+const P_DARK={
+  bg:"#1a1612",card:"#252119",cream:"#2c2820",
+  text:"#f3ead4",muted:"#a89b86",accent:"#d9a85a",
+  accentSoft:"#3a3024",border:"rgba(243,234,212,0.10)",
+  shadow:"rgba(0,0,0,0.50)",onDark:"#1a1612",onAccent:"#1d1812",
+  retinal:"#e86a5a",retinalSoft:"#3a1f1a",
+  green:"#7aaf8b",greenSoft:"#1f2e26",
+};
+let P=P_LIGHT;
+const _themeBumpers=new Set();
+function _systemPrefersDark(){
+  try{return window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(_){return false;}
+}
+function applyTheme(themeName){
+  const effective=themeName==="auto"?(_systemPrefersDark()?"dark":"light"):themeName;
+  P=effective==="dark"?P_DARK:P_LIGHT;
+  // CSS variables para body/html bg (no son JS-controlados)
+  try{
+    document.documentElement.style.setProperty("--app-bg",P.bg);
+    document.documentElement.style.setProperty("--app-text",P.text);
+    const meta=document.querySelector('meta[name="theme-color"]');
+    if(meta)meta.setAttribute("content",P.bg);
+  }catch(_){}
+  // Force re-render de todos los componentes que se subscribieron
+  _themeBumpers.forEach(fn=>{try{fn();}catch(_){}});
+}
+function useThemeReactive(){
+  const [,bump]=React.useReducer(x=>x+1,0);
+  React.useEffect(()=>{_themeBumpers.add(bump);return()=>_themeBumpers.delete(bump);},[]);
+}
 
 // ─── INDEXEDDB (PHOTOS) ─────────────────────────
 let _db=null;
