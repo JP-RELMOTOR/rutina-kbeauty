@@ -2295,11 +2295,10 @@ function App(){
   const profileName=profile?.name||"";
   const profileSex=profile?.sex||null;
   function handleProfilePick(p){
+    const firstTime=localStorage.getItem("kb_phase")===null;
     setupProfile(p);
     setProfile(p);
-    if(p.defaultPhase&&localStorage.getItem("kb_phase")===String(p.defaultPhase)){
-      setPhase&&setPhase(p.defaultPhase);
-    }
+    if(p.defaultPhase&&firstTime)setPhase(p.defaultPhase);
     haptic("medium");
   }
   const _restored=loadRoutineProgress(); // hoy mismo, mismo mode
