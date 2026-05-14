@@ -1913,6 +1913,13 @@ function App(){
   const [expressMode,setExpressMode]=React.useState(()=>ls("kb_express_mode",false));
   const [showRecap,setShowRecap]=React.useState(false);
   const [showJourney,setShowJourney]=React.useState(false);
+  const [viewerPhoto,setViewerPhoto]=React.useState(null);
+
+  async function handlePhotoDeleted(id){
+    const p=await dbGetPhotos();
+    setPhotos(p||[]);
+    haptic("medium");
+  }
   React.useEffect(()=>{
     if(shouldShowWeeklyRecap(history)){
       const t=setTimeout(()=>setShowRecap(true),600);
