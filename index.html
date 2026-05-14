@@ -1717,7 +1717,7 @@ function App(){
       const entry={date:today,time:session.time,routine:rKey,feel:mood,note:""};
       const newD=[...diary,entry];setDiary(newD);lsSet("kb_diary",newD);
     }
-    setShowComplete(false);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);
+    setShowComplete(false);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();
   }
 
   function handlePhotoSave(entry){
