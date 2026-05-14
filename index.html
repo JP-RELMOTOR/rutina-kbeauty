@@ -1759,6 +1759,15 @@ function App(){
   const [showImport,setShowImport]=React.useState(false);
   const [backupReminderOpen,setBackupReminderOpen]=React.useState(()=>shouldShowBackupReminder());
   const [expressMode,setExpressMode]=React.useState(()=>ls("kb_express_mode",false));
+  const [showRecap,setShowRecap]=React.useState(false);
+  React.useEffect(()=>{
+    if(shouldShowWeeklyRecap(history)){
+      const t=setTimeout(()=>setShowRecap(true),600);
+      return()=>clearTimeout(t);
+    }
+  },[]);
+  const recapStats=React.useMemo(()=>showRecap?computeWeekStats(history,diary,ROUTINES):null,[showRecap,history,diary]);
+  function handleCloseRecap(){markRecapShown();setShowRecap(false);}
   function handleExpressChange(v){setExpressMode(v);lsSet("kb_express_mode",v);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();haptic("light");}
 
   async function handleBackupExport(){
