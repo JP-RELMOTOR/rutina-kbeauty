@@ -956,6 +956,7 @@ function ImportPhotos({onClose,onSave}){
 function CompleteSheet({stats,onPhoto,onClose}){
   const mon=isMonday();
   const [mood,setMood]=React.useState(null);
+  const [note,setNote]=React.useState("");
   const moods=[{e:"😍",l:"Radiante"},{e:"🙂",l:"Bien"},{e:"😊",l:"Normal"},{e:"😌",l:"Sensible"},{e:"😟",l:"Irritada"}];
   return<div style={{position:"absolute",inset:0,zIndex:80,background:P.bg,display:"flex",flexDirection:"column",overflowY:"auto",animation:"fadeIn .4s ease",WebkitOverflowScrolling:"touch"}}>
     <div style={{flex:"0 0 auto",display:"flex",flexDirection:"column",alignItems:"center",padding:"56px 24px 18px",textAlign:"center"}}>
