@@ -2058,7 +2058,8 @@ function App(){
     {activeIngredient&&<IngredientSheet ingredient={activeIngredient} onClose={()=>setActiveIngredient(null)}/>}
     {showImport&&<ImportPhotos onClose={()=>setShowImport(false)} onSave={handleImportDone}/>}
     {showRecap&&recapStats&&<WeeklyRecapSheet stats={recapStats} onClose={handleCloseRecap}/>}
-    {showJourney&&<SkinJourneySheet photos={photos} onClose={()=>setShowJourney(false)}/>}
+    {showJourney&&<SkinJourneySheet photos={photos} onClose={()=>setShowJourney(false)} onOpenPhoto={setViewerPhoto}/>}
+    {viewerPhoto&&<PhotoViewer photo={viewerPhoto} onClose={()=>setViewerPhoto(null)} onDelete={handlePhotoDeleted}/>}
     {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose}/>}
     {showCamera&&<PhotoCapture onClose={()=>setShowCamera(false)} onSave={handlePhotoSave}/>}
   </div>;
