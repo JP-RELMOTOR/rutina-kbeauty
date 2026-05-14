@@ -1,7 +1,7 @@
 {
-  "name": "K-Beauty · Mijal",
+  "name": "K-Beauty · Skincare",
   "short_name": "K-Beauty",
-  "description": "Rutina diaria de skincare coreano paso a paso, con seguimiento de retinal, fotos de progreso y diario de piel.",
+  "description": "Rutina diaria de skincare coreano paso a paso · seguimiento de retinal, fotos de progreso, diario · multi-perfil.",
   "start_url": "/rutina-kbeauty/",
   "scope": "/rutina-kbeauty/",
   "display": "standalone",
