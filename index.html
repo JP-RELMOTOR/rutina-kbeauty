@@ -1246,10 +1246,10 @@ function DiaryScreen({diary,photos,onAddPhoto,onImportPhotos,onOpenJourney,onOpe
           <div style={{fontSize:20,lineHeight:1}}>📥</div>
           <div style={{fontSize:9,fontWeight:700,letterSpacing:.3,textAlign:"center",lineHeight:1.2}}>IMPORTAR<br/>FOTOTECA</div>
         </button>
-        {photos.slice().reverse().map((ph,i)=><div key={i} style={{width:76,height:96,borderRadius:14,flexShrink:0,overflow:"hidden",border:`1px solid ${P.border}`,position:"relative"}}>
-          <img src={ph.dataUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+        {sortedAsc.map((ph,i)=><button key={ph.id||i} onClick={()=>onOpenPhoto&&onOpenPhoto(ph)} style={{width:76,height:96,borderRadius:14,flexShrink:0,overflow:"hidden",border:`1px solid ${P.border}`,position:"relative",padding:0,cursor:"pointer",background:"none"}}>
+          <img src={ph.dataUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
           <div style={{position:"absolute",bottom:3,left:3,right:3,background:"rgba(29,24,18,.55)",borderRadius:4,padding:"2px 5px",fontSize:8,color:"white",fontFamily:"'JetBrains Mono',monospace"}}>{ph.date}</div>
-        </div>)}
+        </button>)}
         {photos.length===0&&<div style={{display:"flex",alignItems:"center",padding:"0 4px",color:P.muted,fontSize:12,fontStyle:"italic"}}>Aún no hay fotos.<br/>¡La primera es el lunes!</div>}
       </div>
     </div>
