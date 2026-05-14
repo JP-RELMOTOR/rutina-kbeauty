@@ -1723,7 +1723,7 @@ function App(){
     {showAudio&&<AudioPanel active={audioActive} volume={audioVolume} onSelect={handleAudioSelect} onVolume={handleAudioVolume} onClose={()=>setShowAudio(false)}/>}
     {activeIngredient&&<IngredientSheet ingredient={activeIngredient} onClose={()=>setActiveIngredient(null)}/>}
     {showImport&&<ImportPhotos onClose={()=>setShowImport(false)} onSave={handleImportDone}/>}
-    {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>{setShowComplete(false);setTimeout(()=>setShowCamera(true),200);}} onClose={handleCompleteClose}/>}
+    {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose}/>}
     {showCamera&&<PhotoCapture onClose={()=>setShowCamera(false)} onSave={handlePhotoSave}/>}
   </div>;
 }
