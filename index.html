@@ -1988,7 +1988,7 @@ function App(){
     <div style={{height:"100%",overflowY:"auto",paddingBottom:110,WebkitOverflowScrolling:"touch"}}>
       {tab==="today"&&<TodayScreen mode={mode} setMode={handleSetMode} routine={routine} stepState={stepState} onTap={handleTap} onComplete={handleComplete} onSkip={handleSkip} completedCount={completedCount} completedMin={completedMin} isFinished={isFinished} onShowComplete={()=>setShowComplete(true)} streak={streak} phase={phase} doneSteps={doneSteps} onOpenSettings={()=>setShowSettings(true)} onOpenAudio={()=>setShowAudio(true)} audioActive={audioActive} onIngredient={setActiveIngredient} backupReminderOpen={backupReminderOpen} onBackupExport={handleBackupExport} onBackupDismiss={handleBackupDismiss} expressMode={expressMode} onExpressChange={handleExpressChange}/>}
       {tab==="history"&&<HistoryScreen history={history} streak={streak} phase={phase}/>}
-      {tab==="diary"&&<DiaryScreen diary={diary} photos={photos} onAddPhoto={()=>setShowCamera(true)} onImportPhotos={()=>setShowImport(true)}/>}
+      {tab==="diary"&&<DiaryScreen diary={diary} photos={photos} onAddPhoto={()=>setShowCamera(true)} onImportPhotos={()=>setShowImport(true)} onOpenJourney={()=>setShowJourney(true)}/>}
       {tab==="progress"&&<ProgressScreen history={history} streak={streak}/>}
     </div>
     <TabBar tab={tab} onTab={setTab}/>
