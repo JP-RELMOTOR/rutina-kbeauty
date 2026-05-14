@@ -1677,6 +1677,17 @@ function CompleteSheet({stats,onPhoto,onClose,profileName}){
       </div>
     </div>
 
+    {/* Bienestar — sliders rápidos */}
+    <div style={{padding:"0 16px 8px"}}>
+      <div style={{padding:"14px 14px 10px",borderRadius:18,background:P.card,border:`1px solid ${P.border}`}}>
+        <div style={{fontSize:11,fontWeight:600,color:P.text,marginBottom:3,letterSpacing:"-.1px"}}>Bienestar de hoy</div>
+        <div style={{fontSize:10.5,color:P.muted,marginBottom:14}}>Estos datos correlacionan con tu piel a lo largo del tiempo</div>
+        <Slider label="Sueño anoche" emoji="😴" value={sleep} onChange={setSleep} low="poco" high="muy bien"/>
+        <Slider label="Estrés hoy" emoji="😰" value={stress} onChange={setStress} low="bajo" high="alto"/>
+        <Slider label="Agua bebida" emoji="💧" value={water} onChange={setWater} low="poca" high="2L+"/>
+      </div>
+    </div>
+
     <div style={{padding:"8px 16px 28px"}}>
       {mon
         ?<button onClick={onPhoto} style={{width:"100%",height:54,borderRadius:18,border:"none",background:P.accent,color:P.onAccent,fontSize:14,fontWeight:600,cursor:"pointer",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
