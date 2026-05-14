@@ -2230,6 +2230,11 @@ function App(){
   const [updateDismissed,setUpdateDismissed]=React.useState(false);
   const [activeIngredient,setActiveIngredient]=React.useState(null);
   const [activeProduct,setActiveProduct]=React.useState(null);
+  const allProducts=React.useMemo(()=>getUniqueProducts(),[]);
+  function openStepProduct(step){
+    const p=allProducts.find(x=>x.brand===step.brand&&x.name===step.name);
+    if(p)setActiveProduct(p);
+  }
   const [waitingAfterIdx,setWaitingAfterIdx]=React.useState(null);
   const [waitSecs,setWaitSecs]=React.useState(0);
   const [waitTotal,setWaitTotal]=React.useState(0);
