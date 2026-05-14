@@ -1343,7 +1343,7 @@ function TabBar({tab,onTab}){
 }
 
 // ─── SKIN JOURNEY TIMELINE ───────────────────────
-function SkinJourneySheet({photos,onClose}){
+function SkinJourneySheet({photos,onClose,onOpenPhoto}){
   const sorted=React.useMemo(()=>[...photos].sort((a,b)=>(a.date||"").localeCompare(b.date||"")),[photos]);
   // Pares de comparación útiles: primera vs última, hoy vs 1 mes atrás, hoy vs 3 meses atrás
   const comparisons=React.useMemo(()=>{
