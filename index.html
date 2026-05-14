@@ -474,6 +474,168 @@ function findIngredient(name){
   return INGREDIENTS.find(i=>low.includes(i.key))||null;
 }
 
+// Fichas editoriales de cada producto — historia, qué lo hace especial, datos curiosos
+const PRODUCT_INFO=[
+  {
+    brand:"COSRX",nameMatch:"Low pH Good Morning",
+    launched:2014,origin:"Seúl, Corea del Sur",size:"150 ml · pH 5.5",
+    story:"COSRX (abreviación de 'COSmetics' + 'Rx' como receta médica) revolucionó la limpieza facial en 2014. Antes de este cleanser, casi todos los gel-cleansers tenían pH 9-10 (alcalinos, que dañan la barrera cutánea). Este mantiene 5.5 — idéntico al pH natural de la piel sana. Fue la prueba de que se podía limpiar profundo sin agredir.",
+    special:"Combina BHA (betaína salicilato, más suave que ácido salicílico tradicional) con tea tree oil antibacteriano. Limpia poros, controla brotes y exfolia suavemente — todo a pH amigable. Sin alcohol, sin fragancia añadida, sin aceites esenciales fuertes.",
+    facts:[
+      "Producto cult en Reddit r/SkincareAddiction desde 2015 — uno de los primeros K-beauty masivos en occidente",
+      "Filosofía COSRX: 'minimal ingredients, maximum effect' — 8-12 ingredientes vs 30+ tradicional",
+      "Hyram Yarbro y múltiples derms occidentales lo recomiendan como 'starter K-beauty cleanser'",
+      "Su pH 5.5 era revolucionario en 2014 — hoy es estándar industria gracias en parte a este producto",
+    ],
+    bestFor:["Pieles mixtas","Pieles grasas con brotes","Principiantes en K-beauty"],
+    cautious:"Si tienes piel muy seca o barrera dañada, empieza usándolo cada 2 días — el BHA puede ser exfoliante de más al inicio.",
+  },
+  {
+    brand:"Beauty of Joseon",nameMatch:"Ginseng Essence Water",
+    launched:"2019 · marca 2010",origin:"Corea del Sur",size:"150 ml",
+    story:"Beauty of Joseon es la marca más nostálgica del K-beauty contemporáneo. Su nombre y filosofía honran la Dinastía Joseon (1392-1897), cuando las mujeres coreanas usaban ginseng, arroz y plantas medicinales para el cuidado de la piel. Cada producto reinterpreta esas tradiciones con ciencia moderna.",
+    special:"El 'water' del nombre no es agua — es el extracto mismo. 70% extracto de ginseng PANAX (no diluido) + niacinamida + ácido salicílico botánico. Fermentación de 90 días aumenta la biodisponibilidad de los 70+ ginsenósidos activos.",
+    facts:[
+      "El ginseng coreano es Patrimonio Cultural Inmaterial de Corea por sus 2000+ años de uso medicinal",
+      "BOJ creció exponencialmente al llegar a EE.UU. en 2020 — viral en Sephora US, Cult Beauty UK",
+      "Sin parabenos, sin sulfatos, sin fragancia, sin alcohol — apto piel sensible",
+      "El packaging imita caligrafía hanja tradicional coreana",
+    ],
+    bestFor:["Pieles deshidratadas","Pieles maduras","Buscando 'glass skin' coreano"],
+    cautious:"Si eres alérgica a ginseng o ginsenósidos (raro), evítalo.",
+  },
+  {
+    brand:"Axis-Y",nameMatch:"Dark Spot Correcting",
+    launched:"2018",origin:"Corea del Sur",size:"50 ml",
+    story:"Axis-Y nació en 2018 con filosofía 'skincare with a purpose' — solo productos esenciales, sin releases constantes ni gimmicks. Su nombre (axis = eje) refleja la idea de que cada producto debe ser un pilar real de la rutina. Hoy son referentes del 'less is more' en K-beauty contemporáneo.",
+    special:"Triple acción: niacinamida 5% (aclara manchas y poros) + 11% Sea Buckthorn (acerola coreana, vitamina C natural) + squalane derivado de OLIVO (ético, no de tiburón como antes era estándar).",
+    facts:[
+      "Vegano y cruelty-free certificado por LeapingBunny",
+      "Premiado como 'Best Niacinamida Serum' en K-beauty awards 2021, 2022 y 2023",
+      "Sin parabenos, sin alcohol, sin sulfatos, sin colorantes",
+      "Resultados visibles en 4-8 semanas con uso constante",
+    ],
+    bestFor:["Manchas post-acné","Hiperpigmentación","Pieles con tono desigual"],
+    cautious:"Si te pica al aplicar, espacia a cada 2 días al inicio. Necesita SPF AM obligatorio.",
+  },
+  {
+    brand:"COSRX",nameMatch:"Hyaluronic Acid Intensive",
+    launched:"2017",origin:"Corea del Sur",size:"100 ml",
+    story:"Una de las cremas más recomendadas del K-beauty para principiantes. COSRX la diseñó como un staple — el producto al que vuelves después de probar todo. Sin promesas exageradas, solo los tres ingredientes esenciales para barrera sana, bien formulados.",
+    special:"72% sodio hialuronato (concentración alta) + ceramida NP 0.05% (plant-based) + panthenol B5. Textura ligera apta para piel mixta y grasa — raro para una crema. Triple acción: humectante + sellador + reparador.",
+    facts:[
+      "La crema 'starter K-beauty' por excelencia",
+      "Combina los 3 ingredientes esenciales para reparar barrera cutánea",
+      "Sin fragancia, sin aceites esenciales fuertes, sin alcohol",
+      "Apta para piel sensible, reactiva y post-procedimientos",
+    ],
+    bestFor:["Todos los tipos de piel","Piel sensible","Buscando barrera reforzada"],
+    cautious:"Si tu piel es MUY grasa puede sentirse un poco pesada — usa cantidad pequeña.",
+  },
+  {
+    brand:"Skin1004",nameMatch:"Centella Hyalu-Cica Sun Serum",
+    launched:"2022",origin:"Corea del Sur",size:"50 ml",
+    story:"Skin1004 hizo de la Centella Asiática (de Madagascar específicamente) su sello distintivo. Sourcing trazable directamente desde cooperativas en Madagascar — pagan precios justos a los productores. Su filosofía 'farm-to-face' es genuina, no marketing.",
+    special:"Filtros químicos modernos + Centella + Ácido Hialurónico — textura 'sun serum' (no crema gruesa, no deja velo blanco). PA++++ es la MÁXIMA protección UVA disponible en cosmética.",
+    facts:[
+      "Viral en TikTok 2023-2024 como el 'SPF invisible'",
+      "Madagascar Centella es la variedad con mayor concentración de madecasósido (calmante más potente)",
+      "Apta para piel muy sensible y post-procedimiento (post-láser, post-microneedling)",
+      "La marca paga directamente a cooperativas malgaches (no intermediarios)",
+    ],
+    bestFor:["Pieles sensibles","Tonos morenos (no deja blanco)","Uso diario obligatorio"],
+    cautious:"Re-aplica cada 2 horas si estás expuesta al sol directo. Necesitas media cucharadita para cara + cuello.",
+  },
+  {
+    brand:"Banila Co",nameMatch:"Clean It Zero",
+    launched:"2010",origin:"Corea del Sur",size:"100 ml",
+    story:"Banila Co nació en 2005, pero fue su 'Clean It Zero' de 2010 quien la puso en el mapa mundial. Este balm popularizó la doble limpieza coreana al resto del mundo — antes, en occidente, casi nadie limpiaba la cara dos veces. Hoy es estándar.",
+    special:"Textura tri-fase: sólido al tacto → aceite al masajear → leche al añadir agua (auto-emulsifica sin dejar residuo). Disuelve SPF, sebo y maquillaje sin esfuerzo. Acerola Berry (vitamina C natural) + vitamina E como bonus antioxidante.",
+    facts:[
+      "Top 1 en categoría cleansing balm en Corea desde 2014 — sin pausa",
+      "En 2023 cumplió 13 años en el mercado — longevidad rara en K-beauty",
+      "Pionero del concepto 'first cleanse' en occidente",
+      "Su pink pastel es marca registrada",
+    ],
+    bestFor:["Quienes usan SPF a diario","Pieles mixtas y normales","Doble limpieza nocturna"],
+    cautious:"Pieles muy acneicas pueden preferir versiones 'Purifying' (mismo balm pero sin algunos ingredientes).",
+  },
+  {
+    brand:"Mizon",nameMatch:"Snail Repair Intensive",
+    launched:"2014",origin:"Corea del Sur · marca 2007",size:"50 ml",
+    story:"Mizon fue una de las marcas que occidentalizó la mucina de caracol — un ingrediente con uso clínico documentado en Corea desde los años 80, originalmente para cicatrizar quemaduras menores. De ahí saltó a cosmética cuando se confirmaron sus efectos regenerativos.",
+    special:"80% filtrado puro de mucina de caracol — de las concentraciones más altas del mercado. Adenosina (antiedad) + alantoína (calmante) complementan. La mucina contiene glicoproteínas, ácido glicólico natural, péptidos y hialurónico — multifunción en una sola molécula.",
+    facts:[
+      "Filtrado purificado: los caracoles NO sufren ni mueren en el proceso (marcas serias)",
+      "Se usa en clínicas para acelerar cicatrización post-procedimiento",
+      "Apta para todos los tipos de piel, incluyendo acneica",
+      "Resultados visibles en 4-8 semanas — la mucina es 'lenta pero efectiva'",
+    ],
+    bestFor:["Cicatrices de acné","Pieles deshidratadas","Líneas finas tempranas"],
+    cautious:"Si eres vegana, esto contiene producto animal. Hay alternativas con bakuchiol que reemplazan.",
+  },
+  {
+    brand:"Skin1004",nameMatch:"Madagascar Centella Ampoule",
+    launched:"2017",origin:"Corea del Sur",size:"100 ml",
+    story:"El producto hero de Skin1004 — el que puso a la marca en el radar K-beauty global. Una ampoule revolucionaria: 100% extracto de Centella Asiática Madagascar, sin agua añadida en la fórmula. El 'agua' del producto viene del extracto botánico mismo.",
+    special:"Los 4 compuestos calmantes activos de Centella están aquí: madecasósido, asiaticósido, ácido asiático y madecásico. Cada uno trabaja distinto: anti-inflamación, regeneración, estímulo de colágeno y barrera. Es el calmante #1 recomendado por dermatólogos K-beauty.",
+    facts:[
+      "Aparece en virtualmente todas las 'Top 10 K-beauty must-haves' anuales",
+      "Apta para uso post-láser, post-microneedling, post-procedimientos",
+      "Calma rojez y reactividad en minutos — uso inmediato post-irritación",
+      "Sin alcohol, sin fragancia, sin aceites esenciales — apta dermatitis y rosácea",
+    ],
+    bestFor:["Pieles reactivas","Post-procedimiento estético","Eczema y dermatitis"],
+    cautious:"Sin precauciones — es uno de los productos más seguros del K-beauty.",
+  },
+  {
+    brand:"Beauty of Joseon",nameMatch:"Revive Serum",
+    launched:"2022",origin:"Corea del Sur",size:"30 ml",
+    story:"Parte de la línea 'Revive' de Beauty of Joseon — sus productos más modernos y enfocados, lanzados desde 2022. Combina dos ingredientes hero del K-beauty (ginseng tradicional + mucina contemporánea) en una sola fórmula sinérgica.",
+    special:"Ginseng Panax 63% + Mucina de Caracol 3% + Niacinamida 2%. Tradición coreana + ciencia clínica moderna. Sin alcohol, sin fragancia, sin parabenos. Textura serum ligera, absorbe sin pegajosidad.",
+    facts:[
+      "Rápidamente best-seller de BOJ desde su lanzamiento 2022",
+      "63% ginseng es de las concentraciones más altas en un sérum global",
+      "Combina filosofía antigua (ginseng coreano) + clínica moderna (mucina filtrada)",
+      "Niacinamida 2% suficiente para brillo, sin saturación",
+    ],
+    bestFor:["Antiedad temprana","Pieles maduras","Buscando reparar barrera"],
+    cautious:"Contiene producto animal (mucina) — no apto vegano.",
+  },
+  {
+    brand:"K-Secret",nameMatch:"Seoul 1988",
+    launched:"2022",origin:"Corea del Sur",size:"30 ml",
+    story:"K-Secret es una marca menos conocida globalmente pero muy respetada en Corea. 'Seoul 1988' rinde homenaje a los Juegos Olímpicos de Seúl — el momento en que Corea se abrió al mundo. Cada producto de esta línea celebra esa apertura: tradición coreana llevada a estándares internacionales.",
+    special:"2% retinal LIPOSOMADO (encapsulado en lípidos para liberación gradual = mucho menos irritación que retinal libre). Bakuchiol potencia el activo. Ginseng negro fermentado — más potente que el rojo tradicional. Esta combinación tripartita es de las más avanzadas en retinol-based skincare hoy.",
+    facts:[
+      "Retinal es 11× más potente que retinol con MENOS irritación",
+      "Liposomas reducen la irritación típica del retinal ~40% según estudios",
+      "Bakuchiol+Retinal es la combinación más estudiada 2020-2024 en dermo-cosmética",
+      "2% es de las concentraciones más altas disponibles sin receta médica",
+    ],
+    bestFor:["Líneas finas marcadas","Manchas resistentes","Antiedad serio"],
+    cautious:"AUMENTA sensibilidad al sol — SPF AM obligatorio. Empieza 2×/semana, sube gradual. Evita ojos (1cm), bordes labios y nariz. No usar embarazada/lactancia.",
+  },
+  {
+    brand:"Beauty of Joseon",nameMatch:"Revive Eye Serum",
+    launched:"2023",origin:"Corea del Sur",size:"30 ml",
+    story:"Versión 'contorno de ojos' del Revive Serum de Beauty of Joseon. Retinal a concentración suave (mucho menor que en producto facial) diseñado específicamente para la piel más delicada del rostro.",
+    special:"Retinal liposomado a baja concentración + Ginseng Panax 10% + ceramida NP. La ceramida fortalece la barrera ultradelgada del párpado. Niacinamida 2% ilumina ojeras.",
+    facts:[
+      "Uno de los pocos eye serums con retinal a precio accesible",
+      "Lanzado 2023, parte de la línea Revive de BOJ",
+      "Aplicar SOLO con dedo anular (el más débil) para minimizar tracción",
+      "Un grano de arroz alcanza para ambos ojos",
+    ],
+    bestFor:["Líneas finas del ojo","Ojeras pigmentadas","Antiedad zona ocular"],
+    cautious:"Evita contacto directo con el ojo (1cm de distancia). Si pica, espacia uso. SPF obligatorio.",
+  },
+];
+function getProductInfo(product){
+  if(!product||!product.brand||!product.name)return null;
+  return PRODUCT_INFO.find(info=>info.brand===product.brand&&product.name.includes(info.nameMatch))||null;
+}
+
 // Aggrega productos únicos desde las 3 rutinas (mismo producto puede aparecer en varias)
 function getUniqueProducts(){
   const seen=new Map();
