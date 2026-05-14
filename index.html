@@ -60,6 +60,21 @@ const P_DARK={
   retinal:"#e86a5a",retinalSoft:"#3a1f1a",
   green:"#7aaf8b",greenSoft:"#1f2e26",
 };
+// Accent presets — el dorado se puede cambiar por cualquiera de estos
+const ACCENT_PRESETS={
+  gold:    {name:"Dorado clásico",accent:"#c89849",accentSoft:"#f3e3bf",accentSoftDark:"#3a3024",accentDark:"#d9a85a"},
+  rose:    {name:"Rosa antiguo",  accent:"#c87878",accentSoft:"#f5dcdc",accentSoftDark:"#3a2424",accentDark:"#dc8e8e"},
+  sage:    {name:"Verde sage",    accent:"#7a9c7a",accentSoft:"#dee9dc",accentSoftDark:"#1f2e24",accentDark:"#9bb89c"},
+  lavender:{name:"Lavanda",       accent:"#9c8ac8",accentSoft:"#e2dcf0",accentSoftDark:"#252035",accentDark:"#b6a4dc"},
+  coral:   {name:"Coral",         accent:"#e08a6a",accentSoft:"#f7d8c5",accentSoftDark:"#3a2820",accentDark:"#f0a085"},
+};
+function applyAccent(accentKey,intoDark){
+  const preset=ACCENT_PRESETS[accentKey]||ACCENT_PRESETS.gold;
+  P_LIGHT.accent=preset.accent;
+  P_LIGHT.accentSoft=preset.accentSoft;
+  P_DARK.accent=preset.accentDark;
+  P_DARK.accentSoft=preset.accentSoftDark;
+}
 let P=P_LIGHT;
 const _themeBumpers=new Set();
 // Inicializar P ANTES del primer render para evitar flash claro→oscuro
