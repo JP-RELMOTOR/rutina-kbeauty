@@ -1286,6 +1286,102 @@ function TabBar({tab,onTab}){
   </div>;
 }
 
+// ─── SKIN JOURNEY TIMELINE ───────────────────────
+function SkinJourneySheet({photos,onClose}){
+  const sorted=React.useMemo(()=>[...photos].sort((a,b)=>(a.date||"").localeCompare(b.date||"")),[photos]);
+  // Pares de comparación útiles: primera vs última, hoy vs 1 mes atrás, hoy vs 3 meses atrás
+  const comparisons=React.useMemo(()=>{
+    if(sorted.length<2)return [];
+    const out=[];
+    const latest=sorted[sorted.length-1];
+    const first=sorted[0];
+    out.push({label:"Primera foto · ahora",a:first,b:latest});
+    const findClosest=(targetDate)=>{
+      let best=null,bestDiff=Infinity;
+      for(const p of sorted){
+        const diff=Math.abs(new Date(p.date)-new Date(targetDate));
+        if(diff<bestDiff){bestDiff=diff;best=p;}
+      }
+      return best;
+    };
+    const latestDt=new Date(latest.date);
+    const oneMo=new Date(latestDt);oneMo.setMonth(oneMo.getMonth()-1);
+    const threeMo=new Date(latestDt);threeMo.setMonth(threeMo.getMonth()-3);
+    if(oneMo>=new Date(first.date)){
+      const p=findClosest(oneMo.toISOString().split("T")[0]);
+      if(p&&p.date!==latest.date&&p.date!==first.date)out.push({label:"Hace ~1 mes · ahora",a:p,b:latest});
+    }
+    if(threeMo>=new Date(first.date)){
+      const p=findClosest(threeMo.toISOString().split("T")[0]);
+      if(p&&p.date!==latest.date&&p.date!==first.date)out.push({label:"Hace ~3 meses · ahora",a:p,b:latest});
+    }
+    return out;
+  },[sorted]);
+  // Agrupar por mes para la línea de tiempo
+  const byMonth=React.useMemo(()=>{
+    const m={};
+    sorted.forEach(p=>{const k=p.date?.slice(0,7)||"sin-fecha";(m[k]=m[k]||[]).push(p);});
+    return Object.entries(m).sort((a,b)=>a[0].localeCompare(b[0]));
+  },[sorted]);
+  const monthName=key=>{
+    if(key==="sin-fecha")return "Sin fecha";
+    const [y,mo]=key.split("-");
+    const names=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+    return `${names[parseInt(mo)-1]} ${y}`;
+  };
+  return<div style={{position:"absolute",inset:0,zIndex:82,background:P.bg,overflowY:"auto",animation:"fadeIn .3s ease",WebkitOverflowScrolling:"touch"}}>
+    <div style={{padding:"52px 16px 8px",display:"flex",alignItems:"center",gap:10}}>
+      <button onClick={onClose} style={{width:36,height:36,borderRadius:18,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Icon n="arrow" size={16} color={P.text} sw={2}/></button>
+      <div style={{flex:1}}>
+        <div style={{fontSize:11,letterSpacing:1.2,textTransform:"uppercase",color:P.accent,fontWeight:700}}>Tu evolución</div>
+        <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:24,color:P.text,letterSpacing:"-.4px",lineHeight:1.1}}>Skin Journey</div>
+      </div>
+    </div>
+
+    {sorted.length<2?<div style={{padding:"60px 24px",textAlign:"center"}}>
+      <div style={{fontSize:36,marginBottom:14}}>📸</div>
+      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:18,color:P.text,marginBottom:6}}>Aún no hay suficientes fotos</div>
+      <div style={{fontSize:13,color:P.muted,lineHeight:1.5}}>Necesitas al menos 2 fotos para ver tu evolución.<br/>Toma fotos los lunes para construir tu historial.</div>
+    </div>:<>
+
+      {/* Comparaciones automáticas */}
+      {comparisons.length>0&&<div style={{padding:"6px 16px 14px"}}>
+        <div style={{fontSize:11,letterSpacing:1.2,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:10,marginTop:8}}>Antes / ahora</div>
+        {comparisons.map((c,i)=><div key={i} style={{marginBottom:14,padding:14,borderRadius:20,background:P.card,border:`1px solid ${P.border}`}}>
+          <div style={{fontSize:12,color:P.muted,marginBottom:10,fontWeight:600,letterSpacing:.3}}>{c.label}</div>
+          <div style={{display:"flex",gap:8}}>
+            {[c.a,c.b].map((p,j)=><div key={j} style={{flex:1}}>
+              <div style={{aspectRatio:"3/4",borderRadius:14,overflow:"hidden",border:`1px solid ${P.border}`,position:"relative"}}>
+                <img src={p.dataUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                {j===1&&<div style={{position:"absolute",top:6,right:6,padding:"2px 8px",borderRadius:6,background:P.accent,color:P.onAccent,fontSize:9,fontWeight:700,letterSpacing:.3}}>AHORA</div>}
+              </div>
+              <div style={{fontSize:10,color:P.muted,marginTop:6,fontFamily:"'JetBrains Mono',monospace",textAlign:"center"}}>{p.date}</div>
+              {p.feel&&<div style={{fontSize:14,textAlign:"center",marginTop:2}}>{p.feel}</div>}
+            </div>)}
+          </div>
+        </div>)}
+      </div>}
+
+      {/* Línea de tiempo por mes */}
+      <div style={{padding:"4px 16px 24px"}}>
+        <div style={{fontSize:11,letterSpacing:1.2,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:10}}>Mes a mes · {sorted.length} fotos</div>
+        {byMonth.map(([month,list])=><div key={month} style={{marginBottom:18}}>
+          <div style={{display:"flex",alignItems:"baseline",gap:8,marginBottom:8,padding:"6px 4px",borderBottom:`1px solid ${P.border}`}}>
+            <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:18,color:P.text,letterSpacing:"-.2px"}}>{monthName(month)}</div>
+            <div style={{fontSize:11,color:P.muted}}>{list.length} foto{list.length!==1?"s":""}</div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+            {list.map((p,i)=><div key={i} style={{aspectRatio:"3/4",borderRadius:10,overflow:"hidden",border:`1px solid ${P.border}`,position:"relative"}}>
+              <img src={p.dataUrl} alt="" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+              <div style={{position:"absolute",bottom:3,left:3,right:3,background:"rgba(29,24,18,.6)",borderRadius:4,padding:"2px 4px",fontSize:8,color:"white",fontFamily:"'JetBrains Mono',monospace",textAlign:"center"}}>{p.date?.slice(-5)||"--"}</div>
+            </div>)}
+          </div>
+        </div>)}
+      </div>
+    </>}
+  </div>;
+}
+
 // ─── WEEKLY RECAP (domingo estilo Wrapped) ───────
 function computeWeekStats(history,diary,routines){
   const today=new Date();
