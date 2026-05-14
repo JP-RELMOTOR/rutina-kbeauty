@@ -1087,9 +1087,16 @@ function DayPlanBanner({phase,onStartRoutine}){
 }
 
 // ─── STEP CARD ───────────────────────────────────
-function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,onOpenProduct,profileName}){
+function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,onOpenProduct,profileName,voiceEnabled}){
   const photoClick=e=>{if(!step.photo||!onOpenProduct)return;e.stopPropagation();onOpenProduct(step);};
   const animoText=interpolateName(step.animo,profileName);
+  // Habla el tip cuando el paso se activa (si voice está prendida)
+  React.useEffect(()=>{
+    if(state==="active"&&voiceEnabled&&step.tip){
+      const t=setTimeout(()=>speakText(step.tip),300);
+      return()=>clearTimeout(t);
+    }
+  },[state,voiceEnabled]);
   if(nextName) step={...step,_next:nextName};
   const isActive=state==="active",isDone=state==="done";
   const totalSec=Math.round(step.min*60);
