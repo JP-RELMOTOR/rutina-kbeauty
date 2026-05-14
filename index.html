@@ -2410,6 +2410,14 @@ function App(){
   const [profile,setProfile]=React.useState(()=>getProfile());
   const [showProfileModal,setShowProfileModal]=React.useState(false);
   const [theme,setThemeState]=React.useState(()=>ls("kb_theme","auto"));
+  const [accent,setAccentState]=React.useState(()=>ls("kb_accent","gold"));
+  function handleAccentChange(a){
+    setAccentState(a);
+    lsSet("kb_accent",a);
+    applyAccent(a);
+    applyTheme(theme); // re-aplica tema para refrescar P
+    haptic("light");
+  }
   useThemeReactive(); // se re-renderea cuando applyTheme dispara
   // Aplicar tema al inicio + escuchar cambios del sistema
   React.useEffect(()=>{
