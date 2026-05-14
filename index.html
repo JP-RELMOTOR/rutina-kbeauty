@@ -975,17 +975,18 @@ function CompleteSheet({stats,onPhoto,onClose}){
       </div>
     </div>
 
-    {/* MOOD: ahora al final (más preciso que al inicio) */}
+    {/* MOOD + NOTA: al final (más preciso que al inicio) */}
     <div style={{padding:"4px 16px 8px"}}>
       <div style={{padding:"14px 14px 12px",borderRadius:18,background:P.card,border:`1px solid ${P.border}`}}>
         <div style={{fontSize:13,fontWeight:600,color:P.text,marginBottom:3,letterSpacing:"-.1px"}}>¿Cómo está tu piel ahora?</div>
         <div style={{fontSize:11,color:P.muted,marginBottom:12}}>Alimenta tu diario · puedes saltar</div>
-        <div style={{display:"flex",gap:6}}>
+        <div style={{display:"flex",gap:6,marginBottom:12}}>
           {moods.map(m=><button key={m.e} onClick={()=>setMood(m.e)} style={{flex:1,padding:"8px 2px",borderRadius:12,border:`1.5px solid ${mood===m.e?P.accent:P.border}`,background:mood===m.e?P.accentSoft:"transparent",cursor:"pointer",transition:"all .2s",textAlign:"center"}}>
             <div style={{fontSize:22}}>{m.e}</div>
             <div style={{fontSize:9,color:P.muted,marginTop:2,fontWeight:600}}>{m.l}</div>
           </button>)}
         </div>
+        <textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Nota opcional · clima, brote, sensación..." rows={2} style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:12,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:13,resize:"none",outline:"none",fontFamily:"inherit",lineHeight:1.4}}/>
       </div>
     </div>
 
