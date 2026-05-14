@@ -1473,7 +1473,7 @@ function ImportPhotos({onClose,onSave}){
 }
 
 // ─── COMPLETE SHEET ──────────────────────────────
-function CompleteSheet({stats,onPhoto,onClose}){
+function CompleteSheet({stats,onPhoto,onClose,profileName}){
   const mon=isMonday();
   const [mood,setMood]=React.useState(null);
   const [note,setNote]=React.useState("");
