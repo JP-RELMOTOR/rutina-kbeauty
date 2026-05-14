@@ -2078,6 +2078,7 @@ function App(){
     {hasUpdate&&!updateDismissed&&<UpdateBanner onApply={handleApplyUpdate} onDismiss={()=>setUpdateDismissed(true)}/>}
     {showSettings&&<SettingsSheet onClose={()=>setShowSettings(false)} history={history} diary={diary} photos={photos} phase={phase} onPhaseChange={handlePhaseChange} onDataRestored={handleDataRestored}/>}
     {activeIngredient&&<IngredientSheet ingredient={activeIngredient} onClose={()=>setActiveIngredient(null)}/>}
+    {activeProduct&&<ProductDetailSheet product={activeProduct} onClose={()=>setActiveProduct(null)} onOpenIngredient={setActiveIngredient}/>}
     {showImport&&<ImportPhotos onClose={()=>setShowImport(false)} onSave={handleImportDone}/>}
     {showRecap&&recapStats&&<WeeklyRecapSheet stats={recapStats} onClose={handleCloseRecap}/>}
     {showJourney&&<SkinJourneySheet photos={photos} onClose={()=>setShowJourney(false)} onOpenPhoto={setViewerPhoto}/>}
