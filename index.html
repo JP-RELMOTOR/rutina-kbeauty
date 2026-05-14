@@ -1031,6 +1031,7 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
     <DayPlanBanner phase={phase}/>
     <DailyTip/>
     <ModeToggle mode={mode} onChange={setMode}/>
+    <ExpressToggle express={expressMode} onChange={onExpressChange}/>
     <div style={{padding:"14px 16px 10px"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
         <div style={{fontSize:11,color:P.muted,letterSpacing:.3,textTransform:"uppercase",fontWeight:600}}>Progreso</div>
