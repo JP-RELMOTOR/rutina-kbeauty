@@ -1535,7 +1535,7 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
     </div>
     {backupReminderOpen&&<BackupReminder onExport={onBackupExport} onDismiss={onBackupDismiss}/>}
     <DayPlanBanner phase={phase}/>
-    <DailyTip/>
+    <DailyTip profileSex={profileSex}/>
     <ModeToggle mode={mode} onChange={setMode}/>
     <ExpressToggle express={expressMode} onChange={onExpressChange}/>
     <div style={{padding:"14px 16px 10px"}}>
