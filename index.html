@@ -2516,6 +2516,8 @@ function App(){
   const [theme,setThemeState]=React.useState(()=>ls("kb_theme","auto"));
   const [accent,setAccentState]=React.useState(()=>ls("kb_accent","gold"));
   const [voiceEnabled,setVoiceEnabled]=React.useState(()=>ls("kb_voice",false));
+  const [showIntention,setShowIntention]=React.useState(false);
+  const [pendingFirstIdx,setPendingFirstIdx]=React.useState(null);
   function handleVoiceChange(v){setVoiceEnabled(v);lsSet("kb_voice",v);if(!v)stopSpeaking();haptic("light");}
   function handleAccentChange(a){
     setAccentState(a);
