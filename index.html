@@ -2868,6 +2868,23 @@ function App(){
   const [backupReminderOpen,setBackupReminderOpen]=React.useState(()=>shouldShowBackupReminder());
   const [expressMode,setExpressMode]=React.useState(()=>ls("kb_express_mode",false));
   const [showRecap,setShowRecap]=React.useState(false);
+  const [showYearWrapped,setShowYearWrapped]=React.useState(false);
+  React.useEffect(()=>{
+    if(shouldShowYearWrapped(history)){
+      const t=setTimeout(()=>setShowYearWrapped(true),1200);
+      return()=>clearTimeout(t);
+    }
+  },[]);
+  const yearStats=React.useMemo(()=>{
+    if(!showYearWrapped)return null;
+    const today=new Date();
+    const year=today.getMonth()===0?today.getFullYear()-1:today.getFullYear();
+    return computeYearStats(history,diary,photos,year);
+  },[showYearWrapped,history,diary,photos]);
+  function handleCloseYearWrapped(){
+    if(yearStats)markYearWrappedShown(yearStats.year);
+    setShowYearWrapped(false);
+  }
   const [showJourney,setShowJourney]=React.useState(false);
   const [viewerPhoto,setViewerPhoto]=React.useState(null);
 
