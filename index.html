@@ -1437,11 +1437,32 @@ function PhotoViewer({photo,onClose,onDelete,allPhotos}){
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6"/></svg>
       </button>
     </div>
-    <div onClick={onClose} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 12px",overflow:"hidden",cursor:"pointer"}}>
-      <img src={photo.dataUrl} alt="" onClick={e=>e.stopPropagation()} style={{maxWidth:"100%",maxHeight:"100%",borderRadius:14,objectFit:"contain",cursor:"default"}}/>
+    <div onClick={comparePhoto?null:onClose} onDoubleClick={()=>setZoomed(z=>!z)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 12px",overflow:"hidden",cursor:"pointer",gap:8}}>
+      {comparePhoto?<>
+        <div onClick={e=>{e.stopPropagation();}} style={{flex:1,height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6}}>
+          <div style={{fontSize:9,letterSpacing:1.2,color:"rgba(255,255,255,.5)",fontWeight:700,textTransform:"uppercase"}}>antes · {comparePhoto.date}</div>
+          <img src={comparePhoto.dataUrl} alt="" style={{maxWidth:"100%",maxHeight:"90%",borderRadius:12,objectFit:"contain"}}/>
+        </div>
+        <div onClick={e=>{e.stopPropagation();}} style={{flex:1,height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6}}>
+          <div style={{fontSize:9,letterSpacing:1.2,color:"rgba(255,255,255,.85)",fontWeight:700,textTransform:"uppercase"}}>después · {photo.date}</div>
+          <img src={photo.dataUrl} alt="" style={{maxWidth:"100%",maxHeight:"90%",borderRadius:12,objectFit:"contain"}}/>
+        </div>
+      </>:<img src={photo.dataUrl} alt="" onClick={e=>e.stopPropagation()} style={{maxWidth:zoomed?"none":"100%",maxHeight:zoomed?"none":"100%",borderRadius:14,objectFit:"contain",cursor:"default",transform:zoomed?"scale(1.8)":"scale(1)",transition:"transform .3s ease"}}/>}
     </div>
-    <div style={{padding:"16px 20px 32px",background:"linear-gradient(180deg,rgba(13,10,7,0),rgba(13,10,7,.92) 30%)"}}>
-      {(photo.feel||photo.note)&&<div style={{padding:"14px 16px",borderRadius:18,background:"rgba(255,255,255,.08)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
+    <div style={{padding:"12px 20px 28px",background:"linear-gradient(180deg,rgba(13,10,7,0),rgba(13,10,7,.92) 25%)"}}>
+      {/* Comparar */}
+      {compareSuggestions.length>0&&<div style={{marginBottom:12,padding:"10px 12px",borderRadius:14,background:"rgba(255,255,255,.08)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
+          <span style={{fontSize:10,letterSpacing:1.2,textTransform:"uppercase",color:"rgba(255,255,255,.6)",fontWeight:700}}>{comparePhoto?"Comparando con":"Comparar con"}</span>
+          {comparePhoto&&<button onClick={()=>setCompareIdx(null)} style={{marginLeft:"auto",padding:"2px 8px",borderRadius:6,border:"none",background:"rgba(255,255,255,.15)",color:"white",fontSize:10,fontWeight:600,cursor:"pointer"}}>cerrar</button>}
+        </div>
+        <div style={{display:"flex",gap:6,overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
+          {compareSuggestions.map((p,i)=><button key={p.id||i} onClick={()=>setCompareIdx(compareIdx===i?null:i)} style={{width:44,height:44,borderRadius:10,border:compareIdx===i?`2px solid white`:"1px solid rgba(255,255,255,.2)",padding:0,overflow:"hidden",cursor:"pointer",flexShrink:0,background:"none"}}>
+            <img src={p.dataUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+          </button>)}
+        </div>
+      </div>}
+      {(photo.feel||photo.note)&&!comparePhoto&&<div style={{padding:"14px 16px",borderRadius:18,background:"rgba(255,255,255,.08)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
         {photo.feel&&<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:photo.note?8:0}}>
           <div style={{fontSize:30}}>{photo.feel}</div>
           <div>
@@ -1451,7 +1472,7 @@ function PhotoViewer({photo,onClose,onDelete,allPhotos}){
         </div>}
         {photo.note&&<div style={{fontSize:13,color:"rgba(255,255,255,.9)",lineHeight:1.5,fontStyle:photo.feel?"italic":"normal"}}>{photo.note}</div>}
       </div>}
-      {!photo.feel&&!photo.note&&<div style={{fontSize:12,color:"rgba(255,255,255,.4)",textAlign:"center"}}>Sin mood ni nota guardados</div>}
+      {!photo.feel&&!photo.note&&!comparePhoto&&<div style={{fontSize:11,color:"rgba(255,255,255,.4)",textAlign:"center",marginTop:4}}>Doble tap en la foto para zoom · Tap fuera para cerrar</div>}
     </div>
   </div>;
 }
