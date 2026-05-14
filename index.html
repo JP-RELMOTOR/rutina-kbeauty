@@ -997,7 +997,7 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
     <div style={{padding:"56px 20px 10px",position:"relative"}}>
       <div style={{fontSize:12,color:P.muted,letterSpacing:.3,marginBottom:2}}>{greeting}, Mijal</div>
       <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:30,fontWeight:500,color:P.text,letterSpacing:"-.6px",lineHeight:1.05,marginBottom:16}}>Tu rutina de hoy</div>
-      <button onClick={onOpenAudio} aria-label="Música ambient" style={{position:"absolute",top:54,right:64,width:38,height:38,borderRadius:19,border:`1px solid ${audioActive?P.accent:P.border}`,background:audioActive?P.accentSoft:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",position:"absolute",fontSize:16}}>
+      <button onClick={onOpenAudio} aria-label="Música ambient" style={{position:"absolute",top:54,right:64,width:38,height:38,borderRadius:19,border:`1px solid ${audioActive?P.accent:P.border}`,background:audioActive?P.accentSoft:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:16}}>
         {audioActive?"🎵":"🔇"}
       </button>
       <button onClick={onOpenSettings} aria-label="Ajustes" style={{position:"absolute",top:54,right:18,width:38,height:38,borderRadius:19,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
