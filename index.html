@@ -1510,16 +1510,22 @@ function PhotoViewer({photo,onClose,onDelete,allPhotos}){
       </button>
     </div>
     <div onClick={comparePhoto?null:onClose} onDoubleClick={()=>setZoomed(z=>!z)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 12px",overflow:"hidden",cursor:"pointer",gap:8}}>
-      {comparePhoto?<>
-        <div onClick={e=>{e.stopPropagation();}} style={{flex:1,height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6}}>
-          <div style={{fontSize:9,letterSpacing:1.2,color:"rgba(255,255,255,.5)",fontWeight:700,textTransform:"uppercase"}}>antes · {comparePhoto.date}</div>
-          <img src={comparePhoto.dataUrl} alt="" style={{maxWidth:"100%",maxHeight:"90%",borderRadius:12,objectFit:"contain"}}/>
-        </div>
-        <div onClick={e=>{e.stopPropagation();}} style={{flex:1,height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6}}>
-          <div style={{fontSize:9,letterSpacing:1.2,color:"rgba(255,255,255,.85)",fontWeight:700,textTransform:"uppercase"}}>después · {photo.date}</div>
-          <img src={photo.dataUrl} alt="" style={{maxWidth:"100%",maxHeight:"90%",borderRadius:12,objectFit:"contain"}}/>
-        </div>
-      </>:<img src={photo.dataUrl} alt="" onClick={e=>e.stopPropagation()} style={{maxWidth:zoomed?"none":"100%",maxHeight:zoomed?"none":"100%",borderRadius:14,objectFit:"contain",cursor:"default",transform:zoomed?"scale(1.8)":"scale(1)",transition:"transform .3s ease"}}/>}
+      {comparePhoto?(()=>{
+        // Etiqueta por CRONOLOGÍA real: la más antigua → ANTES, la más nueva → DESPUÉS
+        const photoIsOlder=(photo.date||"")<(comparePhoto.date||"");
+        const olderPhoto=photoIsOlder?photo:comparePhoto;
+        const newerPhoto=photoIsOlder?comparePhoto:photo;
+        return<>
+          <div onClick={e=>{e.stopPropagation();}} style={{flex:1,height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6}}>
+            <div style={{fontSize:9,letterSpacing:1.2,color:"rgba(255,255,255,.5)",fontWeight:700,textTransform:"uppercase"}}>antes · {olderPhoto.date}</div>
+            <img src={olderPhoto.dataUrl} alt="" style={{maxWidth:"100%",maxHeight:"90%",borderRadius:12,objectFit:"contain"}}/>
+          </div>
+          <div onClick={e=>{e.stopPropagation();}} style={{flex:1,height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6}}>
+            <div style={{fontSize:9,letterSpacing:1.2,color:"rgba(255,255,255,.85)",fontWeight:700,textTransform:"uppercase"}}>después · {newerPhoto.date}</div>
+            <img src={newerPhoto.dataUrl} alt="" style={{maxWidth:"100%",maxHeight:"90%",borderRadius:12,objectFit:"contain"}}/>
+          </div>
+        </>;
+      })():<img src={photo.dataUrl} alt="" onClick={e=>e.stopPropagation()} style={{maxWidth:zoomed?"none":"100%",maxHeight:zoomed?"none":"100%",borderRadius:14,objectFit:"contain",cursor:"default",transform:zoomed?"scale(1.8)":"scale(1)",transition:"transform .3s ease"}}/>}
     </div>
     <div style={{padding:"12px 20px 28px",background:"linear-gradient(180deg,rgba(13,10,7,0),rgba(13,10,7,.92) 25%)"}}>
       {/* Comparar */}
