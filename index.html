@@ -1174,7 +1174,8 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,
   const totalSec=Math.round(step.min*60);
   const [secLeft,setSecLeft]=React.useState(totalSec);
   const [running,setRunning]=React.useState(false);
-  React.useEffect(()=>{if(isActive){setSecLeft(totalSec);setRunning(false);}else setRunning(false);},[isActive,totalSec]);
+  // Timer auto-arranca al activar el paso (más práctico con manos ocupadas)
+  React.useEffect(()=>{if(isActive){setSecLeft(totalSec);setRunning(true);}else setRunning(false);},[isActive,totalSec]);
   React.useEffect(()=>{if(!running||secLeft<=0)return;const id=setInterval(()=>setSecLeft(s=>Math.max(0,s-1)),1000);return()=>clearInterval(id);},[running,secLeft]);
   const pct=isActive?1-secLeft/totalSec:0;
   const mm=String(Math.floor(secLeft/60)).padStart(2,"0"),ss=String(secLeft%60).padStart(2,"0");
