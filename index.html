@@ -1732,14 +1732,19 @@ function CompleteSheet({stats,onPhoto,onClose,profileName,mode}){
       </div>
     </div>
 
-    {/* Bienestar — sliders rápidos */}
+    {/* Bienestar — sliders contextuales según AM/PM */}
     <div style={{padding:"0 16px 8px"}}>
       <div style={{padding:"14px 14px 10px",borderRadius:18,background:P.card,border:`1px solid ${P.border}`}}>
-        <div style={{fontSize:11,fontWeight:600,color:P.text,marginBottom:3,letterSpacing:"-.1px"}}>Bienestar de hoy</div>
+        <div style={{fontSize:11,fontWeight:600,color:P.text,marginBottom:3,letterSpacing:"-.1px"}}>{isNight?"Tu día en bienestar":"Tu mañana en bienestar"}</div>
         <div style={{fontSize:10.5,color:P.muted,marginBottom:14}}>Estos datos correlacionan con tu piel a lo largo del tiempo</div>
-        <Slider label="Sueño anoche" emoji="😴" value={sleep} onChange={setSleep} low="poco" high="muy bien"/>
-        <Slider label="Estrés hoy" emoji="😰" value={stress} onChange={setStress} low="bajo" high="alto"/>
-        <Slider label="Agua bebida" emoji="💧" value={water} onChange={setWater} low="poca" high="2L+"/>
+        {isNight?<>
+          <Slider label="Agua bebida hoy" emoji="💧" value={water} onChange={setWater} low="poca" high="2L+"/>
+          <Slider label="Estrés del día" emoji="😰" value={stress} onChange={setStress} low="bajo" high="alto"/>
+          <Slider label="Exposición al sol hoy" emoji="☀️" value={sun} onChange={setSun} low="nada" high="mucha"/>
+        </>:<>
+          <Slider label="¿Cómo dormiste anoche?" emoji="😴" value={sleep} onChange={setSleep} low="mal" high="muy bien"/>
+          <Slider label="Energía al despertar" emoji="⚡" value={energy} onChange={setEnergy} low="baja" high="alta"/>
+        </>}
       </div>
     </div>
 
