@@ -3085,7 +3085,7 @@ function App(){
     {showYearWrapped&&yearStats&&<YearWrappedSheet stats={yearStats} onClose={handleCloseYearWrapped} profileName={profileName}/>}
     {showJourney&&<SkinJourneySheet photos={photos} onClose={()=>setShowJourney(false)} onOpenPhoto={setViewerPhoto}/>}
     {viewerPhoto&&<PhotoViewer photo={viewerPhoto} onClose={()=>setViewerPhoto(null)} onDelete={handlePhotoDeleted} allPhotos={photos}/>}
-    {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose} profileName={profileName}/>}
+    {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose} profileName={profileName} mode={mode}/>}
     {(!profile||showProfileModal)&&<ProfileSetupModal onPick={handleProfilePick} onCancel={profile?()=>setShowProfileModal(false):null}/>}
     {showIntention&&<IntentionModal onDone={handleIntentionDone} profileName={profileName}/>}
     {showCamera&&<PhotoCapture onClose={()=>setShowCamera(false)} onSave={handlePhotoSave}/>}
