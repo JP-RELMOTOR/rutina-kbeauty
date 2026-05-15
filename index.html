@@ -1674,13 +1674,16 @@ function ImportPhotos({onClose,onSave}){
 }
 
 // ─── COMPLETE SHEET ──────────────────────────────
-function CompleteSheet({stats,onPhoto,onClose,profileName}){
+function CompleteSheet({stats,onPhoto,onClose,profileName,mode}){
   const mon=isMonday();
+  const isNight=mode==="night"||mode==="nightRetinal";
   const [mood,setMood]=React.useState(null);
   const [note,setNote]=React.useState("");
-  const [sleep,setSleep]=React.useState(0); // 0=skip, 1-5=valor
-  const [stress,setStress]=React.useState(0);
-  const [water,setWater]=React.useState(0);
+  const [sleep,setSleep]=React.useState(0);   // AM
+  const [energy,setEnergy]=React.useState(0); // AM
+  const [stress,setStress]=React.useState(0); // PM
+  const [water,setWater]=React.useState(0);   // PM
+  const [sun,setSun]=React.useState(0);       // PM
   const moods=[{e:"😍",l:"Radiante"},{e:"🙂",l:"Bien"},{e:"😊",l:"Normal"},{e:"😌",l:"Sensible"},{e:"😟",l:"Irritada"}];
   const Slider=({label,value,onChange,emoji,low,high})=><div style={{marginBottom:10}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:5}}>
