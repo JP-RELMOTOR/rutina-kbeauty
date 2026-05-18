@@ -2186,10 +2186,10 @@ function InfoScreen({onOpenProduct,onOpenIngredient}){
     {/* Section tabs */}
     <div style={{padding:"0 16px 12px"}}>
       <div style={{display:"flex",padding:4,borderRadius:14,background:P.cream,border:`1px solid ${P.border}`}}>
-        {[{id:"productos",l:"Productos",e:"🧴"},{id:"ingredientes",l:"Ingredientes",e:"🧪"},{id:"tips",l:"Tips",e:"💡"}].map(s=>{
+        {[{id:"productos",l:"Productos",e:"🧴"},{id:"ingredientes",l:"Ingredientes",e:"🧪"},{id:"tips",l:"Tips",e:"💡"},{id:"preguntas",l:"Preguntas",e:"❓"}].map(s=>{
           const a=section===s.id;
-          return<button key={s.id} onClick={()=>setSection(s.id)} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:12.5,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:5,cursor:"pointer",transition:"all .2s",boxShadow:a?"0 1px 4px rgba(0,0,0,.07)":"none"}}>
-            <span style={{fontSize:14}}>{s.e}</span>{s.l}
+          return<button key={s.id} onClick={()=>setSection(s.id)} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",transition:"all .2s",boxShadow:a?"0 1px 4px rgba(0,0,0,.07)":"none"}}>
+            <span style={{fontSize:12}}>{s.e}</span>{s.l}
           </button>;
         })}
       </div>
