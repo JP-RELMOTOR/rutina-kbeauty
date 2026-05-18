@@ -2147,15 +2147,16 @@ function InfoScreen({onOpenProduct,onOpenIngredient}){
 
     {/* PRODUCTOS */}
     {section==="productos"&&<div style={{padding:"4px 16px 120px"}}>
-      <div style={{fontSize:11,color:P.muted,marginBottom:10,letterSpacing:.3,padding:"0 4px"}}>{products.length} productos en tu rutina · toca para ver detalle</div>
+      <div style={{fontSize:11,color:P.muted,marginBottom:10,letterSpacing:.3,padding:"0 4px"}}>{products.length} productos · toca para ver detalle</div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-        {products.map((p,i)=><button key={i} onClick={()=>onOpenProduct&&onOpenProduct(p)} style={{padding:10,borderRadius:18,background:P.card,border:`1px solid ${P.border}`,cursor:"pointer",textAlign:"left",fontFamily:"inherit"}}>
-          <div style={{aspectRatio:"1",borderRadius:14,overflow:"hidden",background:P.cream,border:`1px solid ${P.border}`,marginBottom:10}}>
-            {p.photo?<img src={p.photo} alt="" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>🧴</div>}
+        {products.map((p,i)=><button key={i} onClick={()=>onOpenProduct&&onOpenProduct(p)} style={{padding:10,borderRadius:18,background:P.card,border:`1px solid ${p.archived?P.border:P.border}`,cursor:"pointer",textAlign:"left",fontFamily:"inherit",opacity:p.archived?0.78:1}}>
+          <div style={{aspectRatio:"1",borderRadius:14,overflow:"hidden",background:P.cream,border:`1px solid ${P.border}`,marginBottom:10,position:"relative"}}>
+            {p.photo?<img src={p.photo} alt="" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",filter:p.archived?"grayscale(.4)":"none"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>🧴</div>}
+            {p.archived&&<div style={{position:"absolute",top:6,left:6,padding:"2px 8px",borderRadius:6,background:P.text,color:P.onDark,fontSize:8.5,fontWeight:700,letterSpacing:.3,textTransform:"uppercase"}}>Respaldo</div>}
           </div>
           <div style={{fontSize:10,letterSpacing:.5,textTransform:"uppercase",color:P.accent,fontWeight:700,marginBottom:2}}>{p.brand}</div>
           <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:14,color:P.text,lineHeight:1.2,letterSpacing:"-.1px"}}>{p.name}</div>
-          <div style={{fontSize:10,color:P.muted,marginTop:4}}>{p.appearances.length} {p.appearances.length===1?"uso":"usos"} en tu día</div>
+          <div style={{fontSize:10,color:P.muted,marginTop:4}}>{p.archived?"No en rutina activa":`${p.appearances.length} ${p.appearances.length===1?"uso":"usos"} en tu día`}</div>
         </button>)}
       </div>
     </div>}
