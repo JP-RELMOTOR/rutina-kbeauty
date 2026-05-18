@@ -286,7 +286,21 @@ const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
 function haptic(t="light"){try{if(navigator.vibrate){navigator.vibrate(t==="light"?12:t==="medium"?25:50);}}catch{}}
 function getDOW(){return new Date().getDay();} // 0=sun
 function isRetinalDay(phase){
+  // Fase 3 — día por medio: alterna según paridad del día (independiente de la semana)
+  if(phase===3){
+    const epochDay=Math.floor(Date.now()/86400000);
+    return epochDay%2===0;
+  }
   const d=getDOW();
+  return phase===1?(d===1||d===4):(d===1||d===3||d===5);
+}
+// Igual que isRetinalDay pero para una fecha específica (usado en vistas de calendario)
+function isRetinalDayFor(phase,dateStr){
+  if(phase===3){
+    const epochDay=Math.floor(new Date(dateStr+"T12:00:00").getTime()/86400000);
+    return epochDay%2===0;
+  }
+  const d=new Date(dateStr+"T12:00:00").getDay();
   return phase===1?(d===1||d===4):(d===1||d===3||d===5);
 }
 function isMonday(){return getDOW()===1;}
