@@ -1968,7 +1968,8 @@ function HistoryScreen({history,streak,phase}){
       )}
     </div>
     <div style={{margin:"0 16px 14px",padding:"16px",borderRadius:22,background:P.card,border:`1px solid ${P.border}`}}>
-      <div style={{fontSize:14,fontWeight:600,color:P.text,marginBottom:12}}>Plan semanal completo</div>
+      <div style={{fontSize:14,fontWeight:600,color:P.text,marginBottom:4}}>{phase===3?"Tu plan · próximos 7 días":"Plan semanal completo"}</div>
+      {phase===3&&<div style={{fontSize:11,color:P.muted,marginBottom:10,lineHeight:1.4}}>En Fase 3 el retinal alterna día por medio — no cae siempre en los mismos días de la semana.</div>}
       {daySchedule.map((d,i)=><div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:i<6?`1px solid ${P.border}`:"none"}}>
         <div style={{fontSize:14,fontWeight:500,color:P.text}}>{d.name}</div>
         <div style={{display:"flex",gap:6}}>
