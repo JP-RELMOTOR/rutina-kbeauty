@@ -1059,6 +1059,49 @@ const TIPS=[
   {c:"ritual",sex:"m",t:"El BHA del COSRX cleanser previene foliculitis post-afeitado mejor que cualquier after-shave tradicional. Aplícalo después de afeitar."},
   {c:"piel",sex:"m",t:"La piel masculina es 25% más gruesa que la femenina y tolera mejor el retinal. Puedes ir 3-4 veces/sem en vez de 2-3."},
 ];
+
+// ─── PREGUNTAS FRECUENTES ────────────────────────
+const FAQS=[
+  {c:"bloqueador",q:"¿Qué pasa si uso el retinal de noche y no me pongo bloqueador al día siguiente?",
+   a:"Es el error más caro que puedes cometer. El retinal acelera la renovación celular: la piel nueva que sube a la superficie es más fina y vulnerable al sol. Sin bloqueador se quema y se mancha con facilidad — literalmente provocas las manchas que el sérum Axis-Y intenta borrar, y borras el progreso del tratamiento. Con retinal, el SPF no es opcional: es la otra mitad del tratamiento. Lo aplicas de noche, te proteges de día."},
+
+  {c:"bloqueador",q:"¿Necesito bloqueador si paso todo el día en casa?",
+   a:"Sí, si estás cerca de ventanas con luz. El vidrio detiene los rayos UVB (los que queman) pero no los UVA (los que envejecen y manchan), y esos atraviesan la ventana todo el año, incluso nublado. Si pasas horas frente a una ventana soleada, ponte SPF. En un cuarto sin sol directo el riesgo es bajo — pero como ya tienes el Skin1004 en la rutina, aplicarlo siempre no te cuesta nada y protege tu inversión."},
+
+  {c:"bloqueador",q:"¿El bloqueador va antes o después de la crema hidratante?",
+   a:"Después: el SPF es SIEMPRE el último paso de la mañana. Es una capa de protección que debe quedar arriba de todo; si le pones crema encima, la diluyes y rompes el filtro. Orden de la mañana: limpiar → esencia → sérum → crema → bloqueador. Y aplica suficiente: la mayoría usa la mitad de lo necesario. Para la cara, el equivalente a dos dedos de producto."},
+
+  {c:"retinal",q:"Empecé el retinal y me salieron granitos. ¿Algo anda mal?",
+   a:"Casi seguro es 'purging' (purga), y es buena señal. El retinal acelera la renovación y saca de golpe la congestión que ya se estaba formando bajo la piel. Dura de 4 a 6 semanas, son granitos pequeños y parejos en las zonas donde sueles brotarte. Si después de 6 semanas sigue, salen quistes profundos, o aparecen en zonas nuevas donde nunca te brotas → eso ya es irritación: baja la frecuencia del retinal."},
+
+  {c:"retinal",q:"¿Puedo usar el retinal todas las noches?",
+   a:"No al principio. Por eso la app maneja fases: empiezas 2-3 veces por semana y subes solo cuando tu piel lo tolera sin ardor ni rojez al día siguiente. Llegar a uso diario puede ser la meta, pero forzarlo rompe la barrera y te hace retroceder semanas. La piel masculina es ~25% más gruesa y suele aguantar más. La constancia tranquila le gana a la intensidad apurada."},
+
+  {c:"seguridad",q:"¿Puedo hacer esta rutina si estoy embarazada o amamantando?",
+   a:"El retinal NO se recomienda durante el embarazo: dermatólogos y ginecólogos piden evitar cualquier retinoide. En la lactancia el criterio varía y muchos siguen recomendando evitarlo. La buena noticia: el resto de la rutina — limpiadores, ginseng, caracol, centella, ácido hialurónico y bloqueador — es segura. Si es tu caso, reemplaza el retinal por la Ampoule de Centella o la esencia de caracol, y confírmalo con tu médico."},
+
+  {c:"seguridad",q:"Siento ardor, tirantez o rojez constante. ¿Qué hago?",
+   a:"Tu barrera cutánea está dañada. Pausa todos los activos 1 o 2 semanas (retinal y exfoliantes) y deja solo lo básico: limpiador suave, ácido hialurónico, crema y bloqueador. La centella y el caracol de tu rutina juegan a tu favor: calman sin irritar. Cuando la piel deje de arder, retomas el retinal desde la fase más baja. No 'aguantes' la irritación pensando que así funciona — significa que se está rompiendo."},
+
+  {c:"rutina",q:"¿Importa el orden en que me aplico los productos?",
+   a:"Mucho. La regla es de más líquido a más denso: agua → esencia → sérum → crema → aceite o bloqueador. Si lo haces al revés, la crema densa sella la piel y los sérums finos no logran penetrar — los desperdicias. La buena noticia: la app ya te ordena cada paso, solo tienes que seguir el flujo."},
+
+  {c:"rutina",q:"¿Por qué tengo que limpiar dos veces en la noche?",
+   a:"Porque ningún limpiador hace los dos trabajos. El de aceite (Banila Co) disuelve lo que es graso: bloqueador, sebo, contaminación y maquillaje. El de agua (COSRX) arrastra el sudor, la suciedad y los residuos del primero. Primero aceite, después agua. Es solo de noche — en la mañana basta con una limpieza, porque solo retiras los productos de la noche anterior."},
+
+  {c:"rutina",q:"¿Qué pasa si me salto la rutina un día?",
+   a:"Un día no arruina nada: la piel no se 'reinicia'. Pero los resultados que prometen los productos asumen uso constante, así que saltarte muchos días sí alarga el camino. Con el retinal puedes retomar sin reiniciar la fase si fueron pocos días. Para esos tropiezos la app tiene comodines: úsalos sin culpa, lo importante es volver al día siguiente."},
+
+  {c:"rutina",q:"¿Cuánto tardo en ver resultados?",
+   a:"La piel se renueva cada 28-32 días si eres joven, y cada 40-60 días pasados los 40. Los primeros cambios — luminosidad y textura más suave — aparecen entre la semana 4 y 6. Las manchas y líneas finas tardan de 8 a 12 semanas. Los mejores resultados llegan a las 16-20 semanas, tres ciclos completos de piel. Si a los 2 meses no notas nada, no abandones: estás justo donde la mayoría se rinde antes de ver el cambio."},
+
+  {c:"productos",q:"¿Cómo guardo los productos? ¿Los meto al refrigerador?",
+   a:"Busca en el envase el símbolo de un frasco abierto con '12M' o '6M': son los meses que dura el producto una vez abierto (la mayoría de sérums y cremas, 12 meses). No los refrigeres: están hechos para temperatura ambiente y el frío extremo los desestabiliza. Guárdalos lejos del sol directo y de la humedad — el vapor de la ducha los degrada, así que el botiquín del baño no es el mejor lugar."},
+
+  {c:"productos",q:"¿La baba de caracol hace sufrir a los caracoles?",
+   a:"No es 'baba viva': es un filtrado purificado de la secreción del caracol. Existen métodos crueles (estresar al caracol con sal o vinagre), pero marcas serias como Mizon y Beauty of Joseon usan métodos donde el caracol se desplaza libre sobre una malla y deja su mucina sin sufrir daño. No es vegano, porque es de origen animal, pero sí puede ser libre de crueldad."},
+];
+
 function getTipOfTheDay(profileSex){
   // Filtra tips por sexo del perfil (tips sin sex aplican a ambos)
   const eligible=TIPS.filter(t=>!t.sex||t.sex===profileSex);
