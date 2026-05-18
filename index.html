@@ -820,8 +820,23 @@ function getUniqueProducts(){
       });
     });
   });
-  return [...seen.values()];
+  const list=[...seen.values()];
+  // Productos archivados — fuera de la rutina activa pero visibles como respaldo
+  ARCHIVED_PRODUCTS.forEach(ap=>{
+    list.push({...ap,appearances:[],archived:true});
+  });
+  return list;
 }
+// Productos de respaldo — no están en ninguna rutina activa pero se muestran en el catálogo
+const ARCHIVED_PRODUCTS=[
+  {
+    name:"Revive Eye Serum: Ginseng + Retinal",
+    brand:"Beauty of Joseon",
+    photo:"products/beauty-of-joseon-revive-eye-serum.jpg",
+    cat:"Contorno de ojos",
+    ingr:[{a:"Retinal Liposoma 2%",b:"suaviza líneas finas del ojo"},{a:"Ginseng Panax 10%",b:"hidrata y protege"},{a:"Niacinamida",b:"ilumina ojeras"},{a:"Ceramida NP",b:"barrera del contorno"}],
+  },
+];
 
 // ─── INGREDIENT SHEET ────────────────────────────
 function IngredientSheet({ingredient,onClose}){
