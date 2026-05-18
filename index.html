@@ -2168,6 +2168,13 @@ function InfoScreen({onOpenProduct,onOpenIngredient}){
   const products=React.useMemo(()=>getUniqueProducts(),[]);
   const tipCategories=["todos","técnica","ingrediente","mito","piel","ritual","producto"];
   const filteredTips=React.useMemo(()=>tipCat==="todos"?TIPS:TIPS.filter(t=>t.c===tipCat),[tipCat]);
+  const faqCatColors={
+    "bloqueador":{bg:"#f3e3bf",fg:"#8a6420"},
+    "retinal":{bg:"#fdecea",fg:"#c04030"},
+    "seguridad":{bg:"#f4d6c1",fg:"#a8511e"},
+    "rutina":{bg:"#e9f1ee",fg:"#2c6048"},
+    "productos":{bg:"#e0ecf0",fg:"#2a6080"},
+  };
   const catColors={
     "técnica":{bg:"#e9f1ee",fg:"#2c6048"},
     "ingrediente":{bg:"#f3e3bf",fg:"#8a6420"},
