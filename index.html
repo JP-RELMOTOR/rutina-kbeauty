@@ -1882,13 +1882,28 @@ function HistoryScreen({history,streak,phase}){
   const amSessions=history.filter(s=>s.routine==="morning").length;
   const retSessions=history.filter(s=>s.routine==="pm_retinal").length;
 
-  // Weekly retinal schedule for ALL 7 days
+  // Weekly retinal schedule
   const dayNames=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
-  const dowToRetinal=(phase===1)?[1,4]:[1,3,5]; // 1=Mon...7=Sun (using JS style 0=Sun adjusted)
-  const daySchedule=[1,2,3,4,5,6,0].map((jsDay,i)=>({
-    name:dayNames[i],
-    retinal:dowToRetinal.includes(jsDay),
-  }));
+  let daySchedule;
+  if(phase===3){
+    // Fase 3 día por medio — próximos 7 días con fechas reales (no días fijos de semana)
+    const dn=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    daySchedule=[];
+    for(let i=0;i<7;i++){
+      const dt=new Date();dt.setDate(dt.getDate()+i);
+      const ds=dt.toISOString().split("T")[0];
+      daySchedule.push({
+        name:(i===0?"Hoy · ":i===1?"Mañana · ":"")+dn[dt.getDay()],
+        retinal:isRetinalDayFor(3,ds),
+      });
+    }
+  }else{
+    const dowToRetinal=(phase===1)?[1,4]:[1,3,5];
+    daySchedule=[1,2,3,4,5,6,0].map((jsDay,i)=>({
+      name:dayNames[i],
+      retinal:dowToRetinal.includes(jsDay),
+    }));
+  }
 
   return<div>
     <div style={{padding:"56px 20px 14px"}}>
