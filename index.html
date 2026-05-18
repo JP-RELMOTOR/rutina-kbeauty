@@ -2164,6 +2164,7 @@ function ProgressScreen({history,streak}){
 function InfoScreen({onOpenProduct,onOpenIngredient}){
   const [section,setSection]=React.useState("productos");
   const [tipCat,setTipCat]=React.useState("todos");
+  const [openFaq,setOpenFaq]=React.useState(null);
   const products=React.useMemo(()=>getUniqueProducts(),[]);
   const tipCategories=["todos","técnica","ingrediente","mito","piel","ritual","producto"];
   const filteredTips=React.useMemo(()=>tipCat==="todos"?TIPS:TIPS.filter(t=>t.c===tipCat),[tipCat]);
