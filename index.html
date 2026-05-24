@@ -2422,6 +2422,126 @@ function TabBar({tab,onTab}){
   </div>;
 }
 
+// ─── CHAT DE CLAUDE ──────────────────────────────
+function ChatPanel({onClose,profile,phase,mode,routine,history,streak}){
+  const [messages,setMessages]=React.useState(()=>ls("kb_chat_history",[]));
+  const [input,setInput]=React.useState("");
+  const [loading,setLoading]=React.useState(false);
+  const [showSettings,setShowSettings]=React.useState(false);
+  const [workerUrl,setWorkerUrl]=React.useState(()=>ls("kb_claude_worker_url",""));
+  const scrollRef=React.useRef(null);
+  const systemPrompt=React.useMemo(
+    ()=>buildClaudeSystemPrompt({profile,phase,mode,routine,history,streak}),
+    [profile,phase,mode,routine,streak]
+  );
+  React.useEffect(()=>{
+    if(scrollRef.current)scrollRef.current.scrollTop=scrollRef.current.scrollHeight;
+  },[messages,loading]);
+  function handleSend(){
+    const text=input.trim();
+    if(!text||loading)return;
+    const newMsgs=[...messages,{role:"user",content:text}];
+    setMessages(newMsgs);
+    lsSet("kb_chat_history",newMsgs);
+    setInput("");
+    setLoading(true);
+    sendToClaude({systemPrompt,messages:newMsgs}).then(reply=>{
+      const finalMsgs=[...newMsgs,reply];
+      setMessages(finalMsgs);
+      lsSet("kb_chat_history",finalMsgs);
+    }).finally(()=>setLoading(false));
+  }
+  function handleClear(){
+    if(confirm("¿Borrar el historial del chat?")){
+      setMessages([]);
+      lsSet("kb_chat_history",[]);
+    }
+  }
+  function handleSaveSettings(url){
+    setWorkerUrl(url);
+    lsSet("kb_claude_worker_url",url);
+    setShowSettings(false);
+  }
+  const suggestions=[
+    "¿Por qué siento la piel pegajosa después de la crema?",
+    "Hoy tengo poco tiempo, ¿qué pasos no puedo saltar?",
+    "¿Por qué el paso n3 está marcado como opcional?",
+  ];
+  return<div style={{position:"fixed",inset:0,zIndex:100,background:P.bg,display:"flex",flexDirection:"column"}}>
+    <div style={{padding:"50px 16px 14px",borderBottom:`1px solid ${P.border}`,display:"flex",alignItems:"center",gap:12,background:P.card}}>
+      <button onClick={onClose} style={{width:36,height:36,borderRadius:18,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+        <Icon n="close" size={14} color={P.text} sw={2}/>
+      </button>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:22,color:P.text,letterSpacing:"-.3px"}}>Pregúntale a Claude</div>
+        <div style={{fontSize:11,color:workerUrl?P.green:P.muted,marginTop:1}}>{workerUrl?"● Conectado · experto en tu rutina":"○ Modo demo · configura el worker"}</div>
+      </div>
+      <button onClick={()=>setShowSettings(true)} title="Ajustes" style={{width:36,height:36,borderRadius:18,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:16}}>⚙️</button>
+    </div>
+    <div ref={scrollRef} style={{flex:1,overflowY:"auto",padding:"16px 16px 8px"}}>
+      {messages.length===0&&<div style={{padding:"32px 12px",textAlign:"center"}}>
+        <div style={{fontSize:42,marginBottom:12}}>💬</div>
+        <div style={{fontSize:14,color:P.text,fontWeight:600,marginBottom:6}}>Tu dermo-consultor personal</div>
+        <div style={{fontSize:12,color:P.muted,lineHeight:1.5,maxWidth:300,margin:"0 auto 18px"}}>Conozco tu perfil, tu rutina, tus productos y tu fase. Pregúntame lo que sea sobre tu tratamiento.</div>
+        <div style={{display:"flex",flexDirection:"column",gap:6,padding:"0 8px"}}>
+          {suggestions.map(q=>
+            <button key={q} onClick={()=>setInput(q)} style={{padding:"10px 14px",borderRadius:12,background:P.cream,border:`1px solid ${P.border}`,fontSize:12,color:P.text,textAlign:"left",cursor:"pointer",fontFamily:"inherit",lineHeight:1.4}}>{q}</button>
+          )}
+        </div>
+      </div>}
+      {messages.map((m,i)=>
+        <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",marginBottom:10}}>
+          <div style={{maxWidth:"82%",padding:"10px 14px",borderRadius:m.role==="user"?"18px 18px 4px 18px":"18px 18px 18px 4px",background:m.role==="user"?P.accent:P.card,color:m.role==="user"?P.onAccent:P.text,fontSize:13.5,lineHeight:1.5,border:m.role==="user"?"none":`1px solid ${P.border}`,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
+            {m.content}
+          </div>
+        </div>
+      )}
+      {loading&&<div style={{display:"flex",justifyContent:"flex-start",marginBottom:10}}>
+        <div style={{padding:"10px 14px",borderRadius:"18px 18px 18px 4px",background:P.card,border:`1px solid ${P.border}`,fontSize:13,color:P.muted,fontStyle:"italic"}}>Pensando…</div>
+      </div>}
+    </div>
+    <div style={{padding:"12px 12px 22px",borderTop:`1px solid ${P.border}`,background:P.card,display:"flex",gap:8,alignItems:"flex-end"}}>
+      {messages.length>0&&<button onClick={handleClear} title="Limpiar" style={{width:38,height:38,borderRadius:19,border:`1px solid ${P.border}`,background:"transparent",cursor:"pointer",fontSize:14,flexShrink:0}}>🗑️</button>}
+      <textarea value={input} onChange={e=>setInput(e.target.value)} placeholder="Pregunta lo que quieras sobre tu rutina..." onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleSend();}}} rows={1} style={{flex:1,padding:"10px 14px",borderRadius:19,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:13.5,fontFamily:"inherit",resize:"none",maxHeight:120,outline:"none",lineHeight:1.4}}/>
+      <button onClick={handleSend} disabled={!input.trim()||loading} style={{width:38,height:38,borderRadius:19,border:"none",background:input.trim()&&!loading?P.accent:P.cream,color:P.onAccent,cursor:input.trim()&&!loading?"pointer":"default",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:700,transition:"all .15s",flexShrink:0}}>↑</button>
+    </div>
+    {showSettings&&<ChatSettings workerUrl={workerUrl} onSave={handleSaveSettings} onClose={()=>setShowSettings(false)}/>}
+  </div>;
+}
+
+function ChatSettings({workerUrl,onSave,onClose}){
+  const [url,setUrl]=React.useState(workerUrl);
+  const [model,setModel]=React.useState(()=>ls("kb_claude_model","claude-sonnet-4-6"));
+  function save(){
+    lsSet("kb_claude_model",model);
+    onSave(url.trim());
+  }
+  return<div style={{position:"fixed",inset:0,zIndex:110,background:"rgba(0,0,0,.5)",display:"flex",alignItems:"flex-end",justifyContent:"center"}} onClick={onClose}>
+    <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:480,background:P.card,borderTopLeftRadius:24,borderTopRightRadius:24,padding:"22px 20px 28px",maxHeight:"75vh",overflowY:"auto"}}>
+      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:22,color:P.text,marginBottom:6}}>Chat · ajustes</div>
+      <div style={{fontSize:12,color:P.muted,marginBottom:18,lineHeight:1.5}}>Para que el chat hable con Claude de verdad, necesita un Cloudflare Worker que haga de proxy hacia la API de Anthropic. Si lo dejas vacío, el chat queda en modo demo.</div>
+      <div style={{marginBottom:14}}>
+        <div style={{fontSize:11,fontWeight:600,color:P.muted,textTransform:"uppercase",letterSpacing:.3,marginBottom:5}}>URL del Worker</div>
+        <input type="url" placeholder="https://kbeauty-chat.tu-cuenta.workers.dev" value={url} onChange={e=>setUrl(e.target.value)} style={{width:"100%",padding:"10px 12px",borderRadius:10,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:13,fontFamily:"inherit",outline:"none",boxSizing:"border-box"}}/>
+      </div>
+      <div style={{marginBottom:18}}>
+        <div style={{fontSize:11,fontWeight:600,color:P.muted,textTransform:"uppercase",letterSpacing:.3,marginBottom:5}}>Modelo</div>
+        <select value={model} onChange={e=>setModel(e.target.value)} style={{width:"100%",padding:"10px 12px",borderRadius:10,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:13,fontFamily:"inherit",outline:"none"}}>
+          <option value="claude-opus-4-7">Opus 4.7 · el más capaz (más caro)</option>
+          <option value="claude-sonnet-4-6">Sonnet 4.6 · balance ideal (recomendado)</option>
+          <option value="claude-haiku-4-5">Haiku 4.5 · rápido y barato</option>
+        </select>
+      </div>
+      <button onClick={save} style={{width:"100%",padding:"12px",borderRadius:14,border:"none",background:P.text,color:P.onDark,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Guardar</button>
+      <button onClick={onClose} style={{width:"100%",padding:"10px",marginTop:8,borderRadius:14,border:`1px solid ${P.border}`,background:"transparent",color:P.muted,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>Cancelar</button>
+    </div>
+  </div>;
+}
+
+function ChatFAB({onOpen}){
+  return<button onClick={onOpen} title="Pregúntale a Claude" style={{position:"absolute",right:18,bottom:92,zIndex:25,width:54,height:54,borderRadius:27,border:"none",background:P.text,color:P.onDark,boxShadow:`0 10px 24px -6px ${P.shadow}`,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,transition:"transform .15s"}}>💬</button>;
+}
+
 // ─── SKIN JOURNEY TIMELINE ───────────────────────
 function SkinJourneySheet({photos,onClose,onOpenPhoto}){
   const sorted=React.useMemo(()=>[...photos].sort((a,b)=>(a.date||"").localeCompare(b.date||"")),[photos]);
