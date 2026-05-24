@@ -1402,6 +1402,7 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,
           <span style={{fontSize:10,color:P.muted,textTransform:"uppercase",letterSpacing:1.2,fontWeight:600}}>{step.cat}</span>
           {step.star&&<span style={{fontSize:9,color:P.accent,background:P.accentSoft,padding:"1px 6px",borderRadius:5,fontWeight:700,letterSpacing:.3}}>CLAVE</span>}
           {step.critical&&<span style={{fontSize:9,color:"#a8511e",background:"#f4d6c1",padding:"1px 6px",borderRadius:5,fontWeight:700,letterSpacing:.3}}>NO SALTES</span>}
+          {step.optional&&!step.critical&&<span style={{fontSize:9,color:"#2c6048",background:"#e9f1ee",padding:"1px 6px",borderRadius:5,fontWeight:700,letterSpacing:.3}}>OPCIONAL</span>}
         </div>
         <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:16,color:P.text,letterSpacing:"-.2px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{step.name}</div>
         <div style={{fontSize:11,color:P.muted,marginTop:1}}>{step.brand} · {step.min} min</div>
