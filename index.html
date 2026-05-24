@@ -3470,7 +3470,9 @@ function App(){
       {tab==="progress"&&<ProgressScreen history={history} streak={streak}/>}
       {tab==="info"&&<InfoScreen onOpenProduct={setActiveProduct} onOpenIngredient={setActiveIngredient}/>}
     </div>
+    <ChatFAB onOpen={()=>setShowChat(true)}/>
     <TabBar tab={tab} onTab={setTab}/>
+    {showChat&&<ChatPanel onClose={()=>setShowChat(false)} profile={profile} phase={phase} mode={mode} routine={routine} history={history} streak={streak}/>}
     {hasUpdate&&!updateDismissed&&<UpdateBanner onApply={handleApplyUpdate} onDismiss={()=>setUpdateDismissed(true)}/>}
     {showSettings&&<SettingsSheet onClose={()=>setShowSettings(false)} history={history} diary={diary} photos={photos} phase={phase} onPhaseChange={handlePhaseChange} onDataRestored={handleDataRestored} profile={profile} onChangeProfile={handleOpenProfileSwitcher} theme={theme} onThemeChange={handleThemeChange} accent={accent} onAccentChange={handleAccentChange} voiceEnabled={voiceEnabled} onVoiceChange={handleVoiceChange}/>}
     {activeIngredient&&<IngredientSheet ingredient={activeIngredient} onClose={()=>setActiveIngredient(null)}/>}
