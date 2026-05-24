@@ -2543,7 +2543,35 @@ function ChatSettings({workerUrl,onSave,onClose}){
 }
 
 function ChatFAB({onOpen}){
-  return<button onClick={onOpen} title="Pregúntale a Claude" style={{position:"absolute",right:18,bottom:92,zIndex:25,width:54,height:54,borderRadius:27,border:"none",background:P.text,color:P.onDark,boxShadow:`0 10px 24px -6px ${P.shadow}`,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,transition:"transform .15s"}}>💬</button>;
+  // Tooltip se muestra una vez por sesión, durante 5 seg, para invitar a usar el chat
+  const [showTip,setShowTip]=React.useState(()=>{
+    const shown=sessionStorage.getItem("kb_chat_tip_shown");
+    return !shown;
+  });
+  React.useEffect(()=>{
+    if(!showTip)return;
+    sessionStorage.setItem("kb_chat_tip_shown","1");
+    const t=setTimeout(()=>setShowTip(false),5500);
+    return()=>clearTimeout(t);
+  },[showTip]);
+  const isConnected=!!ls("kb_claude_worker_url","");
+  return<div style={{position:"absolute",right:16,bottom:92,zIndex:25,display:"flex",alignItems:"center",gap:8}}>
+    {showTip&&<div onClick={()=>setShowTip(false)} style={{padding:"9px 14px",borderRadius:18,background:P.card,border:`1px solid ${P.border}`,boxShadow:`0 8px 20px -6px ${P.shadow}`,fontSize:12,color:P.text,fontWeight:600,whiteSpace:"nowrap",cursor:"pointer",animation:"tooltipIn .35s ease",fontFamily:"inherit"}}>
+      Pregúntame lo que sea <span style={{marginLeft:4}}>✨</span>
+    </div>}
+    <button onClick={onOpen} title="Asistente personal" style={{
+      width:62,height:62,borderRadius:31,border:"none",
+      background:`radial-gradient(circle at 30% 28%, ${P.accentSoft}, ${P.accent} 55%, ${P.accentDark||P.accent} 100%)`,
+      cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",
+      position:"relative",overflow:"visible",
+      animation:"assistantGlow 2.6s ease-in-out infinite, assistantFloat 3.4s ease-in-out infinite",
+      transition:"transform .18s",
+    }} onMouseDown={e=>e.currentTarget.style.transform="scale(.94)"} onMouseUp={e=>e.currentTarget.style.transform="scale(1)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
+      <span style={{fontSize:26,display:"inline-block",animation:"sparkleSpin 2.8s ease-in-out infinite",filter:"drop-shadow(0 1px 2px rgba(0,0,0,.2))"}}>✨</span>
+      {/* Status dot — verde si conectado, gris si demo */}
+      <span style={{position:"absolute",top:4,right:4,width:11,height:11,borderRadius:6,background:isConnected?P.green:P.muted,border:`2px solid ${P.card}`}}/>
+    </button>
+  </div>;
 }
 
 // ─── SKIN JOURNEY TIMELINE ───────────────────────
