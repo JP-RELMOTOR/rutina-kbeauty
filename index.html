@@ -1110,6 +1110,116 @@ function getTipOfTheDay(profileSex){
   return eligible[seed%eligible.length];
 }
 
+// ─── CHAT DE CLAUDE: SYSTEM PROMPT + API ─────────
+// El system prompt incluye TODO el contexto del tratamiento. Con prompt caching
+// (cache_control) de Anthropic, este bloque grande se cachea y solo se cobra ~10% en
+// peticiones subsecuentes — convierte a Claude en experto personal sin entrenamiento.
+function buildClaudeSystemPrompt({profile,phase,mode,routine,history,streak}){
+  const p=profile||{name:"usuario",sex:"f",emoji:"🌸",desc:"perfil sin definir"};
+  const today=new Date().toISOString().slice(0,10);
+  const phaseText={1:"fase 1 (suave, 2×/semana)",2:"fase 2 (intermedia, 3×/semana)",3:"fase 3 (avanzada, 4×/semana o diaria)"}[phase]||"sin definir";
+  const modeText={morning:"Mañana",night:"Noche normal",nightRetinal:"Noche con Retinal"}[mode]||mode;
+  const productLines=PRODUCT_INFO.map(p=>`• ${p.brand} ${p.nameMatch} (${p.launched}, ${p.origin}, ${p.size}). Activos: ${p.special}. Ideal para: ${(p.bestFor||[]).join(", ")}. Precaución: ${p.cautious||"ninguna"}`).join("\n");
+  const ingrLines=INGREDIENTS.map(i=>`• ${i.name} (${i.type}): ${i.short||i.desc||""}`).join("\n");
+  const tipsLines=TIPS.filter(t=>!t.sex||t.sex===p.sex).slice(0,15).map(t=>`• [${t.c}] ${t.t}`).join("\n");
+  const faqLines=FAQS.map(f=>`Q: ${f.q}\nA: ${f.a}`).join("\n\n");
+  const routineSteps=(routine?.steps||[]).map((s,i)=>{
+    const flags=[s.essential&&"esencial",s.critical&&"NO saltes",s.optional&&"opcional",s.star&&"clave"].filter(Boolean).join(", ");
+    return `${i+1}. ${s.cat} — ${s.brand} ${s.name}${flags?` [${flags}]`:""}\n   Por qué: ${s.why||""}${s.optionalNote?`\n   Nota opcional: ${s.optionalNote}`:""}`;
+  }).join("\n");
+
+  return `Eres el dermo-consultor personal de ${p.name} (${p.desc}). Tu trabajo: responder dudas sobre su rutina K-beauty con conocimiento profundo, cálido y sin tecnicismos innecesarios. Hablas SIEMPRE en español.
+
+## PERFIL ACTUAL
+- Nombre: ${p.name} ${p.emoji||""}
+- Descripción: ${p.desc}
+- Sexo: ${p.sex==="f"?"mujer":"hombre"}${p.age?` · edad: ${p.age}`:""}
+- Fase de retinal: ${phaseText}
+- Rutina activa ahora: ${modeText}
+- Racha actual: ${streak||0} día(s)
+- Fecha de hoy: ${today}
+
+## RUTINA DE HOY (${modeText})
+${routineSteps||"(rutina no disponible)"}
+
+## PRODUCTOS EN SU TRATAMIENTO (${PRODUCT_INFO.length} en total)
+${productLines}
+
+## INGREDIENTES Y SUS FUNCIONES
+${ingrLines}
+
+## TIPS RELEVANTES PARA ${p.name.toUpperCase()}
+${tipsLines}
+
+## PREGUNTAS FRECUENTES (ya respondidas en la app)
+${faqLines}
+
+## ANÁLISIS PERSONALIZADO POR PERFIL
+Pasos opcionales identificados:
+- m4 (Crema AM COSRX): opcional — el bloqueador Skin1004 ya hidrata. Mijal puede saltarla si no siente la piel tirante a media mañana. Juan Pablo (piel grasa) debe saltarla siempre.
+- n3 (Essence Ginseng noche normal): redundante — el Revive Serum (n6) ya trae 63% ginseng.
+- n5 (Centella Ampoule noche normal): aporta poco sin retinal. Úsala solo si hay irritación o rojez.
+
+Pasos críticos que NUNCA recomendar saltar:
+- Bloqueador AM (Skin1004) — siempre
+- Doble limpieza de noche
+- Retinal en noches asignadas
+- Centella PRE-retinal (r5) — buffer crítico
+- Crema POST-retinal (r8) — buffer crítico
+- Sérum Axis-Y AM — activo aclarante para manchas
+
+## REGLAS DE COMPORTAMIENTO
+1. Habla en español, en tono cálido, directo y honesto. Usa "tú", no "usted".
+2. Usa el nombre ${p.name} ocasionalmente para personalizar. Conoce su perfil.
+3. NO inventes productos que no están en su rutina. Si te preguntan por algo nuevo, recomienda solo si encaja y sé clara que es un agregado.
+4. Para temas médicos serios (embarazo, lactancia, reacciones severas, alergias, condiciones de piel diagnosticadas) → recomienda consultar dermatólogo. No diagnostiques.
+5. Si la pregunta es sobre la rutina actual, refiérete a los pasos con su número y producto (ej. "el paso m3 con el Axis-Y").
+6. Cuando expliques algo, justifica con la ciencia o el ingrediente — sin abusar de tecnicismos.
+7. Si hay ambigüedad sobre cómo se siente la piel, haz UNA pregunta de seguimiento concreta antes de recomendar.
+8. Respuestas concisas: usa listas o tablas cuando ayuden, párrafos cortos. Evita esponjado verbal.
+9. Conoces todo el contexto arriba; no preguntes al usuario por información que ya tienes (perfil, fase, rutina).
+
+Tu objetivo: que ${p.name} se sienta acompañada en su tratamiento, no abrumada. Cada respuesta tuya debe dejarle algo accionable o tranquilidad informada.`;
+}
+
+// Envía mensajes a Claude vía worker proxy. Si no hay URL configurada, devuelve mock.
+// El worker debe aceptar POST con {system, messages, model} y devolver el JSON
+// que retorna la API de Anthropic /v1/messages.
+async function sendToClaude({systemPrompt,messages,onError}){
+  const workerUrl=ls("kb_claude_worker_url","");
+  const model=ls("kb_claude_model","claude-sonnet-4-6");
+  if(!workerUrl){
+    // Mock mode — explica que hay que configurar el worker
+    await new Promise(r=>setTimeout(r,600));
+    return {
+      role:"assistant",
+      content:`👋 Estoy en modo demo porque el chat aún no tiene el backend conectado.\n\n**Para activarme de verdad:**\n1. Crea cuenta en console.anthropic.com (créditos gratis al inicio)\n2. Monta un Cloudflare Worker que reenvíe peticiones a la API de Anthropic\n3. Configura la URL del worker en Ajustes → Chat de Claude\n\nMientras tanto, ya tengo cargado todo el contexto de tu tratamiento (perfil, rutinas, productos, ingredientes). Cuando conectes el worker, te respondo en serio.\n\n¿Pregunta de prueba? Te puedo confirmar que la veo y la guardo, pero la respuesta real llegará cuando esté conectado.`
+    };
+  }
+  try{
+    const res=await fetch(workerUrl,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model,
+        max_tokens:1024,
+        system:[{type:"text",text:systemPrompt,cache_control:{type:"ephemeral"}}],
+        messages
+      })
+    });
+    if(!res.ok){
+      const txt=await res.text();
+      throw new Error(`Worker respondió ${res.status}: ${txt.slice(0,200)}`);
+    }
+    const data=await res.json();
+    const textBlock=(data.content||[]).find(b=>b.type==="text");
+    return {role:"assistant",content:textBlock?.text||"(respuesta vacía)"};
+  }catch(e){
+    onError&&onError(e);
+    return {role:"assistant",content:`Hubo un problema al contactar a Claude: ${e.message}\n\nVerifica la URL del worker en Ajustes o intenta de nuevo en un momento.`};
+  }
+}
+
 // ─── PROFILE ─────────────────────────────────────
 const PROFILE_PRESETS=[
   {id:"mijal",name:"Mijal",sex:"f",age:null,defaultPhase:1,emoji:"🌸",desc:"Mujer · piel mixta · fase 1 (suave) del retinal"},
