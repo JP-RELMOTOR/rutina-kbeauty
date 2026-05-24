@@ -26,6 +26,10 @@ textarea{font-family:'Inter',system-ui,sans-serif;}
 @keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 @keyframes stepIn{from{opacity:.5;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes assistantGlow{0%,100%{box-shadow:0 8px 22px -6px rgba(200,152,73,.55),0 0 0 0 rgba(200,152,73,.45)}50%{box-shadow:0 12px 30px -6px rgba(200,152,73,.75),0 0 0 10px rgba(200,152,73,0)}}
+@keyframes assistantFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes tooltipIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes sparkleSpin{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(15deg) scale(1.08)}}
 
   /* INGREDIENT CHIPS */
   .ingr-section { margin: 10px 18px 0; }
