@@ -2517,7 +2517,7 @@ function chatStopSpeak(){try{if(window.speechSynthesis)window.speechSynthesis.ca
 // ─── FOTO-DIAGNÓSTICO: compresión + envío multi-modal ────────────────
 // Redimensiona una foto (iPhone HEIC/JPEG = 3-10MB) a un base64 chico que
 // quepa en el límite de payload del worker. Target ~80-150 KB base64.
-async function shrinkImageForVision(file,{maxDim=1024,quality=0.78}={}){
+async function shrinkImageForVision(file,{maxDim=900,quality=0.72,targetBase64KB=200}={}){
   if(!file)throw new Error("No file");
   // Lee como dataURL primero para soportar HEIC desde iOS (Safari decodifica al renderizar).
   const dataUrl=await new Promise(function(resolve,reject){
@@ -2540,20 +2540,19 @@ async function shrinkImageForVision(file,{maxDim=1024,quality=0.78}={}){
   canvas.width=w;canvas.height=h;
   const ctx=canvas.getContext("2d");
   ctx.drawImage(img,0,0,w,h);
-  // Algunos quality steps por si la primera compresión queda muy grande.
+  // Reduce calidad iterativamente hasta caber bajo el target de base64 (lo que el worker mide).
   let q=quality;
-  for(let attempt=0;attempt<4;attempt++){
+  let outBase64="";
+  for(let attempt=0;attempt<5;attempt++){
     const out=canvas.toDataURL("image/jpeg",q);
-    // out es "data:image/jpeg;base64,XXX..."
-    const base64=out.split(",")[1]||"";
-    // Estimación de tamaño en bytes desde la cadena base64
-    const bytes=Math.floor(base64.length*0.75);
-    if(bytes<140*1024||q<=0.35)return {data:base64,mediaType:"image/jpeg",bytes:bytes,width:w,height:h};
-    q-=0.15;
+    outBase64=out.split(",")[1]||"";
+    const kb=outBase64.length/1024;
+    if(kb<=targetBase64KB||q<=0.30){
+      return {data:outBase64,mediaType:"image/jpeg",bytes:Math.floor(outBase64.length*0.75),width:w,height:h,base64KB:Math.round(kb)};
+    }
+    q-=0.12;
   }
-  // Si falla, devuelve la última (mejor algo que nada)
-  const out=canvas.toDataURL("image/jpeg",0.35);
-  return {data:out.split(",")[1]||"",mediaType:"image/jpeg",bytes:0,width:w,height:h};
+  return {data:outBase64,mediaType:"image/jpeg",bytes:Math.floor(outBase64.length*0.75),width:w,height:h,base64KB:Math.round(outBase64.length/1024)};
 }
 
 // Convierte un mensaje del chat a una versión "ligera" para localStorage
