@@ -2108,60 +2108,60 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
     <DayPlanBanner phase={phase}/>
     <DailyTip profileSex={profileSex} profile={profile} phase={phase} mode={mode} streak={streak}/>
     <ModeToggle mode={mode} onChange={setMode} completionsToday={completionsToday}/>
-    {/* Si la rutina del modo actual ya está completada hoy → mostramos un panel celebratorio
-        y ocultamos los pasos. El usuario puede deshacer o cambiar al otro modo. */}
-    {(completionsToday&&completionsToday[mode])?(()=>{
-      const doneTime=completionsToday[mode];
-      const modeLabel={morning:"de la mañana",night:"de la noche",nightRetinal:"de la noche con retinal"}[mode]||mode;
-      const otherMode=mode==="morning"?"night":"morning";
-      const otherDone=mode==="morning"?(completionsToday.night||completionsToday.nightRetinal):completionsToday.morning;
-      return <div style={{padding:"18px 16px 30px"}}>
-        <div style={{padding:"22px 18px",borderRadius:22,background:P.greenSoft,border:`1.5px solid ${P.green}`,textAlign:"center"}}>
-          <div style={{fontSize:48,marginBottom:8}}>✅</div>
-          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:22,color:P.text,letterSpacing:"-.3px",marginBottom:4}}>Rutina {modeLabel} completa</div>
-          <div style={{fontSize:12,color:P.muted,letterSpacing:.2,marginBottom:18}}>Terminada hoy a las <b style={{color:P.green,fontFamily:"'JetBrains Mono',monospace"}}>{doneTime}</b></div>
-          <div style={{display:"flex",flexDirection:"column",gap:8}}>
-            <button onClick={()=>setMode(otherMode)} style={{width:"100%",padding:"12px 14px",borderRadius:14,border:`1.5px solid ${otherDone?P.green:P.accent}`,background:otherDone?P.greenSoft:P.accentSoft,color:otherDone?P.green:P.accent,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
-              {mode==="morning"?<>🌙 Ir a rutina de noche{otherDone&&" ✓"}</>:<>☀️ Ir a rutina de mañana{otherDone&&" ✓"}</>}
-            </button>
-            <button onClick={()=>onUndoCompletion&&onUndoCompletion(mode)} style={{width:"100%",padding:"10px 14px",borderRadius:14,border:`1px solid ${P.border}`,background:"transparent",color:P.muted,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>
-              ↶ Marcar como no completada
-            </button>
-          </div>
+    {/* Si la rutina del modo actual YA está completada hoy → mostramos panel celebratorio
+        y ocultamos pasos/progreso. Si no, mostramos el flujo normal de la rutina. */}
+    {(completionsToday&&completionsToday[mode])?<div style={{padding:"18px 16px 30px"}}>
+      <div style={{padding:"22px 18px",borderRadius:22,background:P.greenSoft,border:`1.5px solid ${P.green}`,textAlign:"center"}}>
+        <div style={{fontSize:48,marginBottom:8}}>✅</div>
+        <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:22,color:P.text,letterSpacing:"-.3px",marginBottom:4}}>Rutina {({morning:"de la mañana",night:"de la noche",nightRetinal:"de la noche con retinal"})[mode]||mode} completa</div>
+        <div style={{fontSize:12,color:P.muted,letterSpacing:.2,marginBottom:18}}>Terminada hoy a las <b style={{color:P.green,fontFamily:"'JetBrains Mono',monospace"}}>{completionsToday[mode]}</b></div>
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          {(()=>{
+            const otherMode=mode==="morning"?"night":"morning";
+            const otherDone=mode==="morning"?(completionsToday.night||completionsToday.nightRetinal):completionsToday.morning;
+            return <button onClick={()=>setMode(otherMode)} style={{width:"100%",padding:"12px 14px",borderRadius:14,border:`1.5px solid ${otherDone?P.green:P.accent}`,background:otherDone?P.greenSoft:P.accentSoft,color:otherDone?P.green:P.accent,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+              {mode==="morning"?"🌙 Ir a rutina de noche":"☀️ Ir a rutina de mañana"}{otherDone?" · ya hecha ✓":""}
+            </button>;
+          })()}
+          <button onClick={()=>onUndoCompletion&&onUndoCompletion(mode)} style={{width:"100%",padding:"10px 14px",borderRadius:14,border:`1px solid ${P.border}`,background:"transparent",color:P.muted,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>
+            ↶ Marcar como no completada
+          </button>
         </div>
-      </div>;
-    })():<><ExpressToggle express={expressMode} onChange={onExpressChange}/></>}
-    <div style={{padding:"14px 16px 10px"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-        <div style={{fontSize:11,color:P.muted,letterSpacing:.3,textTransform:"uppercase",fontWeight:600}}>Progreso</div>
-        <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:12,color:P.text,fontWeight:600}}>{completedCount}/{routine.total} <span style={{color:P.muted}}>· {Math.round(completedMin)}/{routine.minutes} min</span></div>
       </div>
-      <div style={{height:5,borderRadius:2.5,background:P.cream,overflow:"hidden"}}>
-        <div style={{height:"100%",width:`${(completedCount/routine.total)*100}%`,background:P.accent,transition:"width .5s ease",borderRadius:2.5}}/>
+    </div>:<>
+      <ExpressToggle express={expressMode} onChange={onExpressChange}/>
+      <div style={{padding:"14px 16px 10px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+          <div style={{fontSize:11,color:P.muted,letterSpacing:.3,textTransform:"uppercase",fontWeight:600}}>Progreso</div>
+          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:12,color:P.text,fontWeight:600}}>{completedCount}/{routine.total} <span style={{color:P.muted}}>· {Math.round(completedMin)}/{routine.minutes} min</span></div>
+        </div>
+        <div style={{height:5,borderRadius:2.5,background:P.cream,overflow:"hidden"}}>
+          <div style={{height:"100%",width:`${(completedCount/routine.total)*100}%`,background:P.accent,transition:"width .5s ease",borderRadius:2.5}}/>
+        </div>
       </div>
-    </div>
-    {/* Step dots */}
-    <div style={{display:"flex",gap:5,justifyContent:"center",padding:"0 16px 10px"}}>
-      {routine.steps.map((s,i)=>{
-        const done=doneSteps.has(s.id);
-        const active=i===routine.steps.findIndex((_,ii)=>!doneSteps.has(routine.steps[ii].id));
-        return<div key={s.id} style={{width:done?18:active?18:8,height:8,borderRadius:4,background:done?P.green:active?P.accent:P.cream,border:`1px solid ${done?P.green:active?P.accent:P.border}`,transition:"all .3s ease"}}/>;
-      })}
-    </div>
-    <div style={{padding:"0 16px"}}>
-      {routine.steps.map((s,i)=>{
-        const nextReal=routine.steps.slice(i+1).find(st=>!doneSteps.has(st.id));
-        return<React.Fragment key={s.id}>
-          <StepCard step={s} idx={i} state={stepState(s,i)} onTap={()=>onTap(i)} onComplete={()=>onComplete(s,i)} onSkip={()=>onSkip(s,i)} nextName={nextReal?nextReal.name:null} onIngredient={onIngredient} onOpenProduct={onOpenProduct} profileName={profileName} voiceEnabled={voiceEnabled}/>
-          {waitingAfterIdx===i&&<WaitGate totalSec={waitTotal} secsLeft={waitSecs} running={waitRunning} onToggle={onToggleWait} onSkip={onSkipWait} hint={waitHint} why={waitWhy} nextName={nextReal?nextReal.name:null}/>}
-        </React.Fragment>;
-      })}
-    </div>
-    {isFinished&&<div style={{padding:"8px 16px"}}>
-      <button onClick={onShowComplete} style={{width:"100%",height:54,borderRadius:18,border:"none",background:P.accent,color:P.onAccent,fontSize:15,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
-        <Icon n="sparkle" size={16} color={P.onAccent} fill={P.onAccent} sw={1}/>Registrar rutina completada
-      </button>
-    </div>}
+      {/* Step dots */}
+      <div style={{display:"flex",gap:5,justifyContent:"center",padding:"0 16px 10px"}}>
+        {routine.steps.map((s,i)=>{
+          const done=doneSteps.has(s.id);
+          const active=i===routine.steps.findIndex((_,ii)=>!doneSteps.has(routine.steps[ii].id));
+          return<div key={s.id} style={{width:done?18:active?18:8,height:8,borderRadius:4,background:done?P.green:active?P.accent:P.cream,border:`1px solid ${done?P.green:active?P.accent:P.border}`,transition:"all .3s ease"}}/>;
+        })}
+      </div>
+      <div style={{padding:"0 16px"}}>
+        {routine.steps.map((s,i)=>{
+          const nextReal=routine.steps.slice(i+1).find(st=>!doneSteps.has(st.id));
+          return<React.Fragment key={s.id}>
+            <StepCard step={s} idx={i} state={stepState(s,i)} onTap={()=>onTap(i)} onComplete={()=>onComplete(s,i)} onSkip={()=>onSkip(s,i)} nextName={nextReal?nextReal.name:null} onIngredient={onIngredient} onOpenProduct={onOpenProduct} profileName={profileName} voiceEnabled={voiceEnabled}/>
+            {waitingAfterIdx===i&&<WaitGate totalSec={waitTotal} secsLeft={waitSecs} running={waitRunning} onToggle={onToggleWait} onSkip={onSkipWait} hint={waitHint} why={waitWhy} nextName={nextReal?nextReal.name:null}/>}
+          </React.Fragment>;
+        })}
+      </div>
+      {isFinished&&<div style={{padding:"8px 16px"}}>
+        <button onClick={onShowComplete} style={{width:"100%",height:54,borderRadius:18,border:"none",background:P.accent,color:P.onAccent,fontSize:15,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+          <Icon n="sparkle" size={16} color={P.onAccent} fill={P.onAccent} sw={1}/>Registrar rutina completada
+        </button>
+      </div>}
+    </>}
     <div style={{height:110}}/>
   </div>;
 }
