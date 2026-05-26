@@ -3622,6 +3622,15 @@ function App(){
   const [activeIdx,setActiveIdx]=React.useState(null);
   const [doneSteps,setDoneSteps]=React.useState(()=>_restored?new Set(_restored.doneSteps):new Set());
   const [showComplete,setShowComplete]=React.useState(false);
+  // Estado persistente: qué rutinas de HOY ya están terminadas (con hora).
+  const [completionsToday,setCompletionsToday]=React.useState(()=>getTodayCompletions());
+  function refreshCompletions(){setCompletionsToday(getTodayCompletions());}
+  function handleUndoCompletionFor(modeToUndo){
+    if(!confirm("¿Marcar esta rutina como NO completada y volver a hacerla?"))return;
+    unmarkRoutineCompletedToday(modeToUndo);
+    refreshCompletions();
+    setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();
+  }
   const [showCamera,setShowCamera]=React.useState(false);
   const [history,setHistory]=React.useState(()=>ls("kb_history",[]));
   const [diary,setDiary]=React.useState(()=>ls("kb_diary",[]));
