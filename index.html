@@ -372,6 +372,31 @@ function loadRoutineProgress(){
   return p;
 }
 function clearRoutineProgress(){localStorage.removeItem("kb_routine_progress");}
+
+// ─── COMPLETION TRACKING POR MODO ─────────────────
+// Guarda la hora en que se completó la rutina de cada modo HOY.
+// Sobrevive cierres de app. Se ignora automáticamente al cambiar de día.
+function getTodayCompletions(){
+  const d=ls("kb_completed_today",null);
+  if(!d||d.date!==todayStr())return {morning:null,night:null,nightRetinal:null};
+  return {morning:d.morning||null,night:d.night||null,nightRetinal:d.nightRetinal||null};
+}
+function markRoutineCompletedToday(mode){
+  if(!mode)return;
+  const time=new Date().toTimeString().slice(0,5);
+  const today=todayStr();
+  const existing=ls("kb_completed_today",null);
+  const base=(existing&&existing.date===today)?Object.assign({},existing):{date:today,morning:null,night:null,nightRetinal:null};
+  base[mode]=time;
+  lsSet("kb_completed_today",base);
+}
+function unmarkRoutineCompletedToday(mode){
+  if(!mode)return;
+  const d=ls("kb_completed_today",null);
+  if(!d||d.date!==todayStr())return;
+  const next=Object.assign({},d);next[mode]=null;
+  lsSet("kb_completed_today",next);
+}
 // Backup reminder cada 2 semanas (día 1 y día 15 de cada mes). Persistido para no repetirse el mismo día.
 function shouldShowBackupReminder(){
   const today=todayStr();
