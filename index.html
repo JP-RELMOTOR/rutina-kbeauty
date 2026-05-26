@@ -879,7 +879,7 @@ function IngredientSheet({ingredient,onClose}){
 }
 
 // ─── PRODUCT DETAIL SHEET ────────────────────────
-function ProductDetailSheet({product,onClose,onOpenIngredient}){
+function ProductDetailSheet({product,onClose,onOpenIngredient,onAskAlternative}){
   if(!product)return null;
   const routineEmoji={morning:"☀️",night:"🌙",nightRetinal:"🌙🔴"};
   const info=getProductInfo(product);
