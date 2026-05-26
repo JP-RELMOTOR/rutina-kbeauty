@@ -2735,14 +2735,24 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak,initialInp
       {messages.map(function(m,i){
         const isUser=m.role==="user";
         const isLocal=m._local===true;
-        const canSpeak=!isUser&&!isLocal&&m.content;
+        // Normaliza el contenido a un array de bloques para render unificado (texto y/o imagen).
+        const blocks=typeof m.content==="string"?[{type:"text",text:m.content}]:(Array.isArray(m.content)?m.content:[{type:"text",text:String(m.content||"")}]);
+        const textOnly=blocks.filter(function(b){return b&&b.type==="text";}).map(function(b){return b.text;}).join("\n");
+        const canSpeak=!isUser&&!isLocal&&textOnly;
         const bubbleBg=isUser?P.accent:(isLocal?P.accentSoft:P.card);
         return <div key={i} style={{display:"flex",justifyContent:isUser?"flex-end":"flex-start",marginBottom:10}}>
           <div style={{maxWidth:"82%",display:"flex",flexDirection:"column",alignItems:isUser?"flex-end":"flex-start",gap:4}}>
             <div style={{padding:"10px 14px",borderRadius:isUser?"18px 18px 4px 18px":"18px 18px 18px 4px",background:bubbleBg,color:isUser?P.onAccent:P.text,fontSize:13.5,lineHeight:1.5,border:isUser?"none":`1px solid ${P.border}`,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
-              {m.content}
+              {blocks.map(function(b,bi){
+                if(b&&b.type==="image"&&b.source&&b.source.data){
+                  const src="data:"+(b.source.media_type||"image/jpeg")+";base64,"+b.source.data;
+                  return <img key={bi} src={src} alt="foto" style={{maxWidth:"100%",maxHeight:280,borderRadius:12,display:"block",marginBottom:b.text?6:0}}/>;
+                }
+                if(b&&b.type==="text")return <span key={bi}>{b.text}</span>;
+                return null;
+              })}
             </div>
-            {canSpeak&&<button onClick={function(){toggleSpeak(i,m.content);}} title={speakingIdx===i?"Detener lectura":"Escuchar"} style={{padding:"3px 10px",borderRadius:14,border:`1px solid ${P.border}`,background:speakingIdx===i?P.accent:"transparent",color:speakingIdx===i?P.onAccent:P.muted,fontSize:10.5,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5,fontFamily:"inherit"}}>
+            {canSpeak&&<button onClick={function(){toggleSpeak(i,textOnly);}} title={speakingIdx===i?"Detener lectura":"Escuchar"} style={{padding:"3px 10px",borderRadius:14,border:`1px solid ${P.border}`,background:speakingIdx===i?P.accent:"transparent",color:speakingIdx===i?P.onAccent:P.muted,fontSize:10.5,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5,fontFamily:"inherit"}}>
               <span style={{fontSize:11}}>{speakingIdx===i?"⏹":"🔊"}</span>
               <span>{speakingIdx===i?"Detener":"Escuchar"}</span>
             </button>}
