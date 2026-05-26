@@ -2661,12 +2661,14 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak,initialInp
   // Foto-diagnóstico: imagen comprimida lista para enviar (se borra después de enviar o al pulsar ×)
   const [pendingImage,setPendingImage]=React.useState(null);
   const [imageBusy,setImageBusy]=React.useState(false);
+  // Bump al cambiar personalidad en Ajustes — fuerza a useMemo a regenerar el system prompt.
+  const [personalityVersion,setPersonalityVersion]=React.useState(0);
   const scrollRef=React.useRef(null);
   const inputRef=React.useRef(null);
   const fileInputRef=React.useRef(null);
   const systemPrompt=React.useMemo(
     ()=>buildClaudeSystemPrompt({profile,phase,mode,routine,history,streak}),
-    [profile,phase,mode,routine,streak]
+    [profile,phase,mode,routine,streak,personalityVersion]
   );
   React.useEffect(()=>{
     if(scrollRef.current)scrollRef.current.scrollTop=scrollRef.current.scrollHeight;
