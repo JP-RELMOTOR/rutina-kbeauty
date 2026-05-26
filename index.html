@@ -2107,8 +2107,30 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
     {backupReminderOpen&&<BackupReminder onExport={onBackupExport} onDismiss={onBackupDismiss}/>}
     <DayPlanBanner phase={phase}/>
     <DailyTip profileSex={profileSex} profile={profile} phase={phase} mode={mode} streak={streak}/>
-    <ModeToggle mode={mode} onChange={setMode}/>
-    <ExpressToggle express={expressMode} onChange={onExpressChange}/>
+    <ModeToggle mode={mode} onChange={setMode} completionsToday={completionsToday}/>
+    {/* Si la rutina del modo actual ya está completada hoy → mostramos un panel celebratorio
+        y ocultamos los pasos. El usuario puede deshacer o cambiar al otro modo. */}
+    {(completionsToday&&completionsToday[mode])?(()=>{
+      const doneTime=completionsToday[mode];
+      const modeLabel={morning:"de la mañana",night:"de la noche",nightRetinal:"de la noche con retinal"}[mode]||mode;
+      const otherMode=mode==="morning"?"night":"morning";
+      const otherDone=mode==="morning"?(completionsToday.night||completionsToday.nightRetinal):completionsToday.morning;
+      return <div style={{padding:"18px 16px 30px"}}>
+        <div style={{padding:"22px 18px",borderRadius:22,background:P.greenSoft,border:`1.5px solid ${P.green}`,textAlign:"center"}}>
+          <div style={{fontSize:48,marginBottom:8}}>✅</div>
+          <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:22,color:P.text,letterSpacing:"-.3px",marginBottom:4}}>Rutina {modeLabel} completa</div>
+          <div style={{fontSize:12,color:P.muted,letterSpacing:.2,marginBottom:18}}>Terminada hoy a las <b style={{color:P.green,fontFamily:"'JetBrains Mono',monospace"}}>{doneTime}</b></div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            <button onClick={()=>setMode(otherMode)} style={{width:"100%",padding:"12px 14px",borderRadius:14,border:`1.5px solid ${otherDone?P.green:P.accent}`,background:otherDone?P.greenSoft:P.accentSoft,color:otherDone?P.green:P.accent,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+              {mode==="morning"?<>🌙 Ir a rutina de noche{otherDone&&" ✓"}</>:<>☀️ Ir a rutina de mañana{otherDone&&" ✓"}</>}
+            </button>
+            <button onClick={()=>onUndoCompletion&&onUndoCompletion(mode)} style={{width:"100%",padding:"10px 14px",borderRadius:14,border:`1px solid ${P.border}`,background:"transparent",color:P.muted,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>
+              ↶ Marcar como no completada
+            </button>
+          </div>
+        </div>
+      </div>;
+    })():<><ExpressToggle express={expressMode} onChange={onExpressChange}/></>}
     <div style={{padding:"14px 16px 10px"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
         <div style={{fontSize:11,color:P.muted,letterSpacing:.3,textTransform:"uppercase",fontWeight:600}}>Progreso</div>
