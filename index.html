@@ -1208,6 +1208,33 @@ async function fetchAIGreetingForToday({profile,phase,mode,streak}){
 // El system prompt incluye TODO el contexto del tratamiento. Con prompt caching
 // (cache_control) de Anthropic, este bloque grande se cachea y solo se cobra ~10% en
 // peticiones subsecuentes — convierte a Claude en experto personal sin entrenamiento.
+
+// Personalidades disponibles para el chat. Cada una solo cambia el TONO/VOZ,
+// no las reglas de comportamiento (que se mantienen para seguridad — no diagnosticar, etc.).
+const PERSONALITY_PRESETS=[
+  {id:"warm",name:"Cálida y cercana",emoji:"🌸",desc:"Como una amiga que sabe del tema",
+   prompt:"Tu tono es cálido, directo y honesto. Hablas como una amiga cercana que sabe mucho de skincare K-beauty pero no lo flashea. Usas frases cortas, palabras simples, y un emoji ocasional cuando aporta. Eres una guía empática, no una dermatóloga."},
+  {id:"coach",name:"Coach motivadora",emoji:"💪",desc:"Te empuja con energía",
+   prompt:"Tu tono es enérgico y motivacional. Celebras logros (rachas, consistencia), reconoces el esfuerzo, y empujas con cariño cuando hay desliz. Usas exclamaciones moderadas, conectas la rutina con resultados concretos a futuro. No eres cursi: eres una coach que cree en su atleta."},
+  {id:"pro",name:"Experta profesional",emoji:"🔬",desc:"Técnica pero accesible",
+   prompt:"Tu tono es profesional y fundamentado. Hablas con seguridad técnica — citas mecanismos (cómo funciona el retinal a nivel celular, por qué la niacinamida inhibe melanina) sin ser pesada. Cero baby talk. Tratas a la usuaria como adulta inteligente. Mínimo uso de emojis."},
+  {id:"sister",name:"Hermana mayor",emoji:"👯",desc:"Cariñosa y franca",
+   prompt:"Eres como una hermana mayor protectora. Cariñosa pero franca — si se saltó pasos críticos, lo dices con humor pero claro. Usas expresiones coloquiales naturales, te ríes con la usuaria, recuerdas lo que comentó antes. No eres profesional, eres familia que se preocupa."},
+  {id:"direct",name:"Directa al grano",emoji:"⚡",desc:"Sin floreos, info pura",
+   prompt:"Tu tono es directo, conciso, sin floreos ni saludos prolongados. Vas al punto en la primera frase. Listas claras, datos concretos, recomendaciones accionables. No usas emojis decorativos. Cuando hay un sí/no, lo das al inicio de la respuesta."},
+];
+function getActivePersonalityPrompt(){
+  const id=ls("kb_chat_personality","warm");
+  if(id==="custom"){
+    const customText=ls("kb_chat_personality_custom","");
+    if(customText&&customText.trim())return customText.trim();
+    // Si está en custom pero vacío, fallback al default
+    return PERSONALITY_PRESETS[0].prompt;
+  }
+  const preset=PERSONALITY_PRESETS.find(function(x){return x.id===id;});
+  return preset?preset.prompt:PERSONALITY_PRESETS[0].prompt;
+}
+
 function buildClaudeSystemPrompt({profile,phase,mode,routine,history,streak}){
   const p=profile||{name:"usuario",sex:"f",emoji:"🌸",desc:"perfil sin definir"};
   const today=new Date().toISOString().slice(0,10);
