@@ -2430,6 +2430,81 @@ function TabBar({tab,onTab}){
 }
 
 // ─── CHAT DE CLAUDE ──────────────────────────────
+// ─── CHAT HELPERS: chips, ingredient checker, voice in/out ──────────────
+const CHAT_CHIPS=[
+  {key:"check",emoji:"🔍",label:"Verificar ingredientes",mode:"checker"},
+  {key:"irrit",emoji:"💧",label:"Mi piel está irritada",prompt:"Mi piel se siente irritada o rojiza hoy. ¿Qué pasos de mi rutina debo saltar o suavizar? Sé concreto."},
+  {key:"retinal",emoji:"🌙",label:"¿Hago retinal hoy?",prompt:"¿Es buena idea hacer retinal hoy según mi fase, mi racha y la rutina de la semana? Si no, ¿qué rutina alternativa hago?"},
+  {key:"combine",emoji:"💊",label:"¿Puedo combinar X con Y?",prompt:"Quiero saber si puedo combinar dos productos (de mi rutina o uno nuevo con uno mío). Ahora te digo cuáles:"},
+  {key:"replace",emoji:"🔄",label:"Se me acabó un producto",prompt:"Se me acabó un producto de mi rutina y necesito alternativa del mismo paso. Te digo cuál es y un par de opciones disponibles si quieres:"},
+  {key:"event",emoji:"🎉",label:"Tengo evento pronto",prompt:"Tengo un evento importante en pocos días. ¿Cómo preparo mi piel los días previos? Te cuento la fecha y detalles."},
+  {key:"travel",emoji:"✈️",label:"Voy de viaje",prompt:"Voy de viaje y solo puedo llevar 3-4 productos. ¿Cuáles son los mínimos esenciales de mi rutina y por qué?"},
+  {key:"explain",emoji:"📚",label:"Explícame mi rutina",prompt:"Explícame paso por paso por qué mi rutina actual está armada así, en lenguaje simple y sin tecnicismos."},
+];
+
+const INGREDIENT_CHECKER_INTRO="🔍 **Modo verificador activado**\n\nPégame la **lista INCI completa** del producto que estás considerando (la encuentras en la caja o web del producto, separada por comas).\n\nVoy a analizar:\n• Activos principales y su función\n• Choques con tu rutina actual (ej. AHA + retinal, vit C + niacinamida alta)\n• Irritantes para tu tipo de piel\n• Si es redundante con productos que ya tienes\n• Recomendación final: incorporar / no / con precaución";
+
+function wrapIngredientCheckerPrompt(inci){
+  return `MODO VERIFICADOR DE INGREDIENTES.\n\nLista INCI del producto que estoy considerando:\n${inci}\n\nPor favor:\n1. Identifica activos principales (con %, si se infiere) y su función.\n2. Revisa choques con mi rutina actual (retinal, niacinamida, vit C, AHA/BHA, etc.).\n3. Marca irritantes para mi tipo de piel y mi fase.\n4. Detecta redundancias con productos que ya tengo.\n5. Termina con un veredicto claro: ✅ Incorporar / ⚠️ Con precaución / ❌ No recomendado, con motivo en una línea.`;
+}
+
+// Web Speech API · entrada de voz (micrófono → texto)
+function useSpeechRecognition({onResult,onFinal,onError}){
+  const [supported,setSupported]=React.useState(false);
+  const [listening,setListening]=React.useState(false);
+  const recogRef=React.useRef(null);
+  const callbacksRef=React.useRef({onResult,onFinal,onError});
+  callbacksRef.current={onResult,onFinal,onError};
+  React.useEffect(()=>{
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){setSupported(false);return;}
+    setSupported(true);
+    const r=new SR();
+    r.lang="es-ES";
+    r.continuous=false;
+    r.interimResults=true;
+    r.maxAlternatives=1;
+    r.onresult=ev=>{
+      const last=ev.results[ev.results.length-1];
+      const text=Array.from(ev.results).map(res=>res[0].transcript).join("");
+      callbacksRef.current.onResult&&callbacksRef.current.onResult(text);
+      if(last.isFinal)callbacksRef.current.onFinal&&callbacksRef.current.onFinal(text);
+    };
+    r.onerror=err=>{setListening(false);callbacksRef.current.onError&&callbacksRef.current.onError(err);};
+    r.onend=()=>setListening(false);
+    recogRef.current=r;
+    return ()=>{try{r.stop();}catch(e){}};
+  },[]);
+  const start=()=>{if(!recogRef.current||listening)return;try{recogRef.current.start();setListening(true);}catch(e){}};
+  const stop=()=>{if(!recogRef.current||!listening)return;try{recogRef.current.stop();}catch(e){}};
+  return {supported,listening,start,stop};
+}
+
+// Web Speech API · salida de voz (texto → audio).
+// Quitamos markdown básico para que la voz suene natural.
+function stripMarkdownForSpeech(text){
+  return (text||"")
+    .replace(/```[\s\S]*?```/g," ")
+    .replace(/`([^`]+)`/g,"$1")
+    .replace(/\*\*([^*]+)\*\*/g,"$1")
+    .replace(/\*([^*]+)\*/g,"$1")
+    .replace(/^#{1,6}\s+/gm,"")
+    .replace(/^[-•]\s+/gm,"")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g,"$1")
+    .replace(/\n{2,}/g,". ");
+}
+function speakText(text,onEnd){
+  if(!("speechSynthesis" in window))return null;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(stripMarkdownForSpeech(text));
+  u.lang="es-ES";u.rate=1.05;u.pitch=1;
+  u.onend=()=>onEnd&&onEnd();
+  u.onerror=()=>onEnd&&onEnd();
+  window.speechSynthesis.speak(u);
+  return u;
+}
+function stopSpeaking(){if("speechSynthesis" in window)window.speechSynthesis.cancel();}
+
 function ChatPanel({onClose,profile,phase,mode,routine,history,streak}){
   const [messages,setMessages]=React.useState(()=>ls("kb_chat_history",[]));
   const [input,setInput]=React.useState("");
