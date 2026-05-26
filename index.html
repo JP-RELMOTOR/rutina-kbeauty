@@ -2583,9 +2583,9 @@ function chatSpeak(text,onEnd){
 }
 function chatStopSpeak(){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(_e){}}
 
-function ChatPanel({onClose,profile,phase,mode,routine,history,streak}){
+function ChatPanel({onClose,profile,phase,mode,routine,history,streak,initialInput}){
   const [messages,setMessages]=React.useState(()=>ls("kb_chat_history",[]));
-  const [input,setInput]=React.useState("");
+  const [input,setInput]=React.useState(initialInput||"");
   const [loading,setLoading]=React.useState(false);
   const [showSettings,setShowSettings]=React.useState(false);
   const [workerUrl,setWorkerUrl]=React.useState(()=>ls("kb_claude_worker_url",""));
