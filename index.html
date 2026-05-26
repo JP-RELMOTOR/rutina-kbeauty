@@ -3560,6 +3560,19 @@ function App(){
   const [waitWhy,setWaitWhy]=React.useState("");
   const [showImport,setShowImport]=React.useState(false);
   const [showChat,setShowChat]=React.useState(false);
+  // Mensaje pre-llenado al abrir el chat — se usa cuando el usuario toca "Pedir alternativa"
+  // en ProductDetailSheet. Se aplica una sola vez al montar el chat.
+  const [chatPrefill,setChatPrefill]=React.useState("");
+  function handleAskAlternative(product){
+    const brand=product.brand||"";
+    const name=product.name||"";
+    const cat=product.cat||"este paso";
+    const msg=`Se me acabó el ${brand} ${name} (${cat}) de mi rutina. ¿Qué alternativas similares me recomiendas que cumplan la misma función, considerando mi perfil y fase actual?`;
+    setChatPrefill(msg);
+    setActiveProduct(null);
+    setShowChat(true);
+  }
+  function handleCloseChat(){setShowChat(false);setChatPrefill("");}
   const [backupReminderOpen,setBackupReminderOpen]=React.useState(()=>shouldShowBackupReminder());
   const [expressMode,setExpressMode]=React.useState(()=>ls("kb_express_mode",false));
   const [showRecap,setShowRecap]=React.useState(false);
