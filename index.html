@@ -2514,6 +2514,62 @@ function chatSpeak(text,onEnd){
 }
 function chatStopSpeak(){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(_e){}}
 
+// ─── FOTO-DIAGNÓSTICO: compresión + envío multi-modal ────────────────
+// Redimensiona una foto (iPhone HEIC/JPEG = 3-10MB) a un base64 chico que
+// quepa en el límite de payload del worker. Target ~80-150 KB base64.
+async function shrinkImageForVision(file,{maxDim=1024,quality=0.78}={}){
+  if(!file)throw new Error("No file");
+  // Lee como dataURL primero para soportar HEIC desde iOS (Safari decodifica al renderizar).
+  const dataUrl=await new Promise(function(resolve,reject){
+    const r=new FileReader();
+    r.onload=function(){resolve(r.result);};
+    r.onerror=function(){reject(new Error("No pude leer la foto"));};
+    r.readAsDataURL(file);
+  });
+  const img=await new Promise(function(resolve,reject){
+    const i=new Image();
+    i.onload=function(){resolve(i);};
+    i.onerror=function(){reject(new Error("Formato de imagen no soportado en tu navegador. Prueba con JPG o PNG."));};
+    i.src=dataUrl;
+  });
+  let w=img.naturalWidth||img.width;
+  let h=img.naturalHeight||img.height;
+  if(w>h&&w>maxDim){h=Math.round(h*maxDim/w);w=maxDim;}
+  else if(h>=w&&h>maxDim){w=Math.round(w*maxDim/h);h=maxDim;}
+  const canvas=document.createElement("canvas");
+  canvas.width=w;canvas.height=h;
+  const ctx=canvas.getContext("2d");
+  ctx.drawImage(img,0,0,w,h);
+  // Algunos quality steps por si la primera compresión queda muy grande.
+  let q=quality;
+  for(let attempt=0;attempt<4;attempt++){
+    const out=canvas.toDataURL("image/jpeg",q);
+    // out es "data:image/jpeg;base64,XXX..."
+    const base64=out.split(",")[1]||"";
+    // Estimación de tamaño en bytes desde la cadena base64
+    const bytes=Math.floor(base64.length*0.75);
+    if(bytes<140*1024||q<=0.35)return {data:base64,mediaType:"image/jpeg",bytes:bytes,width:w,height:h};
+    q-=0.15;
+  }
+  // Si falla, devuelve la última (mejor algo que nada)
+  const out=canvas.toDataURL("image/jpeg",0.35);
+  return {data:out.split(",")[1]||"",mediaType:"image/jpeg",bytes:0,width:w,height:h};
+}
+
+// Convierte un mensaje del chat a una versión "ligera" para localStorage
+// (reemplaza bloques de imagen con un marcador para no llenar el storage).
+function stripImagesForStorage(messages){
+  return (messages||[]).map(function(m){
+    if(typeof m.content==="string")return m;
+    if(!Array.isArray(m.content))return m;
+    const stripped=m.content.map(function(b){
+      if(b&&b.type==="image")return {type:"text",text:"📸 [foto enviada · disponible solo en esta sesión]"};
+      return b;
+    });
+    return Object.assign({},m,{content:stripped});
+  });
+}
+
 function ChatPanel({onClose,profile,phase,mode,routine,history,streak,initialInput}){
   const [messages,setMessages]=React.useState(()=>ls("kb_chat_history",[]));
   const [input,setInput]=React.useState(initialInput||"");
