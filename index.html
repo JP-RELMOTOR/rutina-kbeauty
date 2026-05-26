@@ -1689,22 +1689,26 @@ function WaitGate({totalSec,secsLeft,running,onToggle,onSkip,hint,why,nextName})
 }
 
 // ─── MODE TOGGLE ─────────────────────────────────
-function ModeToggle({mode,onChange}){
+function ModeToggle({mode,onChange,completionsToday}){
   const isNight=mode==="night"||mode==="nightRetinal";
+  const c=completionsToday||{};
+  const morningDone=!!c.morning;
+  const nightDone=!!(c.night||c.nightRetinal);
   return<div style={{padding:"0 16px"}}>
     <div style={{display:"flex",padding:4,borderRadius:14,background:P.cream,border:`1px solid ${P.border}`}}>
-      {[{id:"morning",label:"Mañana",icon:"sun"},{id:"night",label:"Noche",icon:"moon"}].map(o=>{
+      {[{id:"morning",label:"Mañana",icon:"sun",done:morningDone},{id:"night",label:"Noche",icon:"moon",done:nightDone}].map(o=>{
         const a=o.id==="morning"?mode==="morning":isNight;
-        return<button key={o.id} onClick={()=>onChange(o.id==="morning"?"morning":"night")} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:13.5,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:7,cursor:"pointer",transition:"all .2s",boxShadow:a?"0 1px 4px rgba(0,0,0,.07)":"none"}}>
+        return<button key={o.id} onClick={()=>onChange(o.id==="morning"?"morning":"night")} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:13.5,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:7,cursor:"pointer",transition:"all .2s",boxShadow:a?"0 1px 4px rgba(0,0,0,.07)":"none",position:"relative"}}>
           <Icon n={o.icon} size={14} color={a?P.text:P.muted}/>{o.label}
+          {o.done&&<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:18,height:18,borderRadius:9,background:P.green,color:"#fff",fontSize:11,fontWeight:700,marginLeft:2,letterSpacing:0}}>✓</span>}
         </button>;
       })}
     </div>
     {isNight&&<div style={{display:"flex",gap:6,marginTop:8}}>
-      {[{id:"night",label:"⚪ Sin Retinal"},{id:"nightRetinal",label:"🔴 Con Retinal"}].map(o=>{
+      {[{id:"night",label:"⚪ Sin Retinal",done:!!c.night},{id:"nightRetinal",label:"🔴 Con Retinal",done:!!c.nightRetinal}].map(o=>{
         const a=mode===o.id;
-        return<button key={o.id} onClick={()=>onChange(o.id)} style={{flex:1,height:34,borderRadius:11,border:`1.5px solid ${a?(o.id==="nightRetinal"?P.retinal:P.accent):P.border}`,background:a?(o.id==="nightRetinal"?P.retinalSoft:P.accentSoft):"transparent",color:a?(o.id==="nightRetinal"?P.retinal:P.text):P.muted,fontSize:12.5,fontWeight:600,cursor:"pointer",transition:"all .2s"}}>
-          {o.label}
+        return<button key={o.id} onClick={()=>onChange(o.id)} style={{flex:1,height:34,borderRadius:11,border:`1.5px solid ${a?(o.id==="nightRetinal"?P.retinal:P.accent):P.border}`,background:a?(o.id==="nightRetinal"?P.retinalSoft:P.accentSoft):"transparent",color:a?(o.id==="nightRetinal"?P.retinal:P.text):P.muted,fontSize:12.5,fontWeight:600,cursor:"pointer",transition:"all .2s",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+          {o.label}{o.done&&<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:16,height:16,borderRadius:8,background:P.green,color:"#fff",fontSize:10,fontWeight:700}}>✓</span>}
         </button>;
       })}
     </div>}
