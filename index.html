@@ -2604,25 +2604,67 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak,initialInp
 
   function handleSend(overrideText){
     const raw=(overrideText!=null?overrideText:input).trim();
-    if(!raw||loading)return;
+    // Permitimos enviar si hay texto O imagen pendiente
+    if((!raw&&!pendingImage)||loading)return;
     if(voiceIn.listening)voiceIn.stop();
     chatStopSpeak();
     setSpeakingIdx(-1);
-    // Modo verificador: mostramos al usuario solo el INCI; enviamos al modelo la plantilla envuelta.
-    const apiContent=checkerMode?wrapIngredientCheckerPrompt(raw):raw;
-    const newMsgsForUi=messages.concat([{role:"user",content:raw}]);
-    const apiHistory=messages.filter(function(m){return !m._local;}).map(function(m){return {role:m.role,content:m.content};});
+    let uiContent,apiContent;
+    if(pendingImage){
+      // Pregunta por defecto si el usuario no escribió nada — foto-diagnóstico de skin completo
+      const defaultQ="Mira esta foto de mi piel. Analiza: textura, brillo, manchas, rojez, descamación. Dime si parece purga del retinal vs reacción/irritación vs estado normal. Qué hacer hoy en mi rutina y si debería consultar dermatólogo.";
+      const txt=raw||defaultQ;
+      const imgBlock={type:"image",source:{type:"base64",media_type:pendingImage.mediaType,data:pendingImage.data}};
+      const textBlock={type:"text",text:txt};
+      uiContent=[imgBlock,textBlock];
+      apiContent=[imgBlock,textBlock];
+    }else{
+      apiContent=checkerMode?wrapIngredientCheckerPrompt(raw):raw;
+      uiContent=raw;
+    }
+    const newMsgsForUi=messages.concat([{role:"user",content:uiContent}]);
+    // Historial para la API: filtramos mensajes locales Y eliminamos las imágenes viejas
+    // (ahorro de tokens — Anthropic cobra por cada imagen en cada turno).
+    const apiHistory=messages.filter(function(m){return !m._local;}).map(function(m){
+      if(typeof m.content==="string")return {role:m.role,content:m.content};
+      if(!Array.isArray(m.content))return {role:m.role,content:String(m.content||"")};
+      const textOnly=m.content.filter(function(b){return b&&b.type==="text";}).map(function(b){return b.text;}).join("\n");
+      return {role:m.role,content:textOnly||"(turno con foto previa)"};
+    });
     const newMsgsForApi=apiHistory.concat([{role:"user",content:apiContent}]);
     setMessages(newMsgsForUi);
-    lsSet("kb_chat_history",newMsgsForUi);
+    lsSet("kb_chat_history",stripImagesForStorage(newMsgsForUi));
     setInput("");
     setCheckerMode(false);
+    setPendingImage(null);
     setLoading(true);
     sendToClaude({systemPrompt,messages:newMsgsForApi}).then(function(reply){
       const finalMsgs=newMsgsForUi.concat([reply]);
       setMessages(finalMsgs);
-      lsSet("kb_chat_history",finalMsgs);
+      lsSet("kb_chat_history",stripImagesForStorage(finalMsgs));
     }).finally(function(){setLoading(false);});
+  }
+  async function handleImageFile(file){
+    if(!file||imageBusy)return;
+    setImageBusy(true);
+    try{
+      const compressed=await shrinkImageForVision(file);
+      const preview="data:"+compressed.mediaType+";base64,"+compressed.data;
+      setPendingImage({data:compressed.data,mediaType:compressed.mediaType,preview:preview,bytes:compressed.bytes,width:compressed.width,height:compressed.height});
+    }catch(e){
+      alert("No pude procesar esa foto: "+(e&&e.message?e.message:e));
+    }finally{
+      setImageBusy(false);
+    }
+  }
+  function handleImagePick(e){
+    const f=e.target.files&&e.target.files[0];
+    e.target.value="";
+    if(f)handleImageFile(f);
+  }
+  function openImagePicker(){
+    if(imageBusy||loading)return;
+    if(fileInputRef.current)fileInputRef.current.click();
   }
   function handleClear(){
     if(confirm("¿Borrar el historial del chat?")){
