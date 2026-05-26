@@ -3847,6 +3847,8 @@ function App(){
         sleep:w.sleep||null,energy:w.energy||null,stress:w.stress||null,water:w.water||null,sun:w.sun||null};
       const newD=[...diary,entry];setDiary(newD);lsSet("kb_diary",newD);
     }
+    // Marca la rutina del modo actual como completada HOY (persiste hasta el próximo día).
+    markRoutineCompletedToday(mode);refreshCompletions();
     setShowComplete(false);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();
   }
 
