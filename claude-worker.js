@@ -39,10 +39,11 @@ export default {
     try {
       const body = await request.json();
 
-      // Defensa: limitar tamaño del system prompt y mensajes para evitar abuso
+      // Defensa: limitar tamaño del system prompt y mensajes para evitar abuso.
+      // El límite de mensajes está alto porque ahora aceptamos imágenes (base64 ~200KB c/u).
       const systemLen = (body.system || []).reduce((a, b) => a + (b.text?.length || 0), 0);
       const msgsLen = JSON.stringify(body.messages || []).length;
-      if (systemLen > 50000 || msgsLen > 100000) {
+      if (systemLen > 50000 || msgsLen > 800000) {
         return new Response(
           JSON.stringify({ error: "Payload demasiado grande" }),
           { status: 413, headers: { ...corsHeaders, "Content-Type": "application/json" } }
