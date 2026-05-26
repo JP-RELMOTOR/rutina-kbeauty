@@ -2760,6 +2760,8 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak,initialInp
   function handleSaveSettings(url){
     setWorkerUrl(url);
     lsSet("kb_claude_worker_url",url);
+    // Forzar regeneración del system prompt (puede haber cambiado la personalidad).
+    setPersonalityVersion(function(v){return v+1;});
     setShowSettings(false);
   }
   function handleChipClick(chip){
