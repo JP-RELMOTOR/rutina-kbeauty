@@ -2369,26 +2369,9 @@ function ProgressScreen({history,streak}){
 // ─── INFO SCREEN (biblioteca de skincare) ────────
 function InfoScreen({onOpenProduct,onOpenIngredient}){
   const [section,setSection]=React.useState("productos");
-  const [tipCat,setTipCat]=React.useState("todos");
-  const [openFaq,setOpenFaq]=React.useState(null);
   const products=React.useMemo(()=>getUniqueProducts(),[]);
-  const tipCategories=["todos","técnica","ingrediente","mito","piel","ritual","producto"];
-  const filteredTips=React.useMemo(()=>tipCat==="todos"?TIPS:TIPS.filter(t=>t.c===tipCat),[tipCat]);
-  const faqCatColors={
-    "bloqueador":{bg:"#f3e3bf",fg:"#8a6420"},
-    "retinal":{bg:"#fdecea",fg:"#c04030"},
-    "seguridad":{bg:"#f4d6c1",fg:"#a8511e"},
-    "rutina":{bg:"#e9f1ee",fg:"#2c6048"},
-    "productos":{bg:"#e0ecf0",fg:"#2a6080"},
-  };
-  const catColors={
-    "técnica":{bg:"#e9f1ee",fg:"#2c6048"},
-    "ingrediente":{bg:"#f3e3bf",fg:"#8a6420"},
-    "mito":{bg:"#f4d6c1",fg:"#a8511e"},
-    "piel":{bg:"#fdecea",fg:"#c04030"},
-    "ritual":{bg:"#e8e4f0",fg:"#5a4a82"},
-    "producto":{bg:"#e0ecf0",fg:"#2a6080"},
-  };
+  // Tips y Preguntas se eliminaron del UI — ahora viven dentro del agente del chat
+  // (el system prompt sigue cargando TIPS y FAQS desde sus constantes en el archivo).
 
   return<div>
     <div style={{padding:"56px 20px 12px"}}>
@@ -2399,10 +2382,10 @@ function InfoScreen({onOpenProduct,onOpenIngredient}){
     {/* Section tabs */}
     <div style={{padding:"0 16px 12px"}}>
       <div style={{display:"flex",padding:4,borderRadius:14,background:P.cream,border:`1px solid ${P.border}`}}>
-        {[{id:"productos",l:"Productos",e:"🧴"},{id:"ingredientes",l:"Ingredientes",e:"🧪"},{id:"tips",l:"Tips",e:"💡"},{id:"preguntas",l:"Preguntas",e:"❓"}].map(s=>{
+        {[{id:"productos",l:"Productos",e:"🧴"},{id:"ingredientes",l:"Ingredientes",e:"🧪"}].map(s=>{
           const a=section===s.id;
-          return<button key={s.id} onClick={()=>setSection(s.id)} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:3,cursor:"pointer",transition:"all .2s",boxShadow:a?"0 1px 4px rgba(0,0,0,.07)":"none"}}>
-            <span style={{fontSize:12}}>{s.e}</span>{s.l}
+          return<button key={s.id} onClick={()=>setSection(s.id)} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:5,cursor:"pointer",transition:"all .2s",boxShadow:a?"0 1px 4px rgba(0,0,0,.07)":"none"}}>
+            <span style={{fontSize:13}}>{s.e}</span>{s.l}
           </button>;
         })}
       </div>
