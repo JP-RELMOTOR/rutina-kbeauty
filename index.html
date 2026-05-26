@@ -1116,6 +1116,60 @@ function getTipOfTheDay(profileSex){
   return eligible[seed%eligible.length];
 }
 
+// ─── AI DAILY CONTENT ────────────────────────────
+// Llama al worker con un system prompt mini (no el grande del chat) y cachea por día.
+// Devuelve null si no hay worker configurado o falla — el llamador hace fallback al contenido estático.
+async function _fetchAIDailyText({cacheKey,systemPrompt,userMsg,maxTokens}){
+  const cached=ls(cacheKey,null);
+  if(cached)return cached;
+  const workerUrl=ls("kb_claude_worker_url","");
+  if(!workerUrl)return null;
+  try{
+    const res=await fetch(workerUrl,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:ls("kb_claude_model","claude-sonnet-4-6"),
+        max_tokens:maxTokens||200,
+        system:[{type:"text",text:systemPrompt}],
+        messages:[{role:"user",content:userMsg}],
+      }),
+    });
+    if(!res.ok)return null;
+    const data=await res.json();
+    const block=(data.content||[]).find(b=>b.type==="text");
+    const text=block&&block.text&&block.text.trim();
+    if(!text)return null;
+    lsSet(cacheKey,text);
+    return text;
+  }catch(_e){return null;}
+}
+
+async function fetchAITipForToday({profile,phase,mode,streak}){
+  const p=profile||{name:"usuario",desc:"perfil sin definir",sex:"f"};
+  const phaseText={1:"fase 1 (suave, 2×/sem)",2:"fase 2 (intermedia, 3×/sem)",3:"fase 3 (avanzada, casi diaria)"}[phase]||"sin fase";
+  const sys=`Eres un dermo-coach experto en K-beauty. Vas a generar UN tip muy específico para ${p.name} (${p.desc}). Está en ${phaseText} de retinal. Rutina de hoy: ${mode}. Racha: ${streak||0} días. El tip debe ser concreto, accionable, NUEVO (no genérico — algo que aplique especialmente a hoy según fase, modo o racha). Idioma: español, tono cálido. Devuelve ÚNICAMENTE el texto del tip, sin preámbulos ni saludos ni "Tip:" al inicio. Máximo 2 frases.`;
+  return _fetchAIDailyText({
+    cacheKey:`kb_ai_tip_${todayStr()}`,
+    systemPrompt:sys,
+    userMsg:"Dame el tip del día.",
+    maxTokens:200,
+  });
+}
+
+async function fetchAIGreetingForToday({profile,phase,mode,streak}){
+  const p=profile||{name:"usuario",desc:"perfil sin definir",sex:"f"};
+  const dow=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"][new Date().getDay()];
+  const phaseText={1:"fase 1",2:"fase 2",3:"fase 3"}[phase]||"sin fase";
+  const sys=`Eres un asistente cálido y breve. Vas a generar UN saludo contextual MUY corto (1 frase, máx 14 palabras) para ${p.name}. Hoy es ${dow}. Modo de rutina: ${mode}. Fase de retinal: ${phaseText}. Racha: ${streak||0} días. El saludo debe sentirse personal, considerar el contexto (ej. lunes de retinal, racha rota, fin de semana, etc.), y dejar UN insight o motivación. Idioma: español, tono amable y directo, sin formalidad. Devuelve SOLO la frase, sin emojis al inicio, sin "Hola" ni "Saludos" ni preámbulos. Puedes incluir UN emoji al final si encaja.`;
+  return _fetchAIDailyText({
+    cacheKey:`kb_ai_greeting_${todayStr()}`,
+    systemPrompt:sys,
+    userMsg:"Dame el saludo del día.",
+    maxTokens:80,
+  });
+}
+
 // ─── CHAT DE CLAUDE: SYSTEM PROMPT + API ─────────
 // El system prompt incluye TODO el contexto del tratamiento. Con prompt caching
 // (cache_control) de Anthropic, este bloque grande se cachea y solo se cobra ~10% en
