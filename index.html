@@ -2671,6 +2671,7 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak,initialInp
       chatStopSpeak();
       setSpeakingIdx(-1);
       setMessages([]);
+      setPendingImage(null);
       lsSet("kb_chat_history",[]);
     }
   }
