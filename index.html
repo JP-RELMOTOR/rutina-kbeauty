@@ -30,9 +30,6 @@ textarea{font-family:'Inter',system-ui,sans-serif;}
 @keyframes assistantFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 @keyframes tooltipIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
 @keyframes sparkleSpin{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(15deg) scale(1.08)}}
-@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,80,60,.55)}50%{box-shadow:0 0 0 8px rgba(220,80,60,0)}}
-@keyframes speakWave{0%,100%{transform:scaleY(.6)}50%{transform:scaleY(1)}}
-@keyframes chipsScrollHint{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
 
   /* INGREDIENT CHIPS */
   .ingr-section { margin: 10px 18px 0; }
@@ -2430,91 +2427,13 @@ function TabBar({tab,onTab}){
 }
 
 // ─── CHAT DE CLAUDE ──────────────────────────────
-// ─── CHAT HELPERS: chips, ingredient checker, voice in/out ──────────────
-const CHAT_CHIPS=[
-  {key:"check",emoji:"🔍",label:"Verificar ingredientes",mode:"checker"},
-  {key:"irrit",emoji:"💧",label:"Mi piel está irritada",prompt:"Mi piel se siente irritada o rojiza hoy. ¿Qué pasos de mi rutina debo saltar o suavizar? Sé concreto."},
-  {key:"retinal",emoji:"🌙",label:"¿Hago retinal hoy?",prompt:"¿Es buena idea hacer retinal hoy según mi fase, mi racha y la rutina de la semana? Si no, ¿qué rutina alternativa hago?"},
-  {key:"combine",emoji:"💊",label:"¿Puedo combinar X con Y?",prompt:"Quiero saber si puedo combinar dos productos (de mi rutina o uno nuevo con uno mío). Ahora te digo cuáles:"},
-  {key:"replace",emoji:"🔄",label:"Se me acabó un producto",prompt:"Se me acabó un producto de mi rutina y necesito alternativa del mismo paso. Te digo cuál es y un par de opciones disponibles si quieres:"},
-  {key:"event",emoji:"🎉",label:"Tengo evento pronto",prompt:"Tengo un evento importante en pocos días. ¿Cómo preparo mi piel los días previos? Te cuento la fecha y detalles."},
-  {key:"travel",emoji:"✈️",label:"Voy de viaje",prompt:"Voy de viaje y solo puedo llevar 3-4 productos. ¿Cuáles son los mínimos esenciales de mi rutina y por qué?"},
-  {key:"explain",emoji:"📚",label:"Explícame mi rutina",prompt:"Explícame paso por paso por qué mi rutina actual está armada así, en lenguaje simple y sin tecnicismos."},
-];
-
-const INGREDIENT_CHECKER_INTRO="🔍 **Modo verificador activado**\n\nPégame la **lista INCI completa** del producto que estás considerando (la encuentras en la caja o web del producto, separada por comas).\n\nVoy a analizar:\n• Activos principales y su función\n• Choques con tu rutina actual (ej. AHA + retinal, vit C + niacinamida alta)\n• Irritantes para tu tipo de piel\n• Si es redundante con productos que ya tienes\n• Recomendación final: incorporar / no / con precaución";
-
-function wrapIngredientCheckerPrompt(inci){
-  return `MODO VERIFICADOR DE INGREDIENTES.\n\nLista INCI del producto que estoy considerando:\n${inci}\n\nPor favor:\n1. Identifica activos principales (con %, si se infiere) y su función.\n2. Revisa choques con mi rutina actual (retinal, niacinamida, vit C, AHA/BHA, etc.).\n3. Marca irritantes para mi tipo de piel y mi fase.\n4. Detecta redundancias con productos que ya tengo.\n5. Termina con un veredicto claro: ✅ Incorporar / ⚠️ Con precaución / ❌ No recomendado, con motivo en una línea.`;
-}
-
-// Web Speech API · entrada de voz (micrófono → texto)
-function useSpeechRecognition({onResult,onFinal,onError}){
-  const [supported,setSupported]=React.useState(false);
-  const [listening,setListening]=React.useState(false);
-  const recogRef=React.useRef(null);
-  const callbacksRef=React.useRef({onResult,onFinal,onError});
-  callbacksRef.current={onResult,onFinal,onError};
-  React.useEffect(()=>{
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!SR){setSupported(false);return;}
-    setSupported(true);
-    const r=new SR();
-    r.lang="es-ES";
-    r.continuous=false;
-    r.interimResults=true;
-    r.maxAlternatives=1;
-    r.onresult=ev=>{
-      const last=ev.results[ev.results.length-1];
-      const text=Array.from(ev.results).map(res=>res[0].transcript).join("");
-      callbacksRef.current.onResult&&callbacksRef.current.onResult(text);
-      if(last.isFinal)callbacksRef.current.onFinal&&callbacksRef.current.onFinal(text);
-    };
-    r.onerror=err=>{setListening(false);callbacksRef.current.onError&&callbacksRef.current.onError(err);};
-    r.onend=()=>setListening(false);
-    recogRef.current=r;
-    return ()=>{try{r.stop();}catch(e){}};
-  },[]);
-  const start=()=>{if(!recogRef.current||listening)return;try{recogRef.current.start();setListening(true);}catch(e){}};
-  const stop=()=>{if(!recogRef.current||!listening)return;try{recogRef.current.stop();}catch(e){}};
-  return {supported,listening,start,stop};
-}
-
-// Web Speech API · salida de voz (texto → audio).
-// Quitamos markdown básico para que la voz suene natural.
-function stripMarkdownForSpeech(text){
-  return (text||"")
-    .replace(/```[\s\S]*?```/g," ")
-    .replace(/`([^`]+)`/g,"$1")
-    .replace(/\*\*([^*]+)\*\*/g,"$1")
-    .replace(/\*([^*]+)\*/g,"$1")
-    .replace(/^#{1,6}\s+/gm,"")
-    .replace(/^[-•]\s+/gm,"")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g,"$1")
-    .replace(/\n{2,}/g,". ");
-}
-function speakText(text,onEnd){
-  if(!("speechSynthesis" in window))return null;
-  window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(stripMarkdownForSpeech(text));
-  u.lang="es-ES";u.rate=1.05;u.pitch=1;
-  u.onend=()=>onEnd&&onEnd();
-  u.onerror=()=>onEnd&&onEnd();
-  window.speechSynthesis.speak(u);
-  return u;
-}
-function stopSpeaking(){if("speechSynthesis" in window)window.speechSynthesis.cancel();}
-
 function ChatPanel({onClose,profile,phase,mode,routine,history,streak}){
   const [messages,setMessages]=React.useState(()=>ls("kb_chat_history",[]));
   const [input,setInput]=React.useState("");
   const [loading,setLoading]=React.useState(false);
   const [showSettings,setShowSettings]=React.useState(false);
   const [workerUrl,setWorkerUrl]=React.useState(()=>ls("kb_claude_worker_url",""));
-  const [checkerMode,setCheckerMode]=React.useState(false);
-  const [speakingIdx,setSpeakingIdx]=React.useState(-1);
   const scrollRef=React.useRef(null);
-  const inputRef=React.useRef(null);
   const systemPrompt=React.useMemo(
     ()=>buildClaudeSystemPrompt({profile,phase,mode,routine,history,streak}),
     [profile,phase,mode,routine,streak]
@@ -2522,42 +2441,22 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak}){
   React.useEffect(()=>{
     if(scrollRef.current)scrollRef.current.scrollTop=scrollRef.current.scrollHeight;
   },[messages,loading]);
-  // Limpiar TTS al cerrar el panel
-  React.useEffect(()=>()=>stopSpeaking(),[]);
-
-  const speech=useSpeechRecognition({
-    onResult:(text)=>setInput(text),
-    onError:(err)=>{if(err?.error&&err.error!=="aborted")alert("No pude escucharte: "+(err.error||"error de micrófono"));},
-  });
-
-  function handleSend(overrideText){
-    const raw=(overrideText!=null?overrideText:input).trim();
-    if(!raw||loading)return;
-    if(speech.listening)speech.stop();
-    stopSpeaking();
-    setSpeakingIdx(-1);
-    // En modo verificador, envolvemos el INCI en la plantilla; mostramos al usuario solo el INCI bruto.
-    const displayContent=raw;
-    const apiContent=checkerMode?wrapIngredientCheckerPrompt(raw):raw;
-    const newMsgsForUi=[...messages,{role:"user",content:displayContent}];
-    // Para la API: filtramos mensajes locales (intros del modo verificador) que no se enviaron al modelo.
-    const apiHistory=messages.filter(m=>!m._local).map(({_local,...rest})=>rest);
-    const newMsgsForApi=[...apiHistory,{role:"user",content:apiContent}];
-    setMessages(newMsgsForUi);
-    lsSet("kb_chat_history",newMsgsForUi);
+  function handleSend(){
+    const text=input.trim();
+    if(!text||loading)return;
+    const newMsgs=[...messages,{role:"user",content:text}];
+    setMessages(newMsgs);
+    lsSet("kb_chat_history",newMsgs);
     setInput("");
-    setCheckerMode(false);
     setLoading(true);
-    sendToClaude({systemPrompt,messages:newMsgsForApi}).then(reply=>{
-      const finalMsgs=[...newMsgsForUi,reply];
+    sendToClaude({systemPrompt,messages:newMsgs}).then(reply=>{
+      const finalMsgs=[...newMsgs,reply];
       setMessages(finalMsgs);
       lsSet("kb_chat_history",finalMsgs);
     }).finally(()=>setLoading(false));
   }
   function handleClear(){
     if(confirm("¿Borrar el historial del chat?")){
-      stopSpeaking();
-      setSpeakingIdx(-1);
       setMessages([]);
       lsSet("kb_chat_history",[]);
     }
@@ -2567,44 +2466,11 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak}){
     lsSet("kb_claude_worker_url",url);
     setShowSettings(false);
   }
-  function handleChipClick(chip){
-    if(chip.mode==="checker"){
-      setCheckerMode(true);
-      setInput("");
-      // Mostrar la intro del modo verificador como mensaje del asistente (sin gastar tokens)
-      const intro={role:"assistant",content:INGREDIENT_CHECKER_INTRO,_local:true};
-      const newMsgs=[...messages,intro];
-      setMessages(newMsgs);
-      lsSet("kb_chat_history",newMsgs);
-      setTimeout(()=>inputRef.current&&inputRef.current.focus(),50);
-      return;
-    }
-    setInput(chip.prompt);
-    setTimeout(()=>inputRef.current&&inputRef.current.focus(),50);
-  }
-  function toggleMic(){
-    if(!speech.supported){
-      alert("Tu navegador no soporta dictado por voz. En iPhone usa Safari; en Android usa Chrome.");
-      return;
-    }
-    if(speech.listening)speech.stop();
-    else{
-      stopSpeaking();
-      setInput("");
-      speech.start();
-    }
-  }
-  function toggleSpeak(idx,text){
-    if(speakingIdx===idx){
-      stopSpeaking();
-      setSpeakingIdx(-1);
-      return;
-    }
-    stopSpeaking();
-    setSpeakingIdx(idx);
-    speakText(text,()=>setSpeakingIdx(prev=>prev===idx?-1:prev));
-  }
-
+  const suggestions=[
+    "¿Por qué siento la piel pegajosa después de la crema?",
+    "Hoy tengo poco tiempo, ¿qué pasos no puedo saltar?",
+    "¿Por qué el paso n3 está marcado como opcional?",
+  ];
   return<div style={{position:"fixed",inset:0,zIndex:100,background:P.bg,display:"flex",flexDirection:"column"}}>
     <div style={{padding:"50px 16px 14px",borderBottom:`1px solid ${P.border}`,display:"flex",alignItems:"center",gap:12,background:P.card}}>
       <button onClick={onClose} style={{width:36,height:36,borderRadius:18,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
@@ -2617,62 +2483,31 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak}){
       <button onClick={()=>setShowSettings(true)} title="Ajustes" style={{width:36,height:36,borderRadius:18,border:`1px solid ${P.border}`,background:P.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:16}}>⚙️</button>
     </div>
     <div ref={scrollRef} style={{flex:1,overflowY:"auto",padding:"16px 16px 8px"}}>
-      {messages.length===0&&<div style={{padding:"24px 12px 8px",textAlign:"center"}}>
+      {messages.length===0&&<div style={{padding:"32px 12px",textAlign:"center"}}>
         <div style={{fontSize:42,marginBottom:12}}>💬</div>
         <div style={{fontSize:14,color:P.text,fontWeight:600,marginBottom:6}}>Tu dermo-consultor personal</div>
-        <div style={{fontSize:12,color:P.muted,lineHeight:1.5,maxWidth:300,margin:"0 auto"}}>Conozco tu perfil, rutina, productos y fase. Toca un chip de abajo o pregúntame lo que sea.</div>
+        <div style={{fontSize:12,color:P.muted,lineHeight:1.5,maxWidth:300,margin:"0 auto 18px"}}>Conozco tu perfil, tu rutina, tus productos y tu fase. Pregúntame lo que sea sobre tu tratamiento.</div>
+        <div style={{display:"flex",flexDirection:"column",gap:6,padding:"0 8px"}}>
+          {suggestions.map(q=>
+            <button key={q} onClick={()=>setInput(q)} style={{padding:"10px 14px",borderRadius:12,background:P.cream,border:`1px solid ${P.border}`,fontSize:12,color:P.text,textAlign:"left",cursor:"pointer",fontFamily:"inherit",lineHeight:1.4}}>{q}</button>
+          )}
+        </div>
       </div>}
-      {messages.map((m,i)=>{
-        const isUser=m.role==="user";
-        const isLocal=m._local;
-        const canSpeak=!isUser&&!isLocal&&m.content;
-        return <div key={i} style={{display:"flex",justifyContent:isUser?"flex-end":"flex-start",marginBottom:10}}>
-          <div style={{maxWidth:"82%",display:"flex",flexDirection:"column",alignItems:isUser?"flex-end":"flex-start",gap:4}}>
-            <div style={{padding:"10px 14px",borderRadius:isUser?"18px 18px 4px 18px":"18px 18px 18px 4px",background:isUser?P.accent:(isLocal?P.accentSoft:P.card),color:isUser?P.onAccent:P.text,fontSize:13.5,lineHeight:1.5,border:isUser?"none":`1px solid ${P.border}`,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
-              {m.content}
-            </div>
-            {canSpeak&&<button onClick={()=>toggleSpeak(i,m.content)} title={speakingIdx===i?"Detener lectura":"Escuchar"} style={{padding:"3px 10px",borderRadius:14,border:`1px solid ${P.border}`,background:speakingIdx===i?P.accent:"transparent",color:speakingIdx===i?P.onAccent:P.muted,fontSize:10.5,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4,fontFamily:"inherit"}}>
-              {speakingIdx===i?<>
-                <span style={{display:"inline-flex",gap:1.5,alignItems:"center"}}>
-                  <span style={{width:2,height:8,background:"currentColor",borderRadius:1,animation:"speakWave 0.8s ease-in-out infinite",animationDelay:"0s"}}/>
-                  <span style={{width:2,height:8,background:"currentColor",borderRadius:1,animation:"speakWave 0.8s ease-in-out infinite",animationDelay:"0.15s"}}/>
-                  <span style={{width:2,height:8,background:"currentColor",borderRadius:1,animation:"speakWave 0.8s ease-in-out infinite",animationDelay:"0.3s"}}/>
-                </span>
-                Detener
-              </>:<>🔊 Escuchar</>}
-            </button>}
+      {messages.map((m,i)=>
+        <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",marginBottom:10}}>
+          <div style={{maxWidth:"82%",padding:"10px 14px",borderRadius:m.role==="user"?"18px 18px 4px 18px":"18px 18px 18px 4px",background:m.role==="user"?P.accent:P.card,color:m.role==="user"?P.onAccent:P.text,fontSize:13.5,lineHeight:1.5,border:m.role==="user"?"none":`1px solid ${P.border}`,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
+            {m.content}
           </div>
-        </div>;
-      })}
+        </div>
+      )}
       {loading&&<div style={{display:"flex",justifyContent:"flex-start",marginBottom:10}}>
         <div style={{padding:"10px 14px",borderRadius:"18px 18px 18px 4px",background:P.card,border:`1px solid ${P.border}`,fontSize:13,color:P.muted,fontStyle:"italic"}}>Pensando…</div>
       </div>}
     </div>
-
-    {/* Chips de acciones rápidas — scroll horizontal */}
-    <div style={{padding:"8px 0 4px",borderTop:`1px solid ${P.border}`,background:P.card}}>
-      <div style={{display:"flex",gap:6,overflowX:"auto",padding:"0 12px",scrollbarWidth:"none",WebkitOverflowScrolling:"touch"}}>
-        {CHAT_CHIPS.map(chip=>{
-          const active=chip.mode==="checker"&&checkerMode;
-          return <button key={chip.key} onClick={()=>handleChipClick(chip)} style={{flexShrink:0,padding:"7px 12px",borderRadius:18,border:`1px solid ${active?P.accent:P.border}`,background:active?P.accentSoft:"transparent",color:active?P.accent:P.text,fontSize:11.5,fontWeight:600,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:5,whiteSpace:"nowrap"}}>
-            <span style={{fontSize:13}}>{chip.emoji}</span>
-            <span>{chip.label}</span>
-          </button>;
-        })}
-      </div>
-    </div>
-
-    {/* Banner del modo verificador */}
-    {checkerMode&&<div style={{padding:"8px 14px",background:P.accentSoft,borderTop:`1px solid ${P.border}`,fontSize:11.5,color:P.text,display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
-      <span><b>🔍 Modo verificador</b> · pega la lista INCI y envía</span>
-      <button onClick={()=>setCheckerMode(false)} style={{padding:"3px 8px",borderRadius:10,border:`1px solid ${P.border}`,background:P.card,color:P.muted,fontSize:10,cursor:"pointer",fontFamily:"inherit"}}>Cancelar</button>
-    </div>}
-
-    <div style={{padding:"10px 12px 22px",borderTop:checkerMode?"none":`1px solid ${P.border}`,background:P.card,display:"flex",gap:8,alignItems:"flex-end"}}>
+    <div style={{padding:"12px 12px 22px",borderTop:`1px solid ${P.border}`,background:P.card,display:"flex",gap:8,alignItems:"flex-end"}}>
       {messages.length>0&&<button onClick={handleClear} title="Limpiar" style={{width:38,height:38,borderRadius:19,border:`1px solid ${P.border}`,background:"transparent",cursor:"pointer",fontSize:14,flexShrink:0}}>🗑️</button>}
-      <button onClick={toggleMic} title={speech.listening?"Detener dictado":"Hablar"} style={{width:38,height:38,borderRadius:19,border:`1px solid ${speech.listening?"#dc503c":P.border}`,background:speech.listening?"#dc503c":"transparent",color:speech.listening?"#fff":P.text,cursor:speech.supported?"pointer":"not-allowed",opacity:speech.supported?1:.45,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0,animation:speech.listening?"micPulse 1.4s ease-in-out infinite":"none",transition:"all .15s"}}>🎤</button>
-      <textarea ref={inputRef} value={input} onChange={e=>setInput(e.target.value)} placeholder={checkerMode?"Pega la lista INCI aquí…":(speech.listening?"Escuchando… habla ahora":"Pregunta lo que quieras sobre tu rutina...")} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleSend();}}} rows={1} style={{flex:1,padding:"10px 14px",borderRadius:19,border:`1px solid ${speech.listening?"#dc503c":P.border}`,background:P.bg,color:P.text,fontSize:13.5,fontFamily:"inherit",resize:"none",maxHeight:120,outline:"none",lineHeight:1.4,transition:"border .15s"}}/>
-      <button onClick={()=>handleSend()} disabled={!input.trim()||loading} style={{width:38,height:38,borderRadius:19,border:"none",background:input.trim()&&!loading?P.accent:P.cream,color:P.onAccent,cursor:input.trim()&&!loading?"pointer":"default",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:700,transition:"all .15s",flexShrink:0}}>↑</button>
+      <textarea value={input} onChange={e=>setInput(e.target.value)} placeholder="Pregunta lo que quieras sobre tu rutina..." onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleSend();}}} rows={1} style={{flex:1,padding:"10px 14px",borderRadius:19,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:13.5,fontFamily:"inherit",resize:"none",maxHeight:120,outline:"none",lineHeight:1.4}}/>
+      <button onClick={handleSend} disabled={!input.trim()||loading} style={{width:38,height:38,borderRadius:19,border:"none",background:input.trim()&&!loading?P.accent:P.cream,color:P.onAccent,cursor:input.trim()&&!loading?"pointer":"default",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:700,transition:"all .15s",flexShrink:0}}>↑</button>
     </div>
     {showSettings&&<ChatSettings workerUrl={workerUrl} onSave={handleSaveSettings} onClose={()=>setShowSettings(false)}/>}
   </div>;
