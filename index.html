@@ -2540,7 +2540,9 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak}){
     const displayContent=raw;
     const apiContent=checkerMode?wrapIngredientCheckerPrompt(raw):raw;
     const newMsgsForUi=[...messages,{role:"user",content:displayContent}];
-    const newMsgsForApi=[...messages,{role:"user",content:apiContent}];
+    // Para la API: filtramos mensajes locales (intros del modo verificador) que no se enviaron al modelo.
+    const apiHistory=messages.filter(m=>!m._local).map(({_local,...rest})=>rest);
+    const newMsgsForApi=[...apiHistory,{role:"user",content:apiContent}];
     setMessages(newMsgsForUi);
     lsSet("kb_chat_history",newMsgsForUi);
     setInput("");
