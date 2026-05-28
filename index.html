@@ -964,6 +964,23 @@ function getUniqueProducts(){
       });
     });
   });
+  // Suplementos (pastillas) — los recogemos de SUPPLEMENTS para que aparezcan en la biblioteca.
+  // Incluimos tarde + mañana + noche; deduplicamos por brand+name.
+  const supplementBuckets=[SUPPLEMENTS.morning||[],SUPPLEMENTS.night||[],SUPPLEMENTS.afternoon||[]];
+  supplementBuckets.forEach(function(bucket){
+    bucket.forEach(function(s){
+      const key=`${s.brand}|${s.name}`;
+      if(seen.has(key))return;
+      seen.set(key,{
+        name:s.name,
+        brand:s.brand,
+        photo:s.photo||null,
+        cat:s.cat||"Suplemento",
+        ingr:s.ingr||[],
+        appearances:[{routineId:"supplement",routineLabel:"Suplemento",cat:"Suplemento",why:s.why||"",tip:s.tip||"",min:s.min||0,critical:!!s.critical,star:false}],
+      });
+    });
+  });
   const list=[...seen.values()];
   // Productos archivados — fuera de la rutina activa pero visibles como respaldo
   ARCHIVED_PRODUCTS.forEach(ap=>{
