@@ -553,6 +553,44 @@ const ROUTINES={
   ]},
 };
 
+// ─── SUPLEMENTOS POR PERFIL ──────────────────────
+// Pastillas que se añaden como ÚLTIMOS pasos en las rutinas. Cada suplemento
+// se agrega solo cuando profile.id coincide con profileOnly. La "rutina de tarde"
+// no existe como tal — esas pastillas se muestran en un card aparte en TodayScreen.
+const SUPPLEMENTS={
+  morning:[
+    {id:"sup-am-1",profileOnly:"mijal",cat:"Suplemento",brand:"Merck",name:"Eutirox 100 mcg",essential:true,critical:true,min:1,tone:"#7aaf8b",
+     animId:"pill",photo:null,rinse:{do:false},ingr:[{a:"Levotiroxina Sódica",b:"hormona tiroidea T4"}],
+     why:"Hormona tiroidea. CRÍTICO: tómala en ayunas — espera 30-60 min antes de desayunar.",
+     tip:"💊 UNA tableta con agua, en ayunas. Espera 30-60 min antes del desayuno o café. El selenio se toma 1-2 h después (no junto con esta).",
+     animo:"Tu tiroides es la conductora de tu energía del día. Esta pastilla la mantiene afinada."},
+    {id:"sup-am-2",profileOnly:"mijal",cat:"Suplemento",brand:"LP",name:"Selenio 200 mcg",essential:true,critical:true,min:0.5,tone:"#9bb89c",
+     animId:"pill",photo:null,rinse:{do:false},ingr:[{a:"Selenio",b:"cofactor tiroideo + antioxidante capilar"}],
+     why:"Selenio 200 mcg: cofactor de la tiroides y antioxidante clave para el folículo capilar.",
+     tip:"💊 UNA cápsula con agua. Idealmente 1-2 horas DESPUÉS del Eutirox para no interferir con su absorción. Puedes tomarla con el desayuno.",
+     animo:"Selenio = nutrición fina para tu tiroides y tu cabello. Constancia silenciosa."},
+  ],
+  night:[
+    {id:"sup-pm-1",profileOnly:"mijal",cat:"Suplemento",brand:"Penta",name:"Penta Magnesio (1ª cápsula)",essential:true,critical:true,min:0.5,tone:"#6b8e9c",
+     animId:"pill",photo:null,rinse:{do:false},ingr:[{a:"Citrato + Bisglicinato + L-Treonato + Taurato + Malato",b:"5 formas biodisponibles"}],
+     why:"Magnesio multifórmula. Citrato relaja músculos, bisglicinato favorece el sueño, L-treonato apoya función cognitiva, taurato cardio, malato energía.",
+     tip:"💊 UNA cápsula con agua, idealmente con cena o antes de dormir. Esta es la primera de dos.",
+     animo:"Tu cuerpo se prepara para reparar de noche. El magnesio facilita ese proceso."},
+    {id:"sup-pm-2",profileOnly:"mijal",cat:"Suplemento",brand:"Penta",name:"Penta Magnesio (2ª cápsula)",essential:true,critical:true,min:0.5,tone:"#6b8e9c",
+     animId:"pill",photo:null,rinse:{do:false},ingr:[{a:"Citrato + Bisglicinato + L-Treonato + Taurato + Malato",b:"5 formas biodisponibles"}],
+     why:"Segunda cápsula del Penta Magnesio. Completa la dosis diaria nocturna.",
+     tip:"💊 UNA cápsula más con agua. Última pastilla del día. Ahora sí, a dormir bien.",
+     animo:"Cierras el día. Mañana empiezas con fuerza. Buenas noches."},
+  ],
+  // Las pastillas de la tarde van en un widget aparte, no son una rutina.
+  afternoon:[
+    {id:"sup-pm-c",profileOnly:"mijal",brand:"LP",name:"Vitamina C Pura",dose:"1 cápsula",
+     why:"Antioxidante sistémico. Apoya síntesis de colágeno y protege folículo capilar."},
+    {id:"sup-pm-v",profileOnly:"mijal",brand:"Royal Pharma",name:"Vantux Max",dose:"1 cápsula",
+     why:"Suplemento capilar — micronutrientes para fortalecer el cabello desde adentro."},
+  ],
+};
+
 // ─── INGREDIENTS GLOSSARY ────────────────────────
 // Cada entrada se hace match buscando substring en el nombre del chip (ingrediente.a)
 const INGREDIENTS=[
