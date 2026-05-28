@@ -2179,6 +2179,7 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
     {backupReminderOpen&&<BackupReminder onExport={onBackupExport} onDismiss={onBackupDismiss}/>}
     <DayPlanBanner phase={phase}/>
     <DailyTip profileSex={profileSex} profile={profile} phase={phase} mode={mode} streak={streak}/>
+    <AfternoonSupplements profile={profile} onOpenProduct={onOpenProduct}/>
     <ModeToggle mode={mode} onChange={setMode} completionsToday={completionsToday}/>
     {/* Si la rutina del modo actual YA está completada hoy → mostramos panel celebratorio
         y ocultamos pasos/progreso. Si no, mostramos el flujo normal de la rutina. */}
