@@ -4022,6 +4022,16 @@ function App(){
   const [waitWhy,setWaitWhy]=React.useState("");
   const [showImport,setShowImport]=React.useState(false);
   const [showChat,setShowChat]=React.useState(false);
+  const [showBackfill,setShowBackfill]=React.useState(false);
+  // Marca una rutina pasada como completada. SOLO añade al historial,
+  // no toca ni reemplaza registros existentes ni modifica kb_completed_today.
+  function handleBackfill(date,routineKey){
+    if(!date||!routineKey)return;
+    const session={date:date,time:"--:--",routine:routineKey,steps:0,_backfilled:true};
+    const newH=[...history,session];
+    setHistory(newH);
+    lsSet("kb_history",newH);
+  }
   // Mensaje pre-llenado al abrir el chat — se usa cuando el usuario toca "Pedir alternativa"
   // en ProductDetailSheet. Se aplica una sola vez al montar el chat.
   const [chatPrefill,setChatPrefill]=React.useState("");
