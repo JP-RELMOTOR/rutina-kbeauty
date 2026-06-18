@@ -315,7 +315,14 @@ function getDayLabel(){
   const days=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
   return days[getDOW()];
 }
-function todayStr(){return new Date().toISOString().split("T")[0];}
+// Fecha de HOY en la zona horaria del dispositivo (no UTC).
+// Antes usábamos toISOString() que es UTC — eso causaba que las rutinas
+// hechas después de las ~8-9pm en Chile quedaran "fechadas el día siguiente"
+// y al despertar la app las marcara como completadas hoy. Fix: usar fecha local.
+function todayStr(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
 
 // Cycle tracking (opt-in, solo perfil ♀)
 function getCycleInfo(){
