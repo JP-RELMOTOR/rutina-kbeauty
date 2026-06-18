@@ -4251,6 +4251,7 @@ function App(){
     <ChatFAB onOpen={()=>setShowChat(true)}/>
     <TabBar tab={tab} onTab={setTab}/>
     {showChat&&<ChatPanel onClose={handleCloseChat} profile={profile} phase={phase} mode={mode} routine={routine} history={history} streak={streak} initialInput={chatPrefill}/>}
+    {showBackfill&&<BackfillModal onClose={()=>setShowBackfill(false)} onConfirm={handleBackfill} history={history}/>}
     {hasUpdate&&!updateDismissed&&<UpdateBanner onApply={handleApplyUpdate} onDismiss={()=>setUpdateDismissed(true)}/>}
     {showSettings&&<SettingsSheet onClose={()=>setShowSettings(false)} history={history} diary={diary} photos={photos} phase={phase} onPhaseChange={handlePhaseChange} onDataRestored={handleDataRestored} profile={profile} onChangeProfile={handleOpenProfileSwitcher} theme={theme} onThemeChange={handleThemeChange} accent={accent} onAccentChange={handleAccentChange} voiceEnabled={voiceEnabled} onVoiceChange={handleVoiceChange}/>}
     {activeIngredient&&<IngredientSheet ingredient={activeIngredient} onClose={()=>setActiveIngredient(null)}/>}
