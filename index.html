@@ -2330,7 +2330,96 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
         </button>
       </div>}
     </>}
+    {/* Entrada discreta para marcar rutinas de días anteriores que se olvidaron */}
+    {onOpenBackfill&&<div style={{padding:"4px 16px 0"}}>
+      <button onClick={onOpenBackfill} style={{width:"100%",padding:"10px 14px",borderRadius:14,border:`1px dashed ${P.border}`,background:"transparent",color:P.muted,fontSize:12,fontWeight:500,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+        <span>🕐</span>
+        <span>Olvidé marcar una rutina anterior</span>
+      </button>
+    </div>}
     <div style={{height:110}}/>
+  </div>;
+}
+
+// ─── BACKFILL ROUTINE MODAL ──────────────────────
+// Permite marcar una rutina de hasta 7 días atrás. Solo AÑADE al historial
+// (no modifica ni borra registros existentes).
+function BackfillModal({onClose,onConfirm,history}){
+  const [selectedDate,setSelectedDate]=React.useState(null);
+  const [selectedRoutine,setSelectedRoutine]=React.useState(null);
+  const today=todayStr();
+  // Días seleccionables: ayer hasta hace 7 días (HOY se excluye — se usa el flujo normal).
+  const dayOptions=React.useMemo(function(){
+    const opts=[];
+    for(let i=1;i<=7;i++){
+      const d=new Date();d.setDate(d.getDate()-i);
+      const dateStr=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      const labels=["Hoy","Ayer","Anteayer"];
+      let label;
+      if(i===1)label="Ayer";
+      else if(i===2)label="Anteayer";
+      else{
+        const dayNames=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+        label=`${dayNames[d.getDay()]} (hace ${i} días)`;
+      }
+      opts.push({date:dateStr,label,monthDay:`${d.getDate()}/${d.getMonth()+1}`});
+    }
+    return opts;
+  },[]);
+  const routineOptions=[
+    {key:"morning",label:"Mañana",emoji:"☀️"},
+    {key:"pm_normal",label:"Noche",emoji:"🌙"},
+    {key:"pm_retinal",label:"Noche con Retinal",emoji:"🔴"},
+  ];
+  // Qué rutinas ya están marcadas para el día seleccionado (no permitimos duplicar).
+  const existingForDate=React.useMemo(function(){
+    if(!selectedDate)return new Set();
+    const s=new Set();
+    (history||[]).forEach(function(h){if(h.date===selectedDate)s.add(h.routine);});
+    return s;
+  },[history,selectedDate]);
+  function handleConfirm(){
+    if(!selectedDate||!selectedRoutine)return;
+    onConfirm(selectedDate,selectedRoutine);
+    onClose();
+  }
+  const canSave=!!selectedDate&&!!selectedRoutine&&!existingForDate.has(selectedRoutine);
+  return<div style={{position:"fixed",inset:0,zIndex:115,background:"rgba(0,0,0,.5)",display:"flex",alignItems:"flex-end",justifyContent:"center"}} onClick={onClose}>
+    <div onClick={function(e){e.stopPropagation();}} style={{width:"100%",maxWidth:480,background:P.card,borderTopLeftRadius:24,borderTopRightRadius:24,padding:"22px 20px 28px",maxHeight:"85vh",overflowY:"auto"}}>
+      <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:22,color:P.text,marginBottom:4}}>Marcar rutina anterior</div>
+      <div style={{fontSize:12,color:P.muted,marginBottom:18,lineHeight:1.5}}>Si te olvidaste de registrar una rutina de los últimos días, márcala aquí. No se modifican rutinas ya registradas.</div>
+
+      <div style={{fontSize:11,fontWeight:600,color:P.muted,textTransform:"uppercase",letterSpacing:.3,marginBottom:6}}>1. ¿Qué día fue?</div>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:16}}>
+        {dayOptions.map(function(d){
+          const active=selectedDate===d.date;
+          return <button key={d.date} onClick={function(){setSelectedDate(d.date);setSelectedRoutine(null);}} style={{padding:"10px 14px",borderRadius:12,border:`1.5px solid ${active?P.accent:P.border}`,background:active?P.accentSoft:"transparent",cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,textAlign:"left"}}>
+            <span style={{fontSize:13,fontWeight:600,color:active?P.accent:P.text}}>{d.label}</span>
+            <span style={{fontSize:11,color:P.muted,fontFamily:"'JetBrains Mono',monospace"}}>{d.monthDay}</span>
+          </button>;
+        })}
+      </div>
+
+      {selectedDate&&<>
+        <div style={{fontSize:11,fontWeight:600,color:P.muted,textTransform:"uppercase",letterSpacing:.3,marginBottom:6}}>2. ¿Qué rutina hiciste?</div>
+        <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:18}}>
+          {routineOptions.map(function(r){
+            const already=existingForDate.has(r.key);
+            const active=selectedRoutine===r.key;
+            return <button key={r.key} onClick={function(){if(!already)setSelectedRoutine(r.key);}} disabled={already} style={{padding:"10px 14px",borderRadius:12,border:`1.5px solid ${active?P.accent:P.border}`,background:active?P.accentSoft:(already?P.greenSoft:"transparent"),cursor:already?"default":"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:10,textAlign:"left",opacity:already?.7:1}}>
+              <span style={{fontSize:18}}>{r.emoji}</span>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:13,fontWeight:600,color:active?P.accent:P.text}}>{r.label}</div>
+                {already&&<div style={{fontSize:10.5,color:P.green,marginTop:1,fontWeight:600}}>Ya marcada para ese día ✓</div>}
+              </div>
+            </button>;
+          })}
+        </div>
+      </>}
+
+      <button onClick={handleConfirm} disabled={!canSave} style={{width:"100%",padding:"12px",borderRadius:14,border:"none",background:canSave?P.text:P.cream,color:canSave?P.onDark:P.muted,fontSize:13,fontWeight:700,cursor:canSave?"pointer":"default",fontFamily:"inherit"}}>Marcar como completada</button>
+      <button onClick={onClose} style={{width:"100%",padding:"10px",marginTop:8,borderRadius:14,border:`1px solid ${P.border}`,background:"transparent",color:P.muted,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>Cancelar</button>
+    </div>
   </div>;
 }
 
