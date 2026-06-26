@@ -423,6 +423,17 @@ function loadRoutineProgress(){
   return p;
 }
 function clearRoutineProgress(){localStorage.removeItem("kb_routine_progress");}
+// ── Espera de retinal (10-15 min) — persiste por reloj real para sobrevivir segundo plano / cierre de la app ──
+function saveWaitState(o){lsSet("kb_wait",Object.assign({date:todayStr()},o));}
+function clearWaitState(){localStorage.removeItem("kb_wait");}
+function loadWaitState(currentMode){
+  const w=ls("kb_wait",null);
+  if(!w||w.date!==todayStr()||w.mode!==currentMode)return null;
+  let remaining;
+  if(w.running&&w.endTime)remaining=Math.max(0,Math.round((w.endTime-Date.now())/1000));
+  else remaining=Math.max(0,w.remaining||0);
+  return {afterIdx:w.afterIdx,total:w.total,endTime:w.running?w.endTime:null,running:!!w.running,remaining,hint:w.hint||"",why:w.why||""};
+}
 
 // ─── COMPLETION TRACKING POR MODO ─────────────────
 // Guarda la hora en que se completó la rutina de cada modo HOY.
@@ -4088,12 +4099,14 @@ function App(){
     const p=allProducts.find(x=>x.brand===step.brand&&x.name===step.name);
     if(p)setActiveProduct(p);
   }
-  const [waitingAfterIdx,setWaitingAfterIdx]=React.useState(null);
-  const [waitSecs,setWaitSecs]=React.useState(0);
-  const [waitTotal,setWaitTotal]=React.useState(0);
-  const [waitRunning,setWaitRunning]=React.useState(true);
-  const [waitHint,setWaitHint]=React.useState("");
-  const [waitWhy,setWaitWhy]=React.useState("");
+  const _restoredWait=loadWaitState(mode); // espera en curso (sobrevive segundo plano / cierre)
+  const [waitingAfterIdx,setWaitingAfterIdx]=React.useState(_restoredWait?_restoredWait.afterIdx:null);
+  const [waitSecs,setWaitSecs]=React.useState(_restoredWait?_restoredWait.remaining:0);
+  const [waitTotal,setWaitTotal]=React.useState(_restoredWait?_restoredWait.total:0);
+  const [waitRunning,setWaitRunning]=React.useState(_restoredWait?_restoredWait.running:true);
+  const [waitEndTime,setWaitEndTime]=React.useState(_restoredWait?_restoredWait.endTime:null);
+  const [waitHint,setWaitHint]=React.useState(_restoredWait?_restoredWait.hint:"");
+  const [waitWhy,setWaitWhy]=React.useState(_restoredWait?_restoredWait.why:"");
   const [showImport,setShowImport]=React.useState(false);
   const [showChat,setShowChat]=React.useState(false);
   const [showBackfill,setShowBackfill]=React.useState(false);
@@ -4230,13 +4243,17 @@ function App(){
     const next=new Set(doneSteps);next.add(s.id);setDoneSteps(next);
     // Si el paso requiere espera antes del próximo, abre el WaitGate
     if(s.wait&&s.wait>0){
+      const total=s.wait*60;
+      const end=Date.now()+total*1000;
       setActiveIdx(null);
       setWaitingAfterIdx(i);
-      setWaitTotal(s.wait*60);
-      setWaitSecs(s.wait*60);
+      setWaitTotal(total);
+      setWaitSecs(total);
+      setWaitEndTime(end);
       setWaitRunning(true);
       setWaitHint(s.waitHint||"");
       setWaitWhy(s.waitWhy||"");
+      saveWaitState({afterIdx:i,total,endTime:end,running:true,remaining:total,mode,hint:s.waitHint||"",why:s.waitWhy||""});
       return;
     }
     const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!next.has(st.id));
@@ -4245,27 +4262,56 @@ function App(){
   }
   function advancePastWait(){
     const i=waitingAfterIdx;
-    setWaitingAfterIdx(null);setWaitSecs(0);setWaitTotal(0);
+    setWaitingAfterIdx(null);setWaitSecs(0);setWaitTotal(0);setWaitEndTime(null);clearWaitState();
     const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!doneSteps.has(st.id));
     if(nextIdx===-1){setTimeout(()=>setShowComplete(true),350);}
     else setActiveIdx(nextIdx);
   }
   function handleSkipWait(){haptic("light");advancePastWait();}
-  function handleToggleWait(){haptic("light");setWaitRunning(r=>!r);}
-  // Countdown effect
+  function handleToggleWait(){
+    haptic("light");
+    if(waitRunning){
+      // pausar: congela el tiempo restante
+      setWaitRunning(false);setWaitEndTime(null);
+      saveWaitState({afterIdx:waitingAfterIdx,total:waitTotal,endTime:null,running:false,remaining:waitSecs,mode,hint:waitHint,why:waitWhy});
+    }else{
+      // reanudar: recalcula el fin desde ahora
+      const end=Date.now()+waitSecs*1000;
+      setWaitRunning(true);setWaitEndTime(end);
+      saveWaitState({afterIdx:waitingAfterIdx,total:waitTotal,endTime:end,running:true,remaining:waitSecs,mode,hint:waitHint,why:waitWhy});
+    }
+  }
+  // Cuenta regresiva basada en RELOJ REAL (timestamp): sigue correcta aunque la app pase a
+  // segundo plano o iOS congele el JS. Recalcula los segundos desde waitEndTime, no decrementa.
   React.useEffect(()=>{
-    if(waitingAfterIdx===null||!waitRunning||waitSecs<=0)return;
-    const id=setInterval(()=>setWaitSecs(s=>Math.max(0,s-1)),1000);
+    if(waitingAfterIdx===null||!waitRunning||waitEndTime===null)return;
+    const tick=()=>setWaitSecs(Math.max(0,Math.round((waitEndTime-Date.now())/1000)));
+    tick();
+    const id=setInterval(tick,1000);
     return()=>clearInterval(id);
-  },[waitingAfterIdx,waitRunning]);
+  },[waitingAfterIdx,waitRunning,waitEndTime]);
+  // Al volver de segundo plano, recalcula de inmediato (no espera al próximo tick)
+  React.useEffect(()=>{
+    function onVis(){
+      if(document.visibilityState==="visible"&&waitingAfterIdx!==null&&waitRunning&&waitEndTime!==null){
+        setWaitSecs(Math.max(0,Math.round((waitEndTime-Date.now())/1000)));
+      }
+    }
+    document.addEventListener("visibilitychange",onVis);
+    return()=>document.removeEventListener("visibilitychange",onVis);
+  },[waitingAfterIdx,waitRunning,waitEndTime]);
   React.useEffect(()=>{
     if(waitingAfterIdx!==null&&waitSecs===0&&waitTotal>0){
       haptic("medium");
       advancePastWait();
     }
   },[waitSecs,waitingAfterIdx,waitTotal]);
-  // Si cambia de modo o reset, limpia wait
-  React.useEffect(()=>{setWaitingAfterIdx(null);setWaitSecs(0);},[mode]);
+  // Si cambia de modo, limpia la espera — pero NO en el montaje (para respetar una espera restaurada)
+  const _waitModeMounted=React.useRef(false);
+  React.useEffect(()=>{
+    if(!_waitModeMounted.current){_waitModeMounted.current=true;return;}
+    setWaitingAfterIdx(null);setWaitSecs(0);setWaitEndTime(null);clearWaitState();
+  },[mode]);
 
   function handleSkip(s,i){
     const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!doneSteps.has(st.id));
