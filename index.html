@@ -3694,9 +3694,9 @@ function AfternoonSupplements({profile,onOpenProduct,mode}){
   if(mode==="morning")defs.push({key:"manana",label:"Suplementos de la mañana",emoji:"🌅",hint:"Tómalas con tu rutina de la mañana 🌿",items:SUPPLEMENTS.morning||[]});
   if(isNight){
     defs.push({key:"noche",label:"Suplementos de la noche",emoji:"🌙",hint:"Tómalas al terminar tu rutina de noche 🌙",items:(SUPPLEMENTS.afternoon||[]).concat(SUPPLEMENTS.night||[])});
+    // Anticonceptivo: una pastilla al día, solo en la rutina de noche
+    defs.push({key:"anticonceptivo",label:"Anticonceptivo",emoji:"💊",hint:"Una pastilla al día, siempre a la misma hora ⏰",items:SUPPLEMENTS.anticonceptivo||[]});
   }
-  // Anticonceptivo: una pastilla al día (chequeo diario compartido entre rutinas)
-  defs.push({key:"anticonceptivo",label:"Anticonceptivo",emoji:"💊",hint:"Una pastilla al día, siempre a la misma hora ⏰",items:SUPPLEMENTS.anticonceptivo||[]});
   const groups=defs.map(function(g){return {...g,items:g.items.filter(s=>!s.profileOnly||s.profileOnly===profile.id)};}).filter(g=>g.items.length);
   if(!groups.length)return null;
   return <React.Fragment>{groups.map(g=><SupplementCard key={g.key} group={g} onOpenProduct={onOpenProduct}/>)}</React.Fragment>;
