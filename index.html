@@ -640,7 +640,7 @@ const SUPPLEMENTS={
   ],
   // Anticonceptivo oral — una pastilla al día, siempre a la misma hora.
   anticonceptivo:[
-    {id:"sup-anticon",profileOnly:"mijal",brand:"Gedeon Richter",name:"Sibilla CD",dose:"1 comprimido",
+    {id:"sup-anticon",profileOnly:"mijal",brand:"Gedeon Richter",name:"Sibilla CD",dose:"1 comprimido",photo:"products/sibilla-cd.jpg",
      why:"Anticonceptivo oral (Dienogest 2 mg / Etinilestradiol 0,030 mg). Envase de 28 (21 activos + 7). Tómalo todos los días a la misma hora siguiendo el orden del blíster."},
   ],
 };
@@ -979,6 +979,20 @@ const PRODUCT_INFO=[
     ],
     bestFor:["Sueño y relajación","Recuperación muscular","Apoyo cognitivo nocturno"],
     cautious:"En exceso puede causar diarrea (sobre todo el citrato). Si tomas otro magnesio aparte, revisa total diario (límite ~400 mg/día de magnesio elemental).",
+  },
+  {
+    brand:"Gedeon Richter",nameMatch:"Sibilla",
+    launched:"anticonceptivo bioequivalente",origin:"Gedeon Richter (Hungría)",size:"28 comprimidos · 21 activos + 7 placebo · vía oral",
+    story:"Sibilla es un anticonceptivo oral combinado de Gedeon Richter, laboratorio húngaro especializado en salud femenina y ginecología. Combina dos hormonas — etinilestradiol (estrógeno) y dienogest (un progestágeno con efecto antiandrogénico). Es bioequivalente a Valette, la pastilla original con esta fórmula. La versión 'CD' (comprimido diario) trae 21 activos + 7 placebo para tomar todos los días sin pausa entre cajas y no perder el ritmo.",
+    special:"Dienogest 2 mg + Etinilestradiol 0,030 mg (monofásico). El etinilestradiol inhibe la ovulación y el dienogest modifica el endometrio: juntos dan el efecto anticonceptivo. Además, el dienogest tiene acción antiandrogénica (baja los andrógenos en sangre), por eso también ayuda con el acné moderado y la piel grasa.",
+    facts:[
+      "28 comprimidos: 21 activos + 7 placebo (verdes, sin hormona) para el período de descanso",
+      "Se toma 1 al día a la misma hora, siguiendo el orden del blíster, sin pausa entre cajas",
+      "El efecto antiandrogénico mejora acné moderado y seborrea, además de anticonceptivo",
+      "Bioequivalente a Valette — misma fórmula dienogest/etinilestradiol",
+    ],
+    bestFor:["Anticoncepción","Acné moderado hormonal","Piel grasa / seborrea"],
+    cautious:"Medicamento de prescripción. Los anticonceptivos combinados aumentan el riesgo de trombosis (coágulos), sobre todo si fumas, tienes más de 35 años o antecedentes familiares. Úsalo solo bajo indicación y control de tu ginecólogo. Si olvidas un comprimido, sigue las indicaciones del prospecto.",
   },
 ];
 function getProductInfo(product){
