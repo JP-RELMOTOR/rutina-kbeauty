@@ -640,7 +640,7 @@ const SUPPLEMENTS={
   ],
   // Anticonceptivo oral — una pastilla al día, siempre a la misma hora.
   anticonceptivo:[
-    {id:"sup-anticon",profileOnly:"mijal",brand:"Gedeon Richter",name:"Sibilla CD",dose:"1 comprimido",photo:"products/sibilla-cd.jpg",
+    {id:"sup-anticon",profileOnly:"mijal",cat:"Anticonceptivo",brand:"Gedeon Richter",name:"Sibilla CD",dose:"1 comprimido",photo:"products/sibilla-cd.jpg",
      why:"Anticonceptivo oral (Dienogest 2 mg / Etinilestradiol 0,030 mg). Envase de 28 (21 activos + 7). Tómalo todos los días a la misma hora siguiendo el orden del blíster."},
   ],
 };
@@ -1029,8 +1029,8 @@ function getUniqueProducts(){
     });
   });
   // Suplementos (pastillas) — los recogemos de SUPPLEMENTS para que aparezcan en la biblioteca.
-  // Incluimos tarde + mañana + noche; deduplicamos por brand+name.
-  const supplementBuckets=[SUPPLEMENTS.morning||[],SUPPLEMENTS.night||[],SUPPLEMENTS.afternoon||[]];
+  // Incluimos mañana + noche + tarde + anticonceptivo; deduplicamos por brand+name.
+  const supplementBuckets=[SUPPLEMENTS.morning||[],SUPPLEMENTS.night||[],SUPPLEMENTS.afternoon||[],SUPPLEMENTS.anticonceptivo||[]];
   supplementBuckets.forEach(function(bucket){
     bucket.forEach(function(s){
       const key=`${s.brand}|${s.name}`;
