@@ -73,6 +73,9 @@ const ACCENT_PRESETS={
   sage:    {name:"Verde sage",    accent:"#7a9c7a",accentSoft:"#dee9dc",accentSoftDark:"#1f2e24",accentDark:"#9bb89c"},
   lavender:{name:"Lavanda",       accent:"#9c8ac8",accentSoft:"#e2dcf0",accentSoftDark:"#252035",accentDark:"#b6a4dc"},
   coral:   {name:"Coral",         accent:"#e08a6a",accentSoft:"#f7d8c5",accentSoftDark:"#3a2820",accentDark:"#f0a085"},
+  mint:      {name:"Menta",        accent:"#13b196",accentSoft:"#d3f1e9",accentSoftDark:"#173029",accentDark:"#2cc6a8"},
+  freshcoral:{name:"Coral fresco", accent:"#ff6f5e",accentSoft:"#ffe0d6",accentSoftDark:"#3d231c",accentDark:"#ff8472"},
+  lavglow:   {name:"Lavanda glow", accent:"#8a78ef",accentSoft:"#e6dffb",accentSoftDark:"#272040",accentDark:"#a594f5"},
 };
 function applyAccent(accentKey,intoDark){
   const preset=ACCENT_PRESETS[accentKey]||ACCENT_PRESETS.gold;
@@ -81,15 +84,56 @@ function applyAccent(accentKey,intoDark){
   P_DARK.accent=preset.accentDark;
   P_DARK.accentSoft=preset.accentSoftDark;
 }
+// ─── SKINS (temas visuales completos: neutros base + acento, claro y oscuro) ───
+const SKIN_PRESETS={
+  cream:{name:"Crema cálido",
+    light:{bg:"#f6efe2",card:"#fefcf7",cream:"#f1ead9",text:"#1d1812",muted:"#9c9282",accent:"#c89849",accentSoft:"#f3e3bf",border:"rgba(29,24,18,0.08)",shadow:"rgba(80,55,20,0.14)",onDark:"#fefcf7",onAccent:"#1d1812",retinal:"#c04030",retinalSoft:"#fdecea",green:"#4a7c59",greenSoft:"#e8f3eb"},
+    dark:{bg:"#1a1612",card:"#252119",cream:"#2c2820",text:"#f3ead4",muted:"#a89b86",accent:"#d9a85a",accentSoft:"#3a3024",border:"rgba(243,234,212,0.10)",shadow:"rgba(0,0,0,0.50)",onDark:"#1a1612",onAccent:"#1d1812",retinal:"#e86a5a",retinalSoft:"#3a1f1a",green:"#7aaf8b",greenSoft:"#1f2e26"}},
+  mint:{name:"Menta dewy",
+    light:{bg:"#edf6f2",card:"#ffffff",cream:"#e1efe9",text:"#15241f",muted:"#7b918b",accent:"#13b196",accentSoft:"#d3f1e9",border:"rgba(20,40,34,0.09)",shadow:"rgba(20,80,65,0.13)",onDark:"#ffffff",onAccent:"#ffffff",retinal:"#ef5f4a",retinalSoft:"#fde7e2",green:"#2f9e84",greenSoft:"#d8f0e8"},
+    dark:{bg:"#10211c",card:"#182a24",cream:"#1f342d",text:"#e7f3ee",muted:"#86a39a",accent:"#2cc6a8",accentSoft:"#173029",border:"rgba(231,243,238,0.10)",shadow:"rgba(0,0,0,0.50)",onDark:"#10211c",onAccent:"#06231c",retinal:"#f0765f",retinalSoft:"#33201c",green:"#5cc0a2",greenSoft:"#15302a"}},
+  peach:{name:"Durazno coral",
+    light:{bg:"#fff2ec",card:"#ffffff",cream:"#ffe6dc",text:"#2a1815",muted:"#a78b82",accent:"#ff6f5e",accentSoft:"#ffe0d6",border:"rgba(42,24,21,0.09)",shadow:"rgba(150,70,55,0.14)",onDark:"#ffffff",onAccent:"#ffffff",retinal:"#d23a2c",retinalSoft:"#ffdcd5",green:"#3f9e7a",greenSoft:"#dcf1e9"},
+    dark:{bg:"#241310",card:"#301c17",cream:"#3a241e",text:"#f6e4dd",muted:"#bb978c",accent:"#ff8472",accentSoft:"#3d231c",border:"rgba(246,228,221,0.10)",shadow:"rgba(0,0,0,0.50)",onDark:"#241310",onAccent:"#3a0f08",retinal:"#ff7a68",retinalSoft:"#3a201b",green:"#62b893",greenSoft:"#16302a"}},
+  lavender:{name:"Lavanda glow",
+    light:{bg:"#f3f0fc",card:"#ffffff",cream:"#e8e2f8",text:"#1e1833",muted:"#8983a1",accent:"#8a78ef",accentSoft:"#e6dffb",border:"rgba(30,24,51,0.09)",shadow:"rgba(80,60,150,0.14)",onDark:"#ffffff",onAccent:"#ffffff",retinal:"#e85a8f",retinalSoft:"#fbe1ec",green:"#4a9e86",greenSoft:"#ddf0ea"},
+    dark:{bg:"#171327",card:"#201b35",cream:"#282140",text:"#ece7fa",muted:"#9a93b5",accent:"#a594f5",accentSoft:"#272040",border:"rgba(236,231,250,0.10)",shadow:"rgba(0,0,0,0.50)",onDark:"#171327",onAccent:"#1c1233",retinal:"#f06ba0",retinalSoft:"#341c2a",green:"#62b89e",greenSoft:"#16302a"}},
+};
+function applySkin(skinKey){
+  const sk=SKIN_PRESETS[skinKey]||SKIN_PRESETS.cream;
+  Object.assign(P_LIGHT,sk.light);
+  Object.assign(P_DARK,sk.dark);
+}
+// Tema + acento POR PERFIL (Mijal arranca en Menta dewy; el resto en Crema)
+const PROFILE_DEFAULT_SKIN={mijal:"mint",jp:"cream"};
+const SKIN_ACCENT={cream:"gold",mint:"mint",peach:"freshcoral",lavender:"lavglow"};
+function getSkinForProfile(profile){
+  if(profile&&profile.id){
+    const s=localStorage.getItem("kb_skin_"+profile.id);
+    if(s){try{return JSON.parse(s);}catch(_){}}
+    if(PROFILE_DEFAULT_SKIN[profile.id])return PROFILE_DEFAULT_SKIN[profile.id];
+  }
+  const old=localStorage.getItem("kb_skin");
+  if(old){try{return JSON.parse(old);}catch(_){}}
+  return "cream";
+}
+function getAccentForProfile(profile){
+  if(profile&&profile.id){
+    const a=localStorage.getItem("kb_accent_"+profile.id);
+    if(a){try{return JSON.parse(a);}catch(_){}}
+  }
+  return SKIN_ACCENT[getSkinForProfile(profile)]||"gold";
+}
 let P=P_LIGHT;
 const _themeBumpers=new Set();
 // Inicializar P + accent ANTES del primer render para evitar flash
 (function(){
   try{
-    // Accent guardado
-    let storedAccent=localStorage.getItem("kb_accent");
-    storedAccent=storedAccent?JSON.parse(storedAccent):"gold";
-    applyAccent(storedAccent);
+    // Skin + acento del perfil activo (per-perfil; Mijal → Menta dewy por defecto)
+    let _ap=null;
+    try{const _pj=localStorage.getItem("kb_profile");_ap=_pj?JSON.parse(_pj):null;}catch(_){}
+    applySkin(getSkinForProfile(_ap));
+    applyAccent(getAccentForProfile(_ap));
     // Tema guardado
     let stored=localStorage.getItem("kb_theme");
     stored=stored?JSON.parse(stored):"auto";
@@ -580,17 +624,11 @@ const SUPPLEMENTS={
      animo:"Selenio = nutrición fina para tu tiroides y tu cabello. Constancia silenciosa."},
   ],
   night:[
-    {id:"sup-pm-1",profileOnly:"mijal",cat:"Suplemento",brand:"Penta",name:"Penta Magnesio (1ª cápsula)",essential:true,critical:true,min:0.5,tone:"#6b8e9c",
-     animId:"pill",photo:"products/penta-magnesio.jpg",rinse:{do:false},ingr:[{a:"Citrato + Bisglicinato + L-Treonato + Taurato + Malato",b:"5 formas biodisponibles"}],
-     affirmation:"Te preparas para descansar",
-     why:"Magnesio multifórmula. Citrato relaja músculos, bisglicinato favorece el sueño, L-treonato apoya función cognitiva, taurato cardio, malato energía.",
-     tip:"💊 UNA cápsula con agua, idealmente con cena o antes de dormir. Esta es la primera de dos.",
-     animo:"Tu cuerpo se prepara para reparar de noche. El magnesio facilita ese proceso."},
-    {id:"sup-pm-2",profileOnly:"mijal",cat:"Suplemento",brand:"Penta",name:"Penta Magnesio (2ª cápsula)",essential:true,critical:true,min:0.5,tone:"#6b8e9c",
+    {id:"sup-pm",profileOnly:"mijal",cat:"Suplemento",brand:"Penta",name:"Penta Magnesio",dose:"2 cápsulas",essential:true,critical:true,min:1,tone:"#6b8e9c",
      animId:"pill",photo:"products/penta-magnesio.jpg",rinse:{do:false},ingr:[{a:"Citrato + Bisglicinato + L-Treonato + Taurato + Malato",b:"5 formas biodisponibles"}],
      affirmation:"Cierras el día con calma",
-     why:"Segunda cápsula del Penta Magnesio. Completa la dosis diaria nocturna.",
-     tip:"💊 UNA cápsula más con agua. Última pastilla del día. Ahora sí, a dormir bien.",
+     why:"Magnesio multifórmula. Citrato relaja músculos, bisglicinato favorece el sueño, L-treonato apoya función cognitiva, taurato cardio, malato energía.",
+     tip:"💊 DOS cápsulas con agua, idealmente con la cena o antes de dormir. Últimas pastillas del día.",
      animo:"Cierras el día. Mañana empiezas con fuerza. Buenas noches."},
   ],
   // Las pastillas de la tarde van en un widget aparte (no son una rutina de pasos).
@@ -1483,8 +1521,8 @@ async function sendToClaude({systemPrompt,messages,onError}){
 
 // ─── PROFILE ─────────────────────────────────────
 const PROFILE_PRESETS=[
-  {id:"mijal",name:"Mijal",sex:"f",age:null,defaultPhase:1,emoji:"🌸",desc:"Mujer · piel mixta · fase 1 (suave) del retinal"},
-  {id:"jp",name:"Juan Pablo",sex:"m",age:40,defaultPhase:2,emoji:"🌿",desc:"Hombre 40 · piel grasa · fase 2 (3×/sem) del retinal"},
+  {id:"mijal",name:"Mijal",sex:"f",age:null,defaultPhase:1,defaultSkin:"mint",emoji:"🌸",desc:"Mujer · piel mixta · fase 1 (suave) del retinal"},
+  {id:"jp",name:"Juan Pablo",sex:"m",age:40,defaultPhase:2,defaultSkin:"cream",emoji:"🌿",desc:"Hombre 40 · piel grasa · fase 2 (3×/sem) del retinal"},
 ];
 function getProfile(){return ls("kb_profile",null);}
 function setupProfile(preset){
@@ -1513,31 +1551,6 @@ function Ring({pct=0,size=60,stroke=4,color=P.text,track=P.cream,children}){
 }
 
 // ─── INTENTION MODAL ─────────────────────────────
-function IntentionModal({onDone,profileName}){
-  const [text,setText]=React.useState("");
-  const prompts=[
-    "¿Qué quieres dejar atrás hoy?",
-    "¿Qué quieres traer a tu día?",
-    "¿Cómo te quieres sentir hoy?",
-    "Una palabra para tu mañana",
-  ];
-  const prompt=React.useMemo(()=>prompts[Math.floor(Math.random()*prompts.length)],[]);
-  return<div style={{position:"absolute",inset:0,zIndex:60,background:"rgba(29,24,18,.6)",display:"flex",alignItems:"flex-end",animation:"fadeIn .3s ease"}}>
-    <div style={{width:"100%",background:P.bg,borderRadius:"28px 28px 0 0",padding:"28px 22px 36px",animation:"slideUp .35s ease"}}>
-      <div style={{width:40,height:4,borderRadius:2,background:P.cream,margin:"0 auto 20px"}}/>
-      <div style={{textAlign:"center",marginBottom:20}}>
-        <div style={{fontSize:32,marginBottom:10}}>🌿</div>
-        <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:24,color:P.text,letterSpacing:"-.4px",lineHeight:1.15,marginBottom:6}}>{prompt}</div>
-        <div style={{fontSize:12,color:P.muted,lineHeight:1.4}}>Una pausa antes de cuidarte. Puedes saltar.</div>
-      </div>
-      <input type="text" value={text} onChange={e=>setText(e.target.value)} placeholder="Una palabra · una frase · lo que sientas" autoFocus style={{width:"100%",boxSizing:"border-box",padding:"14px 16px",borderRadius:14,border:`1.5px solid ${P.border}`,background:P.card,color:P.text,fontSize:15,outline:"none",fontFamily:"inherit",marginBottom:12,textAlign:"center"}}/>
-      <div style={{display:"flex",gap:8}}>
-        <button onClick={()=>onDone(null)} style={{flex:1,height:48,borderRadius:14,border:`1px solid ${P.border}`,background:"transparent",color:P.muted,fontSize:14,fontWeight:500,cursor:"pointer"}}>Saltar</button>
-        <button onClick={()=>onDone(text.trim()||null)} style={{flex:2,height:48,borderRadius:14,border:"none",background:P.text,color:P.onDark,fontSize:14,fontWeight:600,cursor:"pointer"}}>Empezar rutina →</button>
-      </div>
-    </div>
-  </div>;
-}
 
 // ─── PROFILE SETUP MODAL ─────────────────────────
 function ProfileSetupModal({onPick,onCancel}){
@@ -1856,7 +1869,7 @@ function WaitGate({totalSec,secsLeft,running,onToggle,onSkip,hint,why,nextName})
 }
 
 // ─── MODE TOGGLE ─────────────────────────────────
-function ModeToggle({mode,onChange,completionsToday}){
+function ModeToggle({mode,onChange,completionsToday,phase}){
   const isNight=mode==="night"||mode==="nightRetinal";
   const c=completionsToday||{};
   const morningDone=!!c.morning;
@@ -1865,7 +1878,7 @@ function ModeToggle({mode,onChange,completionsToday}){
     <div style={{display:"flex",padding:4,borderRadius:14,background:P.cream,border:`1px solid ${P.border}`}}>
       {[{id:"morning",label:"Mañana",icon:"sun",done:morningDone},{id:"night",label:"Noche",icon:"moon",done:nightDone}].map(o=>{
         const a=o.id==="morning"?mode==="morning":isNight;
-        return<button key={o.id} onClick={()=>onChange(o.id==="morning"?"morning":"night")} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:13.5,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:7,cursor:"pointer",transition:"all .2s",boxShadow:a?"0 1px 4px rgba(0,0,0,.07)":"none",position:"relative"}}>
+        return<button key={o.id} onClick={()=>onChange(o.id==="morning"?"morning":(isRetinalDay(phase)?"nightRetinal":"night"))} style={{flex:1,height:38,borderRadius:11,border:"none",background:a?P.card:"transparent",color:a?P.text:P.muted,fontSize:13.5,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:7,cursor:"pointer",transition:"all .2s",boxShadow:a?"0 1px 4px rgba(0,0,0,.07)":"none",position:"relative"}}>
           <Icon n={o.icon} size={14} color={a?P.text:P.muted}/>{o.label}
           {o.done&&<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:18,height:18,borderRadius:9,background:P.green,color:"#fff",fontSize:11,fontWeight:700,marginLeft:2,letterSpacing:0}}>✓</span>}
         </button>;
@@ -2274,8 +2287,7 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
     {backupReminderOpen&&<BackupReminder onExport={onBackupExport} onDismiss={onBackupDismiss}/>}
     <DayPlanBanner phase={phase}/>
     <DailyTip profileSex={profileSex} profile={profile} phase={phase} mode={mode} streak={streak}/>
-    <AfternoonSupplements profile={profile} onOpenProduct={onOpenProduct}/>
-    <ModeToggle mode={mode} onChange={setMode} completionsToday={completionsToday}/>
+    <ModeToggle mode={mode} onChange={setMode} completionsToday={completionsToday} phase={phase}/>
     {/* Si la rutina del modo actual YA está completada hoy → mostramos panel celebratorio
         y ocultamos pasos/progreso. Si no, mostramos el flujo normal de la rutina. */}
     {(completionsToday&&completionsToday[mode])?<div style={{padding:"18px 16px 30px"}}>
@@ -2330,6 +2342,7 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
         </button>
       </div>}
     </>}
+    <AfternoonSupplements profile={profile} onOpenProduct={onOpenProduct} mode={mode}/>
     {/* Entrada discreta para marcar rutinas de días anteriores que se olvidaron */}
     {onOpenBackfill&&<div style={{padding:"4px 16px 0"}}>
       <button onClick={onOpenBackfill} style={{width:"100%",padding:"10px 14px",borderRadius:14,border:`1px dashed ${P.border}`,background:"transparent",color:P.muted,fontSize:12,fontWeight:500,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
@@ -3610,11 +3623,9 @@ function BackupReminder({onExport,onDismiss}){
 // ─── SUPLEMENTOS DE LA TARDE (solo Mijal) ────────
 // Tarjeta dedicada en la pantalla Hoy. Cada pastilla con su foto, descripción
 // y check independiente. Persiste por día en localStorage.
-function AfternoonSupplements({profile,onOpenProduct}){
-  if(!profile||!SUPPLEMENTS.afternoon||!SUPPLEMENTS.afternoon.length)return null;
-  const mine=SUPPLEMENTS.afternoon.filter(s=>!s.profileOnly||s.profileOnly===profile.id);
-  if(!mine.length)return null;
-  const storageKey=`kb_supp_tarde_${todayStr()}`;
+function SupplementCard({group,onOpenProduct}){
+  const items=group.items;
+  const storageKey=`kb_supp_${group.key}_${todayStr()}`;
   const [taken,setTaken]=React.useState(()=>ls(storageKey,{}));
   function toggle(id){
     const next={...taken};
@@ -3623,19 +3634,22 @@ function AfternoonSupplements({profile,onOpenProduct}){
     setTaken(next);
     lsSet(storageKey,next);
   }
-  const allDone=mine.every(s=>taken[s.id]);
-  const doneCount=mine.filter(s=>taken[s.id]).length;
+  const allDone=items.every(s=>taken[s.id]);
+  const doneCount=items.filter(s=>taken[s.id]).length;
   return <div style={{margin:"0 16px 14px",borderRadius:18,background:P.card,border:`1px solid ${allDone?P.green:P.border}`,overflow:"hidden"}}>
-    <div style={{padding:"12px 14px 8px",display:"flex",alignItems:"center",gap:8}}>
-      <span style={{fontSize:18}}>🌤️</span>
-      <div style={{flex:1,minWidth:0}}>
-        <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.muted,fontWeight:700}}>Suplementos de la tarde</div>
-        <div style={{fontSize:13,color:P.text,fontWeight:600,marginTop:1}}>{doneCount}/{mine.length} {doneCount===mine.length?"completadas ✓":"pendientes"}</div>
+    <div style={{padding:"12px 14px 8px"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8}}>
+        <span style={{fontSize:18}}>{group.emoji}</span>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:P.muted,fontWeight:700}}>{group.label}</div>
+          <div style={{fontSize:13,color:P.text,fontWeight:600,marginTop:1}}>{doneCount}/{items.length} {doneCount===items.length?"completadas ✓":"pendientes"}</div>
+        </div>
+        {allDone&&<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:24,height:24,borderRadius:12,background:P.green,color:"#fff",fontSize:13,fontWeight:700}}>✓</span>}
       </div>
-      {allDone&&<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:24,height:24,borderRadius:12,background:P.green,color:"#fff",fontSize:13,fontWeight:700}}>✓</span>}
+      <div style={{fontSize:11,color:P.muted,marginTop:6,lineHeight:1.4,fontStyle:"italic"}}>{group.hint}</div>
     </div>
     <div style={{padding:"0 10px 12px",display:"flex",flexDirection:"column",gap:6}}>
-      {mine.map(function(s){
+      {items.map(function(s){
         const isTaken=!!taken[s.id];
         return <div key={s.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",borderRadius:14,background:isTaken?P.greenSoft:P.cream,border:`1px solid ${isTaken?P.green:P.border}`,transition:"all .2s"}}>
           <button onClick={function(){if(onOpenProduct){const p={brand:s.brand,name:s.name,photo:s.photo,cat:"Suplemento",ingr:[],appearances:[{tip:s.why}]};onOpenProduct(p);}}} style={{width:44,height:44,borderRadius:12,background:P.card,border:`1px solid ${P.border}`,padding:0,cursor:onOpenProduct?"pointer":"default",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -3653,6 +3667,19 @@ function AfternoonSupplements({profile,onOpenProduct}){
       })}
     </div>
   </div>;
+}
+function AfternoonSupplements({profile,onOpenProduct,mode}){
+  if(!profile)return null;
+  const isNight=mode==="night"||mode==="nightRetinal";
+  const defs=[];
+  if(mode==="morning")defs.push({key:"manana",label:"Suplementos de la mañana",emoji:"🌅",hint:"Tómalas con tu rutina de la mañana 🌿",items:SUPPLEMENTS.morning||[]});
+  if(isNight){
+    defs.push({key:"tarde",label:"Suplementos de la tarde",emoji:"🌤️",hint:"Aprovecha de tomarlas durante la tarde 🌿",items:SUPPLEMENTS.afternoon||[]});
+    defs.push({key:"noche",label:"Suplementos de la noche",emoji:"🌙",hint:"Tómalas al terminar tu rutina de noche 🌙",items:SUPPLEMENTS.night||[]});
+  }
+  const groups=defs.map(function(g){return {...g,items:g.items.filter(s=>!s.profileOnly||s.profileOnly===profile.id)};}).filter(g=>g.items.length);
+  if(!groups.length)return null;
+  return <React.Fragment>{groups.map(g=><SupplementCard key={g.key} group={g} onOpenProduct={onOpenProduct}/>)}</React.Fragment>;
 }
 
 function DailyTip({profileSex,profile,phase,mode,streak}){
@@ -3776,7 +3803,7 @@ function CycleSection(){
   </div>;
 }
 
-function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataRestored,profile,onChangeProfile,theme,onThemeChange,accent,onAccentChange,voiceEnabled,onVoiceChange}){
+function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataRestored,profile,onChangeProfile,theme,onThemeChange,accent,onAccentChange,skin,onSkinChange,voiceEnabled,onVoiceChange}){
   const fileRef=React.useRef();
   const [stor,setStor]=React.useState({used:0,quota:0});
   const [importing,setImporting]=React.useState(false);
@@ -3839,6 +3866,21 @@ function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataR
           })}
         </div>
         <div style={{fontSize:10.5,color:P.muted,marginTop:8,lineHeight:1.4}}>Auto sigue el modo de tu iPhone (Pantalla y brillo).</div>
+        <div style={{marginTop:12,paddingTop:12,borderTop:`1px solid ${P.border}`}}>
+          <div style={{fontSize:10,letterSpacing:1,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:8}}>Tema visual</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+            {Object.entries(SKIN_PRESETS).map(([key,sk])=>{
+              const a=skin===key;
+              return<button key={key} onClick={()=>onSkinChange&&onSkinChange(key)} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",borderRadius:12,border:`1.5px solid ${a?P.accent:P.border}`,background:a?P.accentSoft:"transparent",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+                <span style={{display:"flex",flexShrink:0,borderRadius:7,overflow:"hidden",border:`1px solid ${P.border}`}}>
+                  <span style={{width:13,height:15,background:sk.light.bg}}/>
+                  <span style={{width:13,height:15,background:sk.light.accent}}/>
+                </span>
+                <span style={{fontSize:11.5,fontWeight:700,color:a?P.accent:P.text,letterSpacing:"-.1px"}}>{sk.name}</span>
+              </button>;
+            })}
+          </div>
+        </div>
         <div style={{marginTop:12,paddingTop:12,borderTop:`1px solid ${P.border}`}}>
           <div style={{fontSize:10,letterSpacing:1,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:8}}>Color de acento</div>
           <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
@@ -3937,16 +3979,27 @@ function App(){
   const [profile,setProfile]=React.useState(()=>getProfile());
   const [showProfileModal,setShowProfileModal]=React.useState(false);
   const [theme,setThemeState]=React.useState(()=>ls("kb_theme","auto"));
-  const [accent,setAccentState]=React.useState(()=>ls("kb_accent","gold"));
+  const [accent,setAccentState]=React.useState(()=>getAccentForProfile(getProfile()));
+  const [skin,setSkinState]=React.useState(()=>getSkinForProfile(getProfile()));
   const [voiceEnabled,setVoiceEnabled]=React.useState(()=>ls("kb_voice",false));
-  const [showIntention,setShowIntention]=React.useState(false);
-  const [pendingFirstIdx,setPendingFirstIdx]=React.useState(null);
   function handleVoiceChange(v){setVoiceEnabled(v);lsSet("kb_voice",v);if(!v)stopSpeaking();haptic("light");}
   function handleAccentChange(a){
     setAccentState(a);
-    lsSet("kb_accent",a);
+    lsSet("kb_accent_"+(profile?.id||"default"),a);
     applyAccent(a);
     applyTheme(theme); // re-aplica tema para refrescar P
+    haptic("light");
+  }
+  function handleSkinChange(s){
+    setSkinState(s);
+    lsSet("kb_skin_"+(profile?.id||"default"),s);
+    applySkin(s);
+    // cada skin trae su acento de firma (el usuario puede cambiarlo luego)
+    const acc=SKIN_ACCENT[s]||"gold";
+    setAccentState(acc);
+    lsSet("kb_accent_"+(profile?.id||"default"),acc);
+    applyAccent(acc);
+    applyTheme(theme);
     haptic("light");
   }
   useThemeReactive(); // se re-renderea cuando applyTheme dispara
@@ -3977,6 +4030,12 @@ function App(){
       setPhase(p.defaultPhase);
       lsSet("kb_phase",p.defaultPhase);
     }
+    // Tema + acento del perfil (Mijal → Menta dewy por defecto)
+    const _sk=getSkinForProfile(p);
+    setSkinState(_sk);applySkin(_sk);
+    const _acc=getAccentForProfile(p);
+    setAccentState(_acc);applyAccent(_acc);
+    applyTheme(theme);
     haptic("medium");
   }
   function handleOpenProfileSwitcher(){setShowProfileModal(true);}
@@ -3984,7 +4043,11 @@ function App(){
   const [mode,setMode]=React.useState(()=>{
     if(_restored)return _restored.mode;
     const h=new Date().getHours();
-    return h>=18||h<6?"night":"morning";
+    if(h>=18||h<6){
+      const ph=parseInt(ls("kb_phase","2"));
+      return isRetinalDay(ph)?"nightRetinal":"night";
+    }
+    return "morning";
   });
   const [phase,setPhase]=React.useState(()=>parseInt(ls("kb_phase","2")));
   const [activeIdx,setActiveIdx]=React.useState(null);
@@ -4127,11 +4190,8 @@ function App(){
 
   const baseRoutine=ROUTINES[mode]||ROUTINES.night;
   const routine=React.useMemo(()=>{
-    // Suplementos por perfil — se anexan al final de la rutina como pasos extra.
-    // Morning → SUPPLEMENTS.morning. Night y nightRetinal → SUPPLEMENTS.night.
-    const supKey=mode==="morning"?"morning":(mode==="night"||mode==="nightRetinal"?"night":null);
-    const profileSupplements=(supKey&&SUPPLEMENTS[supKey])?SUPPLEMENTS[supKey].filter(s=>!s.profileOnly||(profile&&profile.id===s.profileOnly)):[];
-    const stepsWithSupplements=baseRoutine.steps.concat(profileSupplements);
+    // Los suplementos (mañana · tarde · noche) NO son pasos de skincare: viven en el Box de Suplementos.
+    const stepsWithSupplements=baseRoutine.steps;
     const baseWithSup={...baseRoutine,steps:stepsWithSupplements,total:stepsWithSupplements.length,minutes:Math.round(stepsWithSupplements.reduce((a,s)=>a+(s.min||0),0))};
     if(!expressMode)return baseWithSup;
     const filtered=stepsWithSupplements.filter(s=>s.essential);
@@ -4150,25 +4210,8 @@ function App(){
   function stepState(s,i){return doneSteps.has(s.id)?"done":i===activeIdx?"active":"pending";}
 
   function handleTap(i){
-    // Si es el primer paso y no ha empezado, muestra la intención antes
-    if(!started&&i===0&&!doneSteps.has(routine.steps[0].id)){
-      setPendingFirstIdx(i);
-      setShowIntention(true);
-      return;
-    }
     if(!started)setStarted(true);
     setActiveIdx(i);
-  }
-  function handleIntentionDone(intentionText){
-    if(intentionText){
-      const list=ls("kb_intentions",[]);
-      list.push({date:todayStr(),text:intentionText,profileId:profile?.id||"unknown"});
-      lsSet("kb_intentions",list);
-    }
-    setShowIntention(false);
-    setStarted(true);
-    setActiveIdx(pendingFirstIdx??0);
-    setPendingFirstIdx(null);
   }
 
   function handleComplete(s,i){
@@ -4253,7 +4296,7 @@ function App(){
     {showChat&&<ChatPanel onClose={handleCloseChat} profile={profile} phase={phase} mode={mode} routine={routine} history={history} streak={streak} initialInput={chatPrefill}/>}
     {showBackfill&&<BackfillModal onClose={()=>setShowBackfill(false)} onConfirm={handleBackfill} history={history}/>}
     {hasUpdate&&!updateDismissed&&<UpdateBanner onApply={handleApplyUpdate} onDismiss={()=>setUpdateDismissed(true)}/>}
-    {showSettings&&<SettingsSheet onClose={()=>setShowSettings(false)} history={history} diary={diary} photos={photos} phase={phase} onPhaseChange={handlePhaseChange} onDataRestored={handleDataRestored} profile={profile} onChangeProfile={handleOpenProfileSwitcher} theme={theme} onThemeChange={handleThemeChange} accent={accent} onAccentChange={handleAccentChange} voiceEnabled={voiceEnabled} onVoiceChange={handleVoiceChange}/>}
+    {showSettings&&<SettingsSheet onClose={()=>setShowSettings(false)} history={history} diary={diary} photos={photos} phase={phase} onPhaseChange={handlePhaseChange} onDataRestored={handleDataRestored} profile={profile} onChangeProfile={handleOpenProfileSwitcher} theme={theme} onThemeChange={handleThemeChange} accent={accent} onAccentChange={handleAccentChange} skin={skin} onSkinChange={handleSkinChange} voiceEnabled={voiceEnabled} onVoiceChange={handleVoiceChange}/>}
     {activeIngredient&&<IngredientSheet ingredient={activeIngredient} onClose={()=>setActiveIngredient(null)}/>}
     {activeProduct&&<ProductDetailSheet product={activeProduct} onClose={()=>setActiveProduct(null)} onOpenIngredient={setActiveIngredient} onAskAlternative={handleAskAlternative}/>}
     {showImport&&<ImportPhotos onClose={()=>setShowImport(false)} onSave={handleImportDone}/>}
@@ -4263,7 +4306,6 @@ function App(){
     {viewerPhoto&&<PhotoViewer photo={viewerPhoto} onClose={()=>setViewerPhoto(null)} onDelete={handlePhotoDeleted} allPhotos={photos}/>}
     {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose} profileName={profileName} mode={mode}/>}
     {(!profile||showProfileModal)&&<ProfileSetupModal onPick={handleProfilePick} onCancel={profile?()=>setShowProfileModal(false):null}/>}
-    {showIntention&&<IntentionModal onDone={handleIntentionDone} profileName={profileName}/>}
     {showCamera&&<PhotoCapture onClose={()=>setShowCamera(false)} onSave={handlePhotoSave}/>}
   </div>;
 }
