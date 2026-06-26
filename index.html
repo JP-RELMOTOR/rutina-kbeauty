@@ -3748,11 +3748,12 @@ function UpdateBanner({onApply,onDismiss}){
 async function exportAllData(){
   const photos=await dbGetPhotos();
   const data={
-    version:1,
+    version:2,
     exportedAt:new Date().toISOString(),
     history:ls("kb_history",[]),
     diary:ls("kb_diary",[]),
     phase:ls("kb_phase","2"),
+    chat:ls("kb_chat_history",[]),
     photos:photos.map(p=>{const c={...p};delete c.id;return c;}),
   };
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
@@ -3771,6 +3772,7 @@ async function importAllData(file){
   if(Array.isArray(data.history))lsSet("kb_history",data.history);
   if(Array.isArray(data.diary))lsSet("kb_diary",data.diary);
   if(data.phase!=null)lsSet("kb_phase",data.phase);
+  if(Array.isArray(data.chat))lsSet("kb_chat_history",data.chat);
   if(Array.isArray(data.photos)){
     await dbClearPhotos();
     await dbBulkAddPhotos(data.photos);
