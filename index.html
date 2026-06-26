@@ -638,6 +638,11 @@ const SUPPLEMENTS={
     {id:"sup-tarde-v",profileOnly:"mijal",brand:"Royal Pharma",name:"Vantux Max",dose:"1 cápsula",photo:"products/vantux-max.jpg",
      why:"Suplemento capilar — micronutrientes para fortalecer el cabello desde adentro."},
   ],
+  // Anticonceptivo oral — una pastilla al día, siempre a la misma hora.
+  anticonceptivo:[
+    {id:"sup-anticon",profileOnly:"mijal",brand:"Gedeon Richter",name:"Sibilla CD",dose:"1 comprimido",
+     why:"Anticonceptivo oral (Dienogest 2 mg / Etinilestradiol 0,030 mg). Envase de 28 (21 activos + 7). Tómalo todos los días a la misma hora siguiendo el orden del blíster."},
+  ],
 };
 
 // ─── INGREDIENTS GLOSSARY ────────────────────────
@@ -3676,6 +3681,8 @@ function AfternoonSupplements({profile,onOpenProduct,mode}){
   if(isNight){
     defs.push({key:"noche",label:"Suplementos de la noche",emoji:"🌙",hint:"Tómalas al terminar tu rutina de noche 🌙",items:(SUPPLEMENTS.afternoon||[]).concat(SUPPLEMENTS.night||[])});
   }
+  // Anticonceptivo: una pastilla al día (chequeo diario compartido entre rutinas)
+  defs.push({key:"anticonceptivo",label:"Anticonceptivo",emoji:"💊",hint:"Una pastilla al día, siempre a la misma hora ⏰",items:SUPPLEMENTS.anticonceptivo||[]});
   const groups=defs.map(function(g){return {...g,items:g.items.filter(s=>!s.profileOnly||s.profileOnly===profile.id)};}).filter(g=>g.items.length);
   if(!groups.length)return null;
   return <React.Fragment>{groups.map(g=><SupplementCard key={g.key} group={g} onOpenProduct={onOpenProduct}/>)}</React.Fragment>;
