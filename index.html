@@ -3038,16 +3038,6 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak,initialInp
     setInput(chip.prompt);
     setTimeout(function(){if(inputRef.current)inputRef.current.focus();},50);
   }
-  function toggleMic(){
-    if(!voiceIn.supported){
-      alert("Tu navegador no soporta dictado por voz. En iPhone usa Safari; en Android usa Chrome.");
-      return;
-    }
-    if(voiceIn.listening){voiceIn.stop();return;}
-    chatStopSpeak();
-    setInput("");
-    voiceIn.start();
-  }
   function toggleSpeak(idx,text){
     if(speakingIdx===idx){
       chatStopSpeak();
@@ -3144,7 +3134,6 @@ function ChatPanel({onClose,profile,phase,mode,routine,history,streak,initialInp
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImagePick} style={{display:"none"}}/>
       {messages.length>0&&<button onClick={handleClear} title="Limpiar" style={{width:38,height:38,borderRadius:19,border:`1px solid ${P.border}`,background:"transparent",cursor:"pointer",fontSize:14,flexShrink:0}}>🗑️</button>}
       <button onClick={openImagePicker} disabled={imageBusy||loading} title="Adjuntar foto de tu piel" style={{width:38,height:38,borderRadius:19,border:`1px solid ${pendingImage?P.accent:P.border}`,background:pendingImage?P.accentSoft:"transparent",color:P.text,cursor:(imageBusy||loading)?"default":"pointer",opacity:(imageBusy||loading)?.5:1,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0,transition:"all .15s"}}>📷</button>
-      <button onClick={toggleMic} title={voiceIn.listening?"Detener dictado":"Hablar"} style={{width:38,height:38,borderRadius:19,border:`1px solid ${voiceIn.listening?"#dc503c":P.border}`,background:voiceIn.listening?"#dc503c":"transparent",color:voiceIn.listening?"#fff":P.text,cursor:voiceIn.supported?"pointer":"not-allowed",opacity:voiceIn.supported?1:.45,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0,animation:voiceIn.listening?"micPulse 1.4s ease-in-out infinite":"none",transition:"all .15s"}}>🎤</button>
       <textarea ref={inputRef} value={input} onChange={e=>setInput(e.target.value)} placeholder={pendingImage?"Pregunta opcional sobre la foto…":(checkerMode?"Pega la lista INCI aquí…":(voiceIn.listening?"Escuchando… habla ahora":"Pregunta lo que quieras sobre tu rutina..."))} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleSend();}}} rows={1} style={{flex:1,padding:"10px 14px",borderRadius:19,border:`1px solid ${voiceIn.listening?"#dc503c":P.border}`,background:P.bg,color:P.text,fontSize:13.5,fontFamily:"inherit",resize:"none",maxHeight:120,outline:"none",lineHeight:1.4,transition:"border .15s"}}/>
       <button onClick={()=>handleSend()} disabled={(!input.trim()&&!pendingImage)||loading} style={{width:38,height:38,borderRadius:19,border:"none",background:((input.trim()||pendingImage)&&!loading)?P.accent:P.cream,color:P.onAccent,cursor:((input.trim()||pendingImage)&&!loading)?"pointer":"default",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:700,transition:"all .15s",flexShrink:0}}>↑</button>
     </div>
