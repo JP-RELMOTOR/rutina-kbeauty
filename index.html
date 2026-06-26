@@ -3674,8 +3674,7 @@ function AfternoonSupplements({profile,onOpenProduct,mode}){
   const defs=[];
   if(mode==="morning")defs.push({key:"manana",label:"Suplementos de la mañana",emoji:"🌅",hint:"Tómalas con tu rutina de la mañana 🌿",items:SUPPLEMENTS.morning||[]});
   if(isNight){
-    defs.push({key:"tarde",label:"Suplementos de la tarde",emoji:"🌤️",hint:"Aprovecha de tomarlas durante la tarde 🌿",items:SUPPLEMENTS.afternoon||[]});
-    defs.push({key:"noche",label:"Suplementos de la noche",emoji:"🌙",hint:"Tómalas al terminar tu rutina de noche 🌙",items:SUPPLEMENTS.night||[]});
+    defs.push({key:"noche",label:"Suplementos de la noche",emoji:"🌙",hint:"Tómalas al terminar tu rutina de noche 🌙",items:(SUPPLEMENTS.afternoon||[]).concat(SUPPLEMENTS.night||[])});
   }
   const groups=defs.map(function(g){return {...g,items:g.items.filter(s=>!s.profileOnly||s.profileOnly===profile.id)};}).filter(g=>g.items.length);
   if(!groups.length)return null;
