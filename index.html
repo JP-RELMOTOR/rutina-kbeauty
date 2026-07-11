@@ -2030,7 +2030,7 @@ function PhotoViewer({photo,onClose,onDelete,allPhotos}){
   const sortedAll=React.useMemo(()=>allPhotos?[...allPhotos].sort((a,b)=>(a.date||"").localeCompare(b.date||"")):[],[allPhotos]);
   const compareSuggestions=React.useMemo(()=>{
     if(!sortedAll.length||sortedAll.length<2)return [];
-    return sortedAll.filter(p=>p.id!==photo.id).slice(0,8);
+    return sortedAll.filter(p=>p.id!==photo.id);
   },[sortedAll,photo]);
   const comparePhoto=compareIdx!=null?compareSuggestions[compareIdx]:null;
   async function handleDelete(){
