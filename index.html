@@ -332,7 +332,7 @@ async function getStorageEstimate(){
 // Los datos clínicos y de uso pertenecen al perfil activo. La apariencia y el
 // selector de perfil siguen siendo compartidos por este dispositivo.
 const PROFILE_DATA_KEYS=new Set([
-  "kb_history","kb_diary","kb_phase","kb_cycle","kb_completed_today",
+  "kb_history","kb_diary","kb_phase","kb_completed_today",
   "kb_routine_progress","kb_wait","kb_express_mode",
   "kb_last_backup_reminder","kb_last_recap_shown","kb_year_wrapped_shown",
   "kb_chat_history","kb_chat_personality","kb_chat_personality_custom",
@@ -397,23 +397,6 @@ function getDayLabel(){
 function todayStr(){
   const d=new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-
-// Cycle tracking (opt-in, solo perfil ♀)
-function getCycleInfo(){
-  const data=ls("kb_cycle",null);
-  if(!data||!data.enabled||!data.lastPeriod)return null;
-  const cycleLen=data.cycleLength||28;
-  const start=new Date(data.lastPeriod+"T12:00:00");
-  const today=new Date();
-  const daysSince=Math.floor((today-start)/(86400000));
-  const dayInCycle=((daysSince%cycleLen)+cycleLen)%cycleLen+1;
-  let phase,phaseEmoji,phaseTip;
-  if(dayInCycle<=5){phase="Menstrual";phaseEmoji="🌑";phaseTip="Piel más sensible · evita exfoliantes fuertes y retinal";}
-  else if(dayInCycle<=13){phase="Folicular";phaseEmoji="🌒";phaseTip="Piel más receptiva · ideal para introducir activos nuevos";}
-  else if(dayInCycle<=15){phase="Ovulatoria";phaseEmoji="🌕";phaseTip="Piel luminosa · momento más radiante del ciclo";}
-  else{phase="Lútea";phaseEmoji="🌘";phaseTip="Piel propensa a brotes · cuidados extra con limpieza y BHA";}
-  return {dayInCycle,phase,phaseEmoji,phaseTip,cycleLen};
 }
 
 // Skin Level Evolution — basado en días únicos de actividad
@@ -3872,39 +3855,6 @@ async function importAllData(file){
 }
 
 // ─── SETTINGS SHEET ──────────────────────────────
-function CycleSection(){
-  const [cy,setCy]=React.useState(()=>ls("kb_cycle",{enabled:false,lastPeriod:"",cycleLength:28}));
-  function update(patch){const next={...cy,...patch};setCy(next);lsSet("kb_cycle",next);}
-  const info=cy.enabled&&cy.lastPeriod?getCycleInfo():null;
-  return<div style={{marginBottom:14,padding:14,borderRadius:18,background:P.card,border:`1px solid ${P.border}`}}>
-    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:cy.enabled?10:0}}>
-      <div>
-        <div style={{fontSize:11,letterSpacing:1.3,textTransform:"uppercase",color:P.muted,fontWeight:700}}>🌙 Ciclo menstrual</div>
-        <div style={{fontSize:12,color:P.text,marginTop:6,fontWeight:500}}>Adapta consejos según fase hormonal</div>
-      </div>
-      <button onClick={()=>update({enabled:!cy.enabled})} style={{width:54,height:30,borderRadius:15,border:"none",background:cy.enabled?P.accent:P.cream,position:"relative",cursor:"pointer",transition:"all .2s",flexShrink:0}}>
-        <div style={{position:"absolute",top:3,left:cy.enabled?27:3,width:24,height:24,borderRadius:12,background:P.card,transition:"left .2s",boxShadow:"0 1px 3px rgba(0,0,0,.15)"}}/>
-      </button>
-    </div>
-    {cy.enabled&&<>
-      <div style={{marginTop:8}}>
-        <div style={{fontSize:10,letterSpacing:1,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:5}}>Inicio último período</div>
-        <input type="date" value={cy.lastPeriod||""} onChange={e=>update({lastPeriod:e.target.value})} style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:10,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:13,fontFamily:"inherit",marginBottom:8}}/>
-        <div style={{fontSize:10,letterSpacing:1,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:5}}>Duración promedio del ciclo</div>
-        <input type="number" value={cy.cycleLength||28} onChange={e=>update({cycleLength:parseInt(e.target.value)||28})} min="20" max="40" style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:10,border:`1px solid ${P.border}`,background:P.bg,color:P.text,fontSize:13,fontFamily:"inherit"}}/>
-      </div>
-      {info&&<div style={{marginTop:12,padding:12,borderRadius:14,background:P.cream,display:"flex",gap:10,alignItems:"flex-start"}}>
-        <div style={{fontSize:24}}>{info.phaseEmoji}</div>
-        <div style={{flex:1}}>
-          <div style={{fontSize:13,fontWeight:700,color:P.text}}>Fase {info.phase} · Día {info.dayInCycle}</div>
-          <div style={{fontSize:11,color:P.muted,marginTop:3,lineHeight:1.4}}>{info.phaseTip}</div>
-        </div>
-      </div>}
-    </>}
-    {!cy.enabled&&<div style={{fontSize:10.5,color:P.muted,marginTop:8,lineHeight:1.4}}>Opcional. Activa para sugerencias según fase hormonal (menstrual, folicular, ovulatoria, lútea).</div>}
-  </div>;
-}
-
 function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataRestored,profile,onChangeProfile,theme,onThemeChange,accent,onAccentChange,skin,onSkinChange}){
   const fileRef=React.useRef();
   const [stor,setStor]=React.useState({used:0,quota:0});
@@ -4032,23 +3982,6 @@ function SettingsSheet({onClose,history,diary,photos,phase,onPhaseChange,onDataR
         <input ref={fileRef} type="file" accept="application/json" onChange={handleImportFile} style={{display:"none"}}/>
         <button onClick={()=>fileRef.current?.click()} disabled={importing} style={{width:"100%",height:48,borderRadius:14,border:`1px solid ${P.border}`,background:"transparent",color:P.text,fontSize:14,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>📤 {importing?"Importando...":"Importar desde archivo"}</button>
         {msg&&<div style={{marginTop:10,padding:"8px 12px",borderRadius:10,background:msg.type==="ok"?P.greenSoft:P.retinalSoft,color:msg.type==="ok"?P.green:P.retinal,fontSize:12,fontWeight:600}}>{msg.text}</div>}
-      </div>
-
-      {/* CYCLE TRACKING — solo perfil femenino */}
-      {profile?.sex==="f"&&<CycleSection/>}
-
-      {/* PLAYLISTS */}
-      <div style={{marginBottom:14,padding:14,borderRadius:18,background:P.card,border:`1px solid ${P.border}`}}>
-        <div style={{fontSize:11,letterSpacing:1.3,textTransform:"uppercase",color:P.muted,fontWeight:700,marginBottom:10}}>🎵 Música para tu rutina</div>
-        <div style={{display:"flex",flexDirection:"column",gap:8}}>
-          <a href="spotify:playlist:37i9dQZF1DWZqd5JICZI0u" target="_blank" rel="noopener" style={{padding:"10px 12px",borderRadius:12,background:"#1db954",color:"white",fontSize:13,fontWeight:600,textDecoration:"none",display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:14}}>🎧</span>Spotify · Peaceful Piano
-          </a>
-          <a href="music://music.apple.com/us/playlist/pure-calm/pl.dca4554afe614a86b04b977a08a17b66" target="_blank" rel="noopener" style={{padding:"10px 12px",borderRadius:12,background:"#fa233b",color:"white",fontSize:13,fontWeight:600,textDecoration:"none",display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:14}}>🎼</span>Apple Music · Pure Calm
-          </a>
-        </div>
-        <div style={{fontSize:10.5,color:P.muted,marginTop:10,lineHeight:1.4}}>Abre en tu app de música. Ambient para concentrarte en tu rutina.</div>
       </div>
 
       {/* ABOUT */}
