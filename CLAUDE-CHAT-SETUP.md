@@ -43,6 +43,18 @@ En el panel del worker que acabas de crear:
 
 3. Click **Save and deploy** otra vez.
 
+El Worker ahora rechaza cualquier origen distinto de `ALLOWED_ORIGIN`. Si usas
+un dominio adicional, escríbelo separado por comas (por ejemplo,
+`https://jp-relmotor.github.io,https://mi-dominio.cl`). No uses `*`.
+
+### Protección opcional de uso
+
+Para añadir un límite de solicitudes, en **Workers → tu worker → Settings →
+Bindings** crea un **KV Namespace** y asígnalo con el nombre
+`RATE_LIMIT_KV`. Luego agrega la variable de texto
+`MAX_REQUESTS_PER_MINUTE` con valor `20`. Esto limita cada IP por minuto y es
+recomendable antes de compartir el chat fuera de Mijal y JP.
+
 ---
 
 ## Paso 5 · Conectar la app (1 min)
@@ -91,8 +103,8 @@ Los **$5 USD iniciales te duran meses**.
 ## ¿Quieres compartir el chat con alguien más?
 
 Actualmente la app está configurada solo para Mijal y JP. Si quieres dar acceso a más personas, hay que agregar:
-- Rate limiting en el worker (KV de Cloudflare)
-- Auth básica con un PIN compartido
-- Posiblemente lista blanca de usuarios
+- El rate limiting de KV descrito arriba
+- Autenticación real (un PIN compartido no protege una API de pago por sí solo)
+- Posiblemente una lista blanca de usuarios
 
 Avísame cuando llegues a ese punto y lo agregamos.
