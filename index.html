@@ -338,7 +338,7 @@ const PROFILE_DATA_KEYS=new Set([
   "kb_chat_history","kb_chat_personality","kb_chat_personality_custom",
   "kb_claude_worker_url","kb_claude_model"
 ]);
-const PROFILE_DATA_PREFIXES=["kb_supp_","kb_ai_tip_","kb_ai_greeting_"];
+const PROFILE_DATA_PREFIXES=["kb_supp_","kb_ai_tip_","kb_ai_greeting_","kb_readiness_"];
 function activeProfileId(){
   try{return JSON.parse(localStorage.getItem("kb_profile")||"null")?.id||null;}catch(_){return null;}
 }
@@ -427,9 +427,10 @@ function getSkinLevel(history){
   };
 }
 // Persist routine progress so Mijal can pause and resume without losing steps.
-function saveRoutineProgress(mode,doneSet){
-  if(!doneSet||doneSet.size===0){lsRemove("kb_routine_progress");return;}
-  lsSet("kb_routine_progress",{date:todayStr(),mode,doneSteps:[...doneSet]});
+function saveRoutineProgress(mode,doneSet,skippedSet){
+  const done=[...(doneSet||[])],skipped=[...(skippedSet||[])];
+  if(done.length===0&&skipped.length===0){lsRemove("kb_routine_progress");return;}
+  lsSet("kb_routine_progress",{date:todayStr(),mode,doneSteps:done,skippedSteps:skipped});
 }
 function loadRoutineProgress(){
   const p=ls("kb_routine_progress",null);
@@ -1697,12 +1698,43 @@ function DayPlanBanner({phase,onStartRoutine}){
   </div>;
 }
 
+// ─── INICIO DE RUTINA ───────────────────────────
+// Una entrada breve evita mostrar todos los productos antes de que la persona
+// esté lista. En noches de retinal, la decisión de tolerancia es deliberada:
+// la app puede orientar el flujo, pero no diagnostica ni reemplaza una consulta.
+function RoutineStartCard({mode,routine,onStart,onUseNonRetinal}){
+  const key=`kb_readiness_${todayStr()}`;
+  const [readiness,setReadiness]=React.useState(()=>ls(key,""));
+  const choose=v=>{setReadiness(v);lsSet(key,v);haptic("light");};
+  const isRetinal=mode==="nightRetinal";
+  const irritated=readiness==="irritated";
+  return<div style={{margin:"14px 16px 4px",padding:"18px",borderRadius:22,background:P.card,border:`1.5px solid ${isRetinal?P.retinal:P.accent}`,boxShadow:`0 8px 24px -18px ${P.shadow}`}}>
+    <div style={{fontSize:10,letterSpacing:1.3,textTransform:"uppercase",color:isRetinal?P.retinal:P.accent,fontWeight:700,marginBottom:5}}>{isRetinal?"Antes de usar retinal":"Lista para empezar"}</div>
+    <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:22,color:P.text,letterSpacing:"-.35px",lineHeight:1.15,marginBottom:6}}>{routine.label}</div>
+    <div style={{fontSize:12.5,color:P.muted,lineHeight:1.5,marginBottom:isRetinal?14:18}}>{routine.total} pasos guiados · aprox. {routine.minutes} min</div>
+    {isRetinal&&<>
+      <div style={{fontSize:12,color:P.text,fontWeight:600,marginBottom:8}}>¿Cómo se siente tu piel ahora?</div>
+      <div style={{display:"flex",gap:6,marginBottom:irritated?12:16}}>
+        {[{v:"well",l:"Bien"},{v:"sensitive",l:"Sensible"},{v:"irritated",l:"Arde o está roja"}].map(o=>{
+          const active=readiness===o.v;
+          return<button key={o.v} onClick={()=>choose(o.v)} style={{flex:1,minHeight:42,padding:"7px 5px",borderRadius:12,border:`1.5px solid ${active?(o.v==="irritated"?P.retinal:P.accent):P.border}`,background:active?(o.v==="irritated"?P.retinalSoft:P.accentSoft):"transparent",color:active?(o.v==="irritated"?P.retinal:P.text):P.muted,fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit",lineHeight:1.15}}>{o.l}</button>;
+        })}
+      </div>
+      {irritated&&<div style={{padding:"11px 12px",marginBottom:12,borderRadius:13,background:P.retinalSoft,border:`1px solid ${P.retinal}`,fontSize:12,color:P.text,lineHeight:1.5}}>
+        Hoy no inicies el retinal. Si hay dolor intenso, hinchazón, urticaria o la reacción empeora, suspende los productos y busca orientación médica o dermatológica.
+      </div>}
+    </>}
+    {irritated?<button onClick={onUseNonRetinal} style={{width:"100%",height:50,borderRadius:15,border:"none",background:P.text,color:P.onDark,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Ver rutina sin retinal →</button>
+      :<button onClick={onStart} style={{width:"100%",height:52,borderRadius:16,border:"none",background:isRetinal?P.retinal:P.text,color:P.onDark,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>Comenzar rutina <span style={{fontSize:18,lineHeight:0}}>→</span></button>}
+  </div>;
+}
+
 // ─── STEP CARD ───────────────────────────────────
 function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,onOpenProduct,profileName}){
   const photoClick=e=>{if(!step.photo||!onOpenProduct)return;e.stopPropagation();onOpenProduct(step);};
   const animoText=interpolateName(step.animo,profileName);
   if(nextName) step={...step,_next:nextName};
-  const isActive=state==="active",isDone=state==="done";
+  const isActive=state==="active",isDone=state==="done",isSkipped=state==="skipped";
   const totalSec=Math.round(step.min*60);
   const [secLeft,setSecLeft]=React.useState(totalSec);
   const [running,setRunning]=React.useState(false);
@@ -1723,6 +1755,15 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,
       <div style={{fontSize:14,fontWeight:500,color:P.text,textDecoration:"line-through",textDecorationColor:P.muted,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{step.name}</div>
     </div>
     <div style={{fontSize:11,color:P.green,fontWeight:600}}>✓ {step.min}m</div>
+  </div>;
+
+  if(isSkipped)return<div style={{background:P.card,borderRadius:20,marginBottom:8,border:`1px dashed ${P.border}`,padding:"12px 16px",opacity:.72,display:"flex",alignItems:"center",gap:12,cursor:"pointer"}} onClick={onTap}>
+    <div style={{width:36,height:36,borderRadius:18,background:P.cream,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:16}}>↷</div>
+    <div style={{flex:1,minWidth:0}}>
+      <div style={{fontSize:10,color:P.muted,textTransform:"uppercase",letterSpacing:1.2,fontWeight:600}}>{step.cat}</div>
+      <div style={{fontSize:14,fontWeight:500,color:P.muted,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{step.name}</div>
+    </div>
+    <div style={{fontSize:10,color:P.muted,fontWeight:700,textAlign:"right",lineHeight:1.25}}>OMITIDO<br/>tocar para volver</div>
   </div>;
 
   const D = {height:1,background:P.border,margin:"0 18px"};
@@ -1834,7 +1875,7 @@ function StepCard({step,idx,state,onTap,onComplete,onSkip,nextName,onIngredient,
     {/* ── BOTONES ── */}
     <div style={D}/>
     <div style={{display:"flex",gap:8,padding:"12px 18px 16px"}}>
-      <button onClick={e=>{e.stopPropagation();onSkip();}} style={{flex:1,height:48,borderRadius:14,background:"transparent",border:`1px solid ${P.border}`,color:P.muted,fontSize:14,fontWeight:500,cursor:"pointer"}}>Saltar</button>
+      <button onClick={e=>{e.stopPropagation();onSkip();}} style={{flex:1,height:48,borderRadius:14,background:"transparent",border:`1px solid ${P.border}`,color:P.muted,fontSize:14,fontWeight:500,cursor:"pointer"}}>Saltar hoy</button>
       <button onClick={e=>{e.stopPropagation();onComplete();}} style={{flex:2,height:48,borderRadius:14,background:P.text,border:"none",color:P.onDark,fontSize:15,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
         <Icon n="check" size={16} color={P.onDark} sw={2.5}/>Listo
       </button>
@@ -2233,6 +2274,7 @@ function CompleteSheet({stats,onPhoto,onClose,profileName,mode}){
   const [stress,setStress]=React.useState(0); // PM
   const [water,setWater]=React.useState(0);   // PM
   const [sun,setSun]=React.useState(0);       // PM
+  const [detailsOpen,setDetailsOpen]=React.useState(false);
   const moods=[{e:"😍",l:"Radiante"},{e:"🙂",l:"Bien"},{e:"😊",l:"Normal"},{e:"😌",l:"Sensible"},{e:"😟",l:"Irritada"}];
   const Slider=({label,value,onChange,emoji,low,high})=><div style={{marginBottom:10}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:5}}>
@@ -2255,7 +2297,7 @@ function CompleteSheet({stats,onPhoto,onClose,profileName,mode}){
         <Icon n="sparkle" size={36} fill={P.onAccent} color={P.onAccent} sw={1}/>
       </div>
       <div style={{fontFamily:"'Instrument Serif',Georgia,serif",fontSize:28,color:P.text,letterSpacing:"-.6px",lineHeight:1.1,marginBottom:6}}>{profileName?`¡Rutina completa, ${profileName}!`:"¡Rutina completa!"}</div>
-      <div style={{fontSize:13,color:P.muted,lineHeight:1.5,maxWidth:270}}>{stats.completed}/{stats.total} pasos · {stats.minutes} min · Racha {stats.streak} día{stats.streak!==1?"s":""} 🔥</div>
+      <div style={{fontSize:13,color:P.muted,lineHeight:1.5,maxWidth:270}}>{stats.completed}/{stats.total} aplicados{stats.skipped?` · ${stats.skipped} omitido${stats.skipped!==1?"s":""}`:""} · {stats.minutes} min</div>
       <div style={{display:"flex",gap:8,marginTop:16}}>
         {[{v:`${stats.completed}/${stats.total}`,l:"Pasos"},{v:`${stats.minutes}m`,l:"Tiempo"},{v:`${stats.streak}d`,l:"Racha"}].map(s=>
           <div key={s.l} style={{padding:"8px 12px",borderRadius:12,background:P.card,border:`1px solid ${P.border}`,minWidth:68,textAlign:"center"}}>
@@ -2266,8 +2308,15 @@ function CompleteSheet({stats,onPhoto,onClose,profileName,mode}){
       </div>
     </div>
 
-    {/* MOOD + NOTA: al final (más preciso que al inicio) */}
     <div style={{padding:"4px 16px 8px"}}>
+      <button onClick={()=>setDetailsOpen(v=>!v)} style={{width:"100%",padding:"13px 14px",borderRadius:15,border:`1px solid ${P.border}`,background:P.card,color:P.text,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <span>✎ Añadir observación al diario <span style={{fontWeight:400,color:P.muted}}>(opcional)</span></span><span style={{color:P.muted}}>{detailsOpen?"⌃":"⌄"}</span>
+      </button>
+    </div>
+
+    {detailsOpen&&<>
+    {/* MOOD + NOTA: al final (más preciso que al inicio) */}
+    <div style={{padding:"0 16px 8px"}}>
       <div style={{padding:"14px 14px 12px",borderRadius:18,background:P.card,border:`1px solid ${P.border}`}}>
         <div style={{fontSize:13,fontWeight:600,color:P.text,marginBottom:3,letterSpacing:"-.1px"}}>¿Cómo está tu piel ahora?</div>
         <div style={{fontSize:11,color:P.muted,marginBottom:12}}>Alimenta tu diario · puedes saltar</div>
@@ -2296,6 +2345,7 @@ function CompleteSheet({stats,onPhoto,onClose,profileName,mode}){
         </>}
       </div>
     </div>
+    </>}
 
     <div style={{padding:"8px 16px 28px"}}>
       {mon
@@ -2305,13 +2355,13 @@ function CompleteSheet({stats,onPhoto,onClose,profileName,mode}){
         :<button onClick={onPhoto} style={{width:"100%",height:46,borderRadius:14,border:`1px solid ${P.border}`,background:P.card,color:P.muted,fontSize:13,fontWeight:500,cursor:"pointer",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
           <Icon n="camera" size={16} color={P.muted}/>Tomar foto de progreso (opcional)
         </button>}
-      <button onClick={()=>onClose(mood,note,{sleep,energy,stress,water,sun})} style={{width:"100%",height:50,borderRadius:16,border:"none",background:P.text,color:P.onDark,fontSize:15,fontWeight:600,cursor:"pointer"}}>Terminar ✓</button>
+      <button onClick={()=>onClose(mood,note,{sleep,energy,stress,water,sun})} style={{width:"100%",height:50,borderRadius:16,border:"none",background:P.text,color:P.onDark,fontSize:15,fontWeight:600,cursor:"pointer"}}>Registrar rutina ✓</button>
     </div>
   </div>;
 }
 
 // ─── TODAY SCREEN ────────────────────────────────
-function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,completedCount,completedMin,isFinished,onShowComplete,streak,phase,doneSteps,onOpenSettings,onIngredient,onOpenProduct,backupReminderOpen,onBackupExport,onBackupDismiss,expressMode,onExpressChange,waitingAfterIdx,waitTotal,waitSecs,waitRunning,waitHint,waitWhy,onToggleWait,onSkipWait,profileName,profileSex,profile,onSwitchProfile,completionsToday,onUndoCompletion,onOpenBackfill}){
+function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,completedCount,completedMin,skippedCount,isFinished,onShowComplete,streak,phase,doneSteps,skippedSteps,started,onStartRoutine,onUseNonRetinal,onOpenSettings,onIngredient,onOpenProduct,backupReminderOpen,onBackupExport,onBackupDismiss,expressMode,onExpressChange,waitingAfterIdx,waitTotal,waitSecs,waitRunning,waitHint,waitWhy,onToggleWait,onSkipWait,profileName,profileSex,profile,onSwitchProfile,completionsToday,onUndoCompletion,onOpenBackfill}){
   const greeting=getGreeting();
   // Saludo contextual generado por IA, cacheado por día. Null mientras carga o si no hay worker.
   const [aiGreeting,setAiGreeting]=React.useState(()=>ls(`kb_ai_greeting_${todayStr()}`,null));
@@ -2366,10 +2416,11 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
       </div>
     </div>:<>
       <ExpressToggle express={expressMode} onChange={onExpressChange}/>
+      {!started?<RoutineStartCard mode={mode} routine={routine} onStart={onStartRoutine} onUseNonRetinal={onUseNonRetinal}/>:<>
       <div style={{padding:"14px 16px 10px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
           <div style={{fontSize:11,color:P.muted,letterSpacing:.3,textTransform:"uppercase",fontWeight:600}}>Progreso</div>
-          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:12,color:P.text,fontWeight:600}}>{completedCount}/{routine.total} <span style={{color:P.muted}}>· {Math.round(completedMin)}/{routine.minutes} min</span></div>
+          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:12,color:P.text,fontWeight:600}}>{completedCount}/{routine.total} <span style={{color:P.muted}}>· {Math.round(completedMin)}/{routine.minutes} min{skippedCount?` · ${skippedCount} omitido${skippedCount!==1?"s":""}`:""}</span></div>
         </div>
         <div style={{height:5,borderRadius:2.5,background:P.cream,overflow:"hidden"}}>
           <div style={{height:"100%",width:`${(completedCount/routine.total)*100}%`,background:P.accent,transition:"width .5s ease",borderRadius:2.5}}/>
@@ -2378,14 +2429,14 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
       {/* Step dots */}
       <div style={{display:"flex",gap:5,justifyContent:"center",padding:"0 16px 10px"}}>
         {routine.steps.map((s,i)=>{
-          const done=doneSteps.has(s.id);
-          const active=i===routine.steps.findIndex((_,ii)=>!doneSteps.has(routine.steps[ii].id));
-          return<div key={s.id} style={{width:done?18:active?18:8,height:8,borderRadius:4,background:done?P.green:active?P.accent:P.cream,border:`1px solid ${done?P.green:active?P.accent:P.border}`,transition:"all .3s ease"}}/>;
+          const done=doneSteps.has(s.id),skipped=skippedSteps.has(s.id);
+          const active=i===routine.steps.findIndex((_,ii)=>!doneSteps.has(routine.steps[ii].id)&&!skippedSteps.has(routine.steps[ii].id));
+          return<div key={s.id} style={{width:done||skipped?18:active?18:8,height:8,borderRadius:4,background:done?P.green:skipped?P.cream:active?P.accent:P.cream,border:`1px solid ${done?P.green:active?P.accent:P.border}`,transition:"all .3s ease"}}/>;
         })}
       </div>
       <div style={{padding:"0 16px"}}>
         {routine.steps.map((s,i)=>{
-          const nextReal=routine.steps.slice(i+1).find(st=>!doneSteps.has(st.id));
+          const nextReal=routine.steps.slice(i+1).find(st=>!doneSteps.has(st.id)&&!skippedSteps.has(st.id));
           return<React.Fragment key={s.id}>
             <StepCard step={s} idx={i} state={stepState(s,i)} onTap={()=>onTap(i)} onComplete={()=>onComplete(s,i)} onSkip={()=>onSkip(s,i)} nextName={nextReal?nextReal.name:null} onIngredient={onIngredient} onOpenProduct={onOpenProduct} profileName={profileName}/>
             {waitingAfterIdx===i&&<WaitGate totalSec={waitTotal} secsLeft={waitSecs} running={waitRunning} onToggle={onToggleWait} onSkip={onSkipWait} hint={waitHint} why={waitWhy} nextName={nextReal?nextReal.name:null}/>}
@@ -2397,6 +2448,7 @@ function TodayScreen({mode,setMode,routine,stepState,onTap,onComplete,onSkip,com
           <Icon n="sparkle" size={16} color={P.onAccent} fill={P.onAccent} sw={1}/>Registrar rutina completada
         </button>
       </div>}
+      </>}
     </>}
     <AfternoonSupplements profile={profile} onOpenProduct={onOpenProduct} mode={mode}/>
     {/* Entrada discreta para marcar rutinas de días anteriores que se olvidaron */}
@@ -2722,7 +2774,8 @@ function DiaryScreen({history=[],diary,photos,onAddPhoto,onImportPhotos,onOpenJo
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:10,color:P.muted,marginBottom:2,fontWeight:600,textTransform:"uppercase",letterSpacing:.3}}>{entry.date} · {routineLabel}</div>
               {entry._backfilled&&<div style={{display:"inline-block",fontSize:9.5,padding:"2px 6px",borderRadius:6,background:P.accentSoft,color:P.accent,fontWeight:700,marginBottom:4}}>REGISTRADA DESPUÉS</div>}
-              {d?.note?<div style={{fontSize:13,color:P.text,lineHeight:1.45}}>{d.note}</div>:<div style={{fontSize:12,color:P.muted,fontStyle:"italic"}}>{entry._backfilled?"Rutina completada · sin observación":"Rutina completada"}</div>}
+              {entry.partial&&<div style={{display:"inline-block",fontSize:9.5,padding:"2px 6px",borderRadius:6,background:P.cream,color:P.muted,fontWeight:700,marginBottom:4}}>SESIÓN PARCIAL · {(entry.skipped||[]).length} OMITIDO{(entry.skipped||[]).length!==1?"S":""}</div>}
+              {d?.note?<div style={{fontSize:13,color:P.text,lineHeight:1.45}}>{d.note}</div>:<div style={{fontSize:12,color:P.muted,fontStyle:"italic"}}>{entry._backfilled?"Rutina completada · sin observación":entry.partial?"Rutina registrada con pasos omitidos":"Rutina completada"}</div>}
               {wellness&&<div style={{fontSize:10.5,color:P.muted,marginTop:5}}>{wellness}</div>}
             </div>
           </div>;
@@ -4059,7 +4112,8 @@ function App(){
     const fallbackMode=(hour>=18||hour<6)?(isRetinalDay(nextPhase)?"nightRetinal":"night"):"morning";
     setMode(restored?.mode||fallbackMode);
     setDoneSteps(new Set(restored?.doneSteps||[]));
-    setActiveIdx(null);setStarted(false);setShowComplete(false);clearWaitState();
+    setSkippedSteps(new Set(restored?.skippedSteps||[]));
+    setActiveIdx(null);setStarted(!!((restored?.doneSteps||[]).length||(restored?.skippedSteps||[]).length));setShowComplete(false);clearWaitState();
     await dbMigrateLegacyPhotos(p.id);
     const pPhotos=await dbGetPhotos();
     setPhotos(pPhotos||[]);
@@ -4085,6 +4139,7 @@ function App(){
   const [phase,setPhase]=React.useState(()=>parseInt(ls("kb_phase","2")));
   const [activeIdx,setActiveIdx]=React.useState(null);
   const [doneSteps,setDoneSteps]=React.useState(()=>_restored?new Set(_restored.doneSteps):new Set());
+  const [skippedSteps,setSkippedSteps]=React.useState(()=>_restored?new Set(_restored.skippedSteps||[]):new Set());
   const [showComplete,setShowComplete]=React.useState(false);
   // Estado persistente: qué rutinas de HOY ya están terminadas (con hora).
   const [completionsToday,setCompletionsToday]=React.useState(()=>getTodayCompletions());
@@ -4093,13 +4148,13 @@ function App(){
     if(!confirm("¿Marcar esta rutina como NO completada y volver a hacerla?"))return;
     unmarkRoutineCompletedToday(modeToUndo);
     refreshCompletions();
-    setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();
+    setDoneSteps(new Set());setSkippedSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();
   }
   const [showCamera,setShowCamera]=React.useState(false);
   const [history,setHistory]=React.useState(()=>ls("kb_history",[]));
   const [diary,setDiary]=React.useState(()=>ls("kb_diary",[]));
   const [photos,setPhotos]=React.useState([]);
-  const [started,setStarted]=React.useState(false);
+  const [started,setStarted]=React.useState(()=>!!((_restored?.doneSteps||[]).length||(_restored?.skippedSteps||[]).length));
   const [showSettings,setShowSettings]=React.useState(false);
   const [hasUpdate,setHasUpdate]=React.useState(false);
   const [updateDismissed,setUpdateDismissed]=React.useState(false);
@@ -4184,7 +4239,7 @@ function App(){
   },[]);
   const recapStats=React.useMemo(()=>showRecap?computeWeekStats(history,diary,ROUTINES):null,[showRecap,history,diary]);
   function handleCloseRecap(){markRecapShown();setShowRecap(false);}
-  function handleExpressChange(v){setExpressMode(v);lsSet("kb_express_mode",v);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();haptic("light");}
+  function handleExpressChange(v){setExpressMode(v);lsSet("kb_express_mode",v);setDoneSteps(new Set());setSkippedSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();haptic("light");}
 
   async function handleBackupExport(){
     try{await exportAllData();}catch(_){}
@@ -4244,23 +4299,35 @@ function App(){
   },[baseRoutine,expressMode,profile,mode]);
   const streak=getStreak(history);
   const completedCount=routine.steps.filter(s=>doneSteps.has(s.id)).length;
+  const skippedCount=routine.steps.filter(s=>skippedSteps.has(s.id)).length;
   const completedMin=routine.steps.filter(s=>doneSteps.has(s.id)).reduce((a,s)=>a+s.min,0);
-  const isFinished=completedCount===routine.steps.length&&routine.steps.length>0;
+  const isFinished=completedCount+skippedCount===routine.steps.length&&routine.steps.length>0;
 
-  function handleSetMode(m){setMode(m);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();}
-  React.useEffect(()=>{saveRoutineProgress(mode,doneSteps);},[mode,doneSteps]);
-  React.useEffect(()=>{setDoneSteps(new Set());setActiveIdx(null);setStarted(false);},[mode]);
+  function handleSetMode(m){setMode(m);setDoneSteps(new Set());setSkippedSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();}
+  React.useEffect(()=>{saveRoutineProgress(mode,doneSteps,skippedSteps);},[mode,doneSteps,skippedSteps]);
 
-  function stepState(s,i){return doneSteps.has(s.id)?"done":i===activeIdx?"active":"pending";}
+  function stepState(s,i){return doneSteps.has(s.id)?"done":skippedSteps.has(s.id)?"skipped":i===activeIdx?"active":"pending";}
+
+  function handleStartRoutine(){
+    const nextIdx=routine.steps.findIndex(s=>!doneSteps.has(s.id)&&!skippedSteps.has(s.id));
+    if(nextIdx===-1){setShowComplete(true);return;}
+    setStarted(true);setActiveIdx(nextIdx);haptic("light");
+  }
+  function handleUseNonRetinal(){handleSetMode("night");haptic("light");}
 
   function handleTap(i){
     if(!started)setStarted(true);
+    const id=routine.steps[i]?.id;
+    if(id&&skippedSteps.has(id)){
+      const next=new Set(skippedSteps);next.delete(id);setSkippedSteps(next);
+    }
     setActiveIdx(i);
   }
 
   function handleComplete(s,i){
     haptic("medium");
     const next=new Set(doneSteps);next.add(s.id);setDoneSteps(next);
+    if(skippedSteps.has(s.id)){const restored=new Set(skippedSteps);restored.delete(s.id);setSkippedSteps(restored);}
     // Si el paso requiere espera antes del próximo, abre el WaitGate
     if(s.wait&&s.wait>0){
       const total=s.wait*60;
@@ -4276,14 +4343,14 @@ function App(){
       saveWaitState({afterIdx:i,total,endTime:end,running:true,remaining:total,mode,hint:s.waitHint||"",why:s.waitWhy||""});
       return;
     }
-    const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!next.has(st.id));
+    const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!next.has(st.id)&&!skippedSteps.has(st.id));
     if(nextIdx===-1){setActiveIdx(null);setTimeout(()=>setShowComplete(true),350);}
     else setActiveIdx(nextIdx);
   }
   function advancePastWait(){
     const i=waitingAfterIdx;
     setWaitingAfterIdx(null);setWaitSecs(0);setWaitTotal(0);setWaitEndTime(null);clearWaitState();
-    const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!doneSteps.has(st.id));
+    const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!doneSteps.has(st.id)&&!skippedSteps.has(st.id));
     if(nextIdx===-1){setTimeout(()=>setShowComplete(true),350);}
     else setActiveIdx(nextIdx);
   }
@@ -4334,14 +4401,18 @@ function App(){
   },[mode]);
 
   function handleSkip(s,i){
-    const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!doneSteps.has(st.id));
-    setActiveIdx(nextIdx===-1?null:nextIdx);
+    if(s.critical&&!confirm("Este es un paso importante. Si lo omites, la rutina quedará registrada como parcial. ¿Quieres omitirlo hoy?"))return;
+    haptic("light");
+    const nextSkipped=new Set(skippedSteps);nextSkipped.add(s.id);setSkippedSteps(nextSkipped);
+    const nextIdx=routine.steps.findIndex((st,ii)=>ii>i&&!doneSteps.has(st.id)&&!nextSkipped.has(st.id));
+    if(nextIdx===-1){setActiveIdx(null);setTimeout(()=>setShowComplete(true),250);}
+    else setActiveIdx(nextIdx);
   }
 
   function handleCompleteClose(mood,note,wellness){
     const rKey=mode==="morning"?"morning":mode==="nightRetinal"?"pm_retinal":"pm_normal";
     const today=todayStr();
-    const session={date:today,time:new Date().toTimeString().slice(0,5),routine:rKey,steps:completedCount};
+    const session={date:today,time:new Date().toTimeString().slice(0,5),routine:rKey,steps:completedCount,skipped:[...skippedSteps],partial:skippedCount>0};
     const newH=[...history,session];
     setHistory(newH);lsSet("kb_history",newH);
     const w=wellness||{};
@@ -4353,7 +4424,7 @@ function App(){
     }
     // Marca la rutina del modo actual como completada HOY (persiste hasta el próximo día).
     markRoutineCompletedToday(mode);refreshCompletions();
-    setShowComplete(false);setDoneSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();
+    setShowComplete(false);setDoneSteps(new Set());setSkippedSteps(new Set());setActiveIdx(null);setStarted(false);clearRoutineProgress();
   }
 
   function handlePhotoSave(entry){
@@ -4362,7 +4433,7 @@ function App(){
 
   return<div style={{width:"100%",height:"100%",background:P.bg,position:"relative",overflow:"hidden"}}>
     <div style={{height:"100%",overflowY:"auto",paddingBottom:110,WebkitOverflowScrolling:"touch"}}>
-      {tab==="today"&&<TodayScreen mode={mode} setMode={handleSetMode} routine={routine} stepState={stepState} onTap={handleTap} onComplete={handleComplete} onSkip={handleSkip} completedCount={completedCount} completedMin={completedMin} isFinished={isFinished} onShowComplete={()=>setShowComplete(true)} streak={streak} phase={phase} doneSteps={doneSteps} onOpenSettings={()=>setShowSettings(true)} onIngredient={setActiveIngredient} onOpenProduct={openStepProduct} backupReminderOpen={backupReminderOpen} onBackupExport={handleBackupExport} onBackupDismiss={handleBackupDismiss} expressMode={expressMode} onExpressChange={handleExpressChange} waitingAfterIdx={waitingAfterIdx} waitTotal={waitTotal} waitSecs={waitSecs} waitRunning={waitRunning} waitHint={waitHint} waitWhy={waitWhy} onToggleWait={handleToggleWait} onSkipWait={handleSkipWait} profileName={profileName} profileSex={profileSex} profile={profile} onSwitchProfile={handleOpenProfileSwitcher} completionsToday={completionsToday} onUndoCompletion={handleUndoCompletionFor} onOpenBackfill={()=>setShowBackfill(true)}/>}
+      {tab==="today"&&<TodayScreen mode={mode} setMode={handleSetMode} routine={routine} stepState={stepState} onTap={handleTap} onComplete={handleComplete} onSkip={handleSkip} completedCount={completedCount} completedMin={completedMin} skippedCount={skippedCount} isFinished={isFinished} onShowComplete={()=>setShowComplete(true)} streak={streak} phase={phase} doneSteps={doneSteps} skippedSteps={skippedSteps} started={started} onStartRoutine={handleStartRoutine} onUseNonRetinal={handleUseNonRetinal} onOpenSettings={()=>setShowSettings(true)} onIngredient={setActiveIngredient} onOpenProduct={openStepProduct} backupReminderOpen={backupReminderOpen} onBackupExport={handleBackupExport} onBackupDismiss={handleBackupDismiss} expressMode={expressMode} onExpressChange={handleExpressChange} waitingAfterIdx={waitingAfterIdx} waitTotal={waitTotal} waitSecs={waitSecs} waitRunning={waitRunning} waitHint={waitHint} waitWhy={waitWhy} onToggleWait={handleToggleWait} onSkipWait={handleSkipWait} profileName={profileName} profileSex={profileSex} profile={profile} onSwitchProfile={handleOpenProfileSwitcher} completionsToday={completionsToday} onUndoCompletion={handleUndoCompletionFor} onOpenBackfill={()=>setShowBackfill(true)}/>}
       {tab==="history"&&<HistoryScreen history={history} streak={streak} phase={phase} profileName={profileName}/>}
       {tab==="diary"&&<DiaryScreen history={history} diary={diary} photos={photos} onAddPhoto={()=>setShowCamera(true)} onImportPhotos={()=>setShowImport(true)} onOpenJourney={()=>setShowJourney(true)} onOpenPhoto={setViewerPhoto}/>}
       {tab==="progress"&&<ProgressScreen history={history} streak={streak}/>}
@@ -4381,7 +4452,7 @@ function App(){
     {showYearWrapped&&yearStats&&<YearWrappedSheet stats={yearStats} onClose={handleCloseYearWrapped} profileName={profileName}/>}
     {showJourney&&<SkinJourneySheet photos={photos} onClose={()=>setShowJourney(false)} onOpenPhoto={setViewerPhoto}/>}
     {viewerPhoto&&<PhotoViewer photo={viewerPhoto} onClose={()=>setViewerPhoto(null)} onDelete={handlePhotoDeleted} allPhotos={photos}/>}
-    {showComplete&&<CompleteSheet stats={{completed:completedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose} profileName={profileName} mode={mode}/>}
+    {showComplete&&<CompleteSheet stats={{completed:completedCount,skipped:skippedCount,total:routine.steps.length,minutes:Math.round(completedMin),streak}} onPhoto={()=>setShowCamera(true)} onClose={handleCompleteClose} profileName={profileName} mode={mode}/>}
     {(!profile||showProfileModal)&&<ProfileSetupModal onPick={handleProfilePick} onCancel={profile?()=>setShowProfileModal(false):null}/>}
     {showCamera&&<PhotoCapture onClose={()=>setShowCamera(false)} onSave={handlePhotoSave}/>}
   </div>;
